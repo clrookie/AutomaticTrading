@@ -5,7 +5,7 @@ import time
 import yaml
 import schedule
 
-#git
+#git git git
 
 with open('config.yaml', encoding='UTF-8') as f:
     _cfg = yaml.load(f, Loader=yaml.FullLoader)
