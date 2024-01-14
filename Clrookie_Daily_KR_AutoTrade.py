@@ -5,6 +5,8 @@ import time
 import yaml
 import schedule
 
+#git
+
 with open('config.yaml', encoding='UTF-8') as f:
     _cfg = yaml.load(f, Loader=yaml.FullLoader)
 APP_KEY = _cfg['APP_KEY']
