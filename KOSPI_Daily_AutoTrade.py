@@ -280,7 +280,8 @@ ACCESS_TOKEN = get_access_token() # 정의 순서(위치) 중요
 
 def AutomaticTrading():
     try:
-        # symbol_list = ["122630","252670"] # 매수종목 (KODEX 레버리지, KODEX 200선물인버스2X)
+        # 매수종목 (KODEX 레버리지, KODEX 200선물인버스2X, 코스닥150레버리지, 코스닥150선물인버스)
+        # symbol_list = ["122630","252670"] 
         symbol_list = ["003490","034220"] # 매수종목 (대한항공, LG디스플레이)
         bought_list = [] # 매수 리스트
 
