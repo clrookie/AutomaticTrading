@@ -9,6 +9,7 @@ period = 200
 print("원금: ", principal)
 print("수익률: ", rate)
 print("=====")
+print("  ")
 
 result = 0
 for i in range(period):
