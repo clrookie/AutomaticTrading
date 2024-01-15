@@ -295,9 +295,6 @@ def AutomaticTrading():
         buy_amount = total_cash * buy_percent  # 종목별 주문 금액 계산
         soldout = False
 
-        for sym, qty in stock_dict.items():
-            sell(sym, qty)
-
         send_message("===국내주식 자동매매를 시작합니다===")
         while True:
             t_now = datetime.datetime.now()
