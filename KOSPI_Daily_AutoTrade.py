@@ -279,12 +279,12 @@ def AutomaticTrading():
     try:
         # 매수종목 (KODEX 레버리지, KODEX 200선물인버스2X, 코스닥150레버리지, 코스닥150선물인버스)
         # symbol_list = ["122630","252670"] 
-        symbol_list = ["003490","034220"] # 매수종목 (대한항공, LG디스플레이)
+        symbol_list = ["003490","034220","124560","084680"] # 매수종목(대한항공, LG디스플레이,태웅로직스,이월드)
         bought_list = [] # 매수 리스트
         selldone_list = [] # 중간매매 완료 리스트
         
         # 1.2% 매매 (박리다익으로 확률을 높인다)
-        profit_rate = 1.012
+        profit_rate = 1.015
 
         total_cash = get_balance() # 보유 현금 조회
         stock_dict = get_stock_balance() # 보유 주식 조회
