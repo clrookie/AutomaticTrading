@@ -24,7 +24,7 @@ def sell(code="005930", qty="1"):
 
 def AAA():
     # symbol_list = ["122630","252670"] # 매수종목 (KODEX 레버리지, KODEX 200선물인버스2X)
-    symbol_list = ["003490","034220"] # 매수종목 (대한항공, LG디스플레이)
+    symbol_list = ["003490","034220","034220","034220","034220","034220"] # 매수종목 (대한항공, LG디스플레이)
     bought_list = [] # 매수 리스트
 
     selldone_list = [] # 중간매매 완료 리스트
@@ -34,8 +34,8 @@ def AAA():
 
     total_cash = 60000 # 보유 현금 조회
 
-    target_buy_count = 2 # 매수할 종목 수
-    buy_percent = 0.5 # 종목당 매수 금액 비율
+    target_buy_count = int(len(symbol_list)) # 매수할 종목 수
+    buy_percent = 1 / target_buy_count # 종목당 매수 금액 비율
     buy_amount = total_cash * buy_percent  # 종목별 주문 금액 계산
     soldout = False
     stock_dict = {"1"}
