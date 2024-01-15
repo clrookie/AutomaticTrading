@@ -9,6 +9,19 @@ import schedule
 
 print("===국내주식 자동매매를 시작합니다===")
 
+def sell(code="005930", qty="1"):
+    """주식 시장가 매도"""
+    data = {
+        "CANO": "01",
+        "ACNT_PRDT_CD": "01",
+        "PDNO": code,
+        "ORD_DVSN": "01",
+        "ORD_QTY": qty,
+        "ORD_UNPR": "0",
+    }
+
+    return data
+
 def AAA():
     # symbol_list = ["122630","252670"] # 매수종목 (KODEX 레버리지, KODEX 200선물인버스2X)
     symbol_list = ["003490","034220"] # 매수종목 (대한항공, LG디스플레이)
@@ -25,13 +38,14 @@ def AAA():
     buy_percent = 0.5 # 종목당 매수 금액 비율
     buy_amount = total_cash * buy_percent  # 종목별 주문 금액 계산
     soldout = False
+    stock_dict = {"1"}
 
     while True:
         t_now = datetime.datetime.now()
-        t_9 = t_now.replace(hour=15, minute=0, second=0, microsecond=0)
-        t_start = t_now.replace(hour=15, minute=43, second=0, microsecond=0)
-        t_sell = t_now.replace(hour=16, minute=58, second=0, microsecond=0)
-        t_exit = t_now.replace(hour=16, minute=59, second=0,microsecond=0)
+        t_9 = t_now.replace(hour=0, minute=0, second=0, microsecond=0)
+        t_start = t_now.replace(hour=0, minute=0, second=0, microsecond=0)
+        t_sell = t_now.replace(hour=23, minute=58, second=0, microsecond=0)
+        t_exit = t_now.replace(hour=23, minute=59, second=0,microsecond=0)
         if t_9 < t_now < t_start and soldout == False: # 잔여 수량 매도
             for sym in symbol_list:
                 print(f"{sym} 전량 매도")
@@ -53,6 +67,7 @@ def AAA():
                     
                     #익절매
                     if ((target_price*profit_rate) < current_price):
+                        sell("00",stock_dict)
                         print(f"{sym} 익절매 실현 ^^ ")
                         selldone_list.append(sym)
                         continue
@@ -74,7 +89,7 @@ def AAA():
                 time.sleep(1)
 
             if len(selldone_list) == target_buy_count:
-                print("{selldone_list} 다팔았기에 while문을 빠져나옵니다.")
+                print(f"{selldone_list} 다팔았기에 while문을 빠져나옵니다.")
                 break
 
         if t_sell < t_now < t_exit:  # PM 03:15 ~ PM 03:20 : 일괄 매도
@@ -89,7 +104,7 @@ def AAA():
             break
 
 
-schedule.every(10).seconds.do(AAA) 
+schedule.every(1).seconds.do(AAA) 
 # schedule.every(10).seconds.do(AutomaticTrading) # 테스트용 코드
 
 # 자동매매 스케쥴 시작
