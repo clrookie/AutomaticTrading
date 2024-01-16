@@ -315,6 +315,7 @@ def AutomaticTrading():
             if t_start < t_now < t_sell :  # AM 09:00 ~ PM 03:18 : 매수
                 for sym in symbol_list:
 
+                    time.sleep(1) # 너무 자주 호출되서 오류 뜨는 듯.. 빈도수 완화
                     target_price = get_target_price(sym)
                     current_price = get_current_price(sym)
 
