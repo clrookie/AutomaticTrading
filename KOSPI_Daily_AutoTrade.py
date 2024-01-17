@@ -277,6 +277,10 @@ def sell(code="005930", qty="1"):
 
 def AutomaticTrading():
     try:
+        
+        # 1회 토큰세팅
+        ACCESS_TOKEN = get_access_token() # 정의 순서(위치) 중요
+        
         # 매수종목 (KODEX 레버리지, KODEX 200선물인버스2X, 코스닥150레버리지, 코스닥150선물인버스)
         # symbol_list = ["122630","252670"] 
         symbol_list = ["003490","034220","124560","084680"] # 매수종목(대한항공, LG디스플레이,태웅로직스,이월드)
@@ -284,7 +288,7 @@ def AutomaticTrading():
         selldone_list = [] # 중간매매 완료 리스트
         
         # 1.2% 매매 (박리다익으로 확률을 높인다)
-        profit_rate = 1.015
+        profit_rate = 1.012
 
         total_cash = get_balance() # 보유 현금 조회
         stock_dict = get_stock_balance() # 보유 주식 조회
@@ -313,9 +317,10 @@ def AutomaticTrading():
                 bought_list = []
                 stock_dict = get_stock_balance()
             if t_start < t_now < t_sell :  # AM 09:00 ~ PM 03:18 : 매수
+               
+                time.sleep(10) # 
+                
                 for sym in symbol_list:
-
-                    time.sleep(1) # 너무 자주 호출되서 오류 뜨는 듯.. 빈도수 완화
                     target_price = get_target_price(sym)
                     current_price = get_current_price(sym)
 
@@ -356,7 +361,6 @@ def AutomaticTrading():
                             if buy(sym, buy_qty):
                                 bought_list.append(sym)
                                 get_stock_balance()
-                    time.sleep(1)
 
                 if len(selldone_list) == target_buy_count:
                     send_message("익/손절매 전량매도로 종료합니다.")
@@ -365,7 +369,6 @@ def AutomaticTrading():
                     stock_dict = get_stock_balance()
                     break
 
-                time.sleep(1)
                 if t_now.minute == 30 and t_now.second <= 5: 
                     get_stock_balance()
                     time.sleep(5)
@@ -383,12 +386,8 @@ def AutomaticTrading():
         send_message(f"[오류 발생]{e}")
         time.sleep(1)
 
-# 1회 토큰세팅
-ACCESS_TOKEN = get_access_token() # 정의 순서(위치) 중요
-
 # 매일 8시55분 마다 데일리 실행
 schedule.every().day.at("08:59").do(AutomaticTrading) 
-# schedule.every(10).seconds.do(AutomaticTrading) # 테스트용 코드
 
 # 자동매매 스케쥴 시작
 while True:
