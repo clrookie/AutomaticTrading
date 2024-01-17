@@ -341,10 +341,15 @@ def AutomaticTrading():
                                         continue
                             
                         #손절
-                        if(get_stck_oprc(sym) > current_price): #오늘 시가 보다 떨어지면                    
+                        stck_oprc = get_stck_oprc(sym)
+                        if(stck_oprc > current_price): #오늘 시가 보다 떨어지면                    
+                            send_message("손절1/4")
                             for symtemp, qty in stock_dict.items():
+                                send_message("손절2/4")
                                 if sym == symtemp :
+                                    send_message("손절3/4")
                                     if sell(sym, qty):
+                                        send_message("손절4/4")
                                         send_message(f"{sym} ({get_stck_oprc(sym)} > {current_price}) 시가에서 손절합니다. ㅠ ")
                                         selldone_list.append(sym)
                                         get_stock_balance()
