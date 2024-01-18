@@ -3,7 +3,6 @@ import json
 import datetime
 import time
 import yaml
-import schedule
 
 #git git git
 
