@@ -282,7 +282,7 @@ def AutomaticTrading():
         endoncebyday = False
        
 
-        send_message("=== 국내주식 자동매매를 시작합니다 ===")
+        send_message("=== 자동매매를 구동합니다 ===")
 
         while True:
             today = datetime.datetime.today().weekday()
@@ -290,7 +290,7 @@ def AutomaticTrading():
 
             if today == 5 or today == 6:  # 토,일 자동종료
                 if holiday == False:
-                    send_message("주말이라 쉽니다.")
+                    send_message("주말이라 쉽니다~")
                     holiday = True
                 continue
             else:
@@ -302,6 +302,7 @@ def AutomaticTrading():
                 t_exit = t_now.replace(hour=15, minute=19, second=50,microsecond=0)
                 
                 if t_9 < t_now < t_start and startoncebyday == False: # 매매 준비
+                    send_message("=== 데일리 매매를 준비합니다 ===")
                     startoncebyday = True
                     endoncebyday = False
                     holiday = False
@@ -336,9 +337,10 @@ def AutomaticTrading():
                         endoncebyday = True
                         startoncebyday = False
 
-                        send_message("익/손절매 전량매도로 종료합니다.")
                         bought_list = []
                         get_stock_balance()
+                        
+                        send_message("=== 익/손절매 전량매도로 매매를 종료합니다 ===")
                         continue
 
                     for sym in symbol_list:
@@ -357,7 +359,7 @@ def AutomaticTrading():
                                 for symtemp, qty in stock_dict.items():
                                     if sym == symtemp:
                                         if sell(sym, qty):
-                                            send_message(f"{sym} ({target_price*profit_rate} < {current_price}) {profit_rate}% 익절합니다. ^^ ")
+                                            send_message(f"{sym} ({target_price*profit_rate} < {current_price}) {profit_rate}% 익절합니다 ^^ ")
                                             selldone_list.append(sym)
                                             get_stock_balance()
                                             continue
@@ -369,7 +371,7 @@ def AutomaticTrading():
                                 for symtemp, qty in stock_dict.items():
                                     if sym == symtemp:
                                         if sell(sym, qty):
-                                            send_message(f"{sym} ({get_stck_oprc(sym)} > {current_price}) 시가에서 손절합니다. ㅠ ")
+                                            send_message(f"{sym} ({get_stck_oprc(sym)} > {current_price}) 시가에서 손절합니다 ㅠ ")
                                             selldone_list.append(sym)
                                             get_stock_balance()
                                             continue
@@ -381,7 +383,7 @@ def AutomaticTrading():
                             buy_qty = 0  # 매수할 수량 초기화
                             buy_qty = int(buy_amount // current_price)
                             if buy_qty > 0:
-                                send_message(f"{sym} 목표가 달성({target_price} < {current_price})으로 매수합니다.")
+                                send_message(f"{sym} 목표가 달성({target_price} < {current_price})으로 매수합니다~")
                                 if buy(sym, buy_qty):
                                     bought_list.append(sym)
                                     get_stock_balance()
@@ -396,12 +398,13 @@ def AutomaticTrading():
                     endoncebyday = True
                     startoncebyday = False
 
-                    send_message("=== 데일리 매매를 종료합니다 ===")
                     stock_dict = get_stock_balance()
                     for sym, qty in stock_dict.items():
                         sell(sym, qty)
                     bought_list = []
                     stock_dict = get_stock_balance()
+                    
+                    send_message("=== 데일리 매매를 종료합니다 ===")
                     continue
     except Exception as e:
         send_message(f"[오류 발생]{e}")

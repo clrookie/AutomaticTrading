@@ -282,7 +282,7 @@ def AutomaticTrading():
         endoncebyday = False
        
 
-        send_message("=== 국내주식 자동매매를 시작합니다 ===")
+        send_message("=== 자동매매를 구동합니다 ===")
 
         while True:
             today = datetime.datetime.today().weekday()
@@ -302,6 +302,8 @@ def AutomaticTrading():
                 t_exit = t_now.replace(hour=20, minute=34, second=1,microsecond=0)
                 
                 if t_9 < t_now < t_start and startoncebyday == False: # 매매 준비
+                    
+                    send_message("=== 데일리 매매를 준비합니다 ===")
                     startoncebyday = True
                     endoncebyday = False
                     holiday = False
@@ -336,7 +338,7 @@ def AutomaticTrading():
                         endoncebyday = True
                         startoncebyday = False
 
-                        send_message("익/손절매 전량매도로 종료합니다.")
+                        send_message("=== 익/손절매 전량매도로 매매를 종료합니다 ===")
  
                         continue
 
