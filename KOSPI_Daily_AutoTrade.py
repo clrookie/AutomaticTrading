@@ -274,12 +274,10 @@ def sell(code="005930", qty="1"):
         return False
     
 
-# def AutomaticTrading():
-    
+# 자동 매매 코드
 try:        
     holiday = False
     startoncebyday = False
-    endoncebyday = False
     
     send_message("=== 자동매매를 구동합니다 ===")
 
@@ -302,7 +300,6 @@ try:
                 send_message("=== 데일리 매매를 준비합니다 ===")
                 
                 startoncebyday = True
-                endoncebyday = False
                 holiday = False
 
                 # 토큰 세팅
@@ -334,10 +331,9 @@ try:
                 time.sleep(1)
                 get_stock_balance() # 보유 주식 조회
 
-            if t_start < t_now < t_exit and endoncebyday == False:  # AM 09:00 ~ PM 03:18 : 매수
+            if t_start < t_now < t_exit and startoncebyday == True:  # AM 09:00 ~ PM 03:18 : 매수
                 
                 if len(selldone_list) == target_buy_count:
-                    endoncebyday = True
                     startoncebyday = False
 
                     bought_list = []
@@ -397,8 +393,7 @@ try:
                 
                 time.sleep(60) # 1분 주기 모니터링
 
-            if t_exit < t_now and endoncebyday == False:  # PM 03:19 ~ : 데일리 프로그램 종료
-                endoncebyday = True
+            if t_exit < t_now and startoncebyday == True:  # PM 03:19 ~ : 데일리 프로그램 종료
                 startoncebyday = False
 
                 stock_dict = get_stock_balance()
@@ -413,6 +408,4 @@ except Exception as e:
     send_message(f"[오류 발생]{e}")
     time.sleep(1)
 
-# 자동 매매
-# AutomaticTrading()
 
