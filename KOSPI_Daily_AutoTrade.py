@@ -304,6 +304,7 @@ def AutomaticTrading():
                 if t_9 < t_now < t_start and startoncebyday == False: # 매매 준비
                     startoncebyday = True
                     endoncebyday = False
+                    holiday = False
 
                     # 매수종목 (KODEX 레버리지, KODEX 200선물인버스2X, 코스닥150레버리지, 코스닥150선물인버스)
                     # symbol_list = ["122630","252670"] 
@@ -327,7 +328,7 @@ def AutomaticTrading():
                         sell(sym, qty)
                         
                     bought_list = []
-                    stock_dict = get_stock_balance() # 보유 주식 조회
+                    get_stock_balance() # 보유 주식 조회
 
                 if t_start < t_now < t_sell and endoncebyday == False:  # AM 09:00 ~ PM 03:18 : 매수
                     
@@ -337,7 +338,7 @@ def AutomaticTrading():
 
                         send_message("익/손절매 전량매도로 종료합니다.")
                         bought_list = []
-                        stock_dict = get_stock_balance()
+                        get_stock_balance()
                         continue
 
                     for sym in symbol_list:
