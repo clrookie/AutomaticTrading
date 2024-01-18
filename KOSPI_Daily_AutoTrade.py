@@ -276,125 +276,140 @@ def sell(code="005930", qty="1"):
     
 
 def AutomaticTrading():
-    try:
-        
-        # 1회 토큰세팅
-        ACCESS_TOKEN = get_access_token() # 정의 순서(위치) 중요
-        
-        # 매수종목 (KODEX 레버리지, KODEX 200선물인버스2X, 코스닥150레버리지, 코스닥150선물인버스)
-        # symbol_list = ["122630","252670"] 
-        symbol_list = ["003490","034220","124560","084680"] # 매수종목(대한항공, LG디스플레이,태웅로직스,이월드)
-        bought_list = [] # 매수 리스트
-        selldone_list = [] # 중간매매 완료 리스트
-        
-        # 1.2% 매매 (박리다익으로 확률을 높인다)
-        profit_rate = 1.012
+    try:        
+        holiday = False
+        startoncebyday = False
+        endoncebyday = False
+       
 
-        total_cash = get_balance() # 보유 현금 조회
-        stock_dict = get_stock_balance() # 보유 주식 조회
-        for sym in stock_dict.keys():
-            bought_list.append(sym)
-        target_buy_count = int(len(symbol_list)) # 매수할 종목 수
-        buy_percent = 1 / target_buy_count # 종목당 매수 금액 비율
-        buy_amount = total_cash * buy_percent  # 종목별 주문 금액 계산
-        soldout = False
+        send_message("=== 국내주식 자동매매를 시작합니다 ===")
 
-        send_message("===국내주식 자동매매를 시작합니다===")
         while True:
-            t_now = datetime.datetime.now()
-            t_9 = t_now.replace(hour=9, minute=0, second=0, microsecond=0)
-            t_start = t_now.replace(hour=9, minute=0, second=1, microsecond=0)
-            t_sell = t_now.replace(hour=15, minute=19, second=0, microsecond=0)
-            t_exit = t_now.replace(hour=15, minute=19, second=1,microsecond=0)
             today = datetime.datetime.today().weekday()
-            if today == 5 or today == 6:  # 토요일이나 일요일이면 자동 종료
-                send_message("주말이므로 프로그램을 종료합니다.")
-                break
-            if t_9 < t_now < t_start and soldout == False: # 잔여 수량 매도
-                for sym, qty in stock_dict.items():
-                    sell(sym, qty)
-                soldout = True
-                bought_list = []
-                stock_dict = get_stock_balance()
-            if t_start < t_now < t_sell :  # AM 09:00 ~ PM 03:18 : 매수
-               
-                time.sleep(10) # 
+            
+
+            if today == 5 or today == 6:  # 토,일 자동종료
+                if holiday == False:
+                    send_message("주말이라 쉽니다.")
+                    holiday = True
+                continue
+            else:
+                t_now = datetime.datetime.now()
+
+                t_9 = t_now.replace(hour=9, minute=0, second=0, microsecond=0)
+                t_start = t_now.replace(hour=9, minute=0, second=1, microsecond=0)
+                t_sell = t_now.replace(hour=15, minute=19, second=0, microsecond=0)
+                t_exit = t_now.replace(hour=15, minute=19, second=50,microsecond=0)
                 
-                for sym in symbol_list:
-                    target_price = get_target_price(sym)
-                    current_price = get_current_price(sym)
+                if t_9 < t_now < t_start and startoncebyday == False: # 매매 준비
+                    startoncebyday = True
+                    endoncebyday = False
 
-                    if sym in bought_list: #매수한 종목 -> 익절 or 손절 처리만
-                        
-                        #이미 익절 or 손절 했으면 패스
-                        if (sym in selldone_list):
-                            continue
-                        
-                        #익절
-                        if ((target_price*profit_rate) < current_price):
-                            for symtemp, qty in stock_dict.items():
-                                if sym == symtemp :
-                                    if sell(sym, qty):
-                                        send_message(f"{sym} ({target_price*profit_rate} < {current_price}) {profit_rate}% 익절합니다. ^^ ")
-                                        selldone_list.append(sym)
-                                        get_stock_balance()
-                                        continue
-                            
-                        #손절
-                        stck_oprc = get_stck_oprc(sym)
-                        if(stck_oprc > current_price): #오늘 시가 보다 떨어지면                    
-                            send_message("손절1/4")
-                            for symtemp, qty in stock_dict.items():
-                                send_message("손절2/4")
-                                if sym == symtemp :
-                                    send_message("손절3/4")
-                                    if sell(sym, qty):
-                                        send_message("손절4/4")
-                                        send_message(f"{sym} ({get_stck_oprc(sym)} > {current_price}) 시가에서 손절합니다. ㅠ ")
-                                        selldone_list.append(sym)
-                                        get_stock_balance()
-                                        continue
-                        
-                        continue # 종목 이미 샀거나, 이후 익/손절매 했으면 패스
+                    # 매수종목 (KODEX 레버리지, KODEX 200선물인버스2X, 코스닥150레버리지, 코스닥150선물인버스)
+                    # symbol_list = ["122630","252670"] 
+                    symbol_list = ["003490","034220","124560","084680"] # 매수종목(대한항공, LG디스플레이,태웅로직스,이월드)
+                    bought_list = [] # 매수 리스트
+                    selldone_list = [] # 중간매매 완료 리스트
                     
-                    # 목표가에 달성했다면
-                    if target_price < current_price:
-                        buy_qty = 0  # 매수할 수량 초기화
-                        buy_qty = int(buy_amount // current_price)
-                        if buy_qty > 0:
-                            send_message(f"{sym} 목표가 달성({target_price} < {current_price})으로 매수합니다.")
-                            if buy(sym, buy_qty):
-                                bought_list.append(sym)
-                                get_stock_balance()
+                    # 1.2% 매매 (박리다익으로 확률을 높인다)
+                    profit_rate = 1.012
 
-                if len(selldone_list) == target_buy_count:
-                    send_message("익/손절매 전량매도로 종료합니다.")
-                    soldout = False
+                    total_cash = get_balance() # 보유 현금 조회
+                    stock_dict = get_stock_balance() # 보유 주식 조회
+                    for sym in stock_dict.keys():
+                        bought_list.append(sym)
+
+                    target_buy_count = int(len(symbol_list)) # 매수할 종목 수
+                    buy_percent = 1 / target_buy_count # 종목당 매수 금액 비율
+                    buy_amount = total_cash * buy_percent  # 종목별 주문 금액 계산
+
+                    for sym, qty in stock_dict.items(): 
+                        sell(sym, qty)
+                        
+                    bought_list = []
+                    stock_dict = get_stock_balance() # 보유 주식 조회
+
+                if t_start < t_now < t_sell and endoncebyday == False:  # AM 09:00 ~ PM 03:18 : 매수
+                    
+                    if len(selldone_list) == target_buy_count:
+                        endoncebyday = True
+                        startoncebyday = False
+
+                        send_message("익/손절매 전량매도로 종료합니다.")
+                        bought_list = []
+                        stock_dict = get_stock_balance()
+                        continue
+
+                    for sym in symbol_list:
+                        target_price = get_target_price(sym)
+                        current_price = get_current_price(sym)
+
+                        if sym in bought_list: #매수한 종목 -> 익절 or 손절 처리만
+                            
+                            #이미 익절 or 손절 했으면 패스
+                            if (sym in selldone_list):
+                                continue
+                            
+                            #익절
+                            if ((target_price*profit_rate) < current_price):
+                                stock_dict = get_stock_balance() # 보유주식 정보 최신화
+                                for symtemp, qty in stock_dict.items():
+                                    if sym == symtemp:
+                                        if sell(sym, qty):
+                                            send_message(f"{sym} ({target_price*profit_rate} < {current_price}) {profit_rate}% 익절합니다. ^^ ")
+                                            selldone_list.append(sym)
+                                            get_stock_balance()
+                                            continue
+                                
+                            #손절
+                            stck_oprc = get_stck_oprc(sym)
+                            if(stck_oprc > current_price): #오늘 시가 보다 떨어지면                    
+                                stock_dict = get_stock_balance() # 보유주식 정보 최신화
+                                for symtemp, qty in stock_dict.items():
+                                    if sym == symtemp:
+                                        if sell(sym, qty):
+                                            send_message(f"{sym} ({get_stck_oprc(sym)} > {current_price}) 시가에서 손절합니다. ㅠ ")
+                                            selldone_list.append(sym)
+                                            get_stock_balance()
+                                            continue
+                            
+                            continue # 종목 이미 샀거나, 이후 익/손절매 했으면 패스
+                        
+                        # 목표가에 달성했다면
+                        if target_price < current_price:
+                            buy_qty = 0  # 매수할 수량 초기화
+                            buy_qty = int(buy_amount // current_price)
+                            if buy_qty > 0:
+                                send_message(f"{sym} 목표가 달성({target_price} < {current_price})으로 매수합니다.")
+                                if buy(sym, buy_qty):
+                                    bought_list.append(sym)
+                                    get_stock_balance()
+
+                    if t_now.minute == 30 and t_now.second <= 5: 
+                        get_stock_balance()
+                        time.sleep(5)
+                    
+                    time.sleep(60) # 1분 주기 모니터링
+
+                if t_exit < t_now and endoncebyday == False:  # PM 03:19 ~ : 데일리 프로그램 종료
+                    endoncebyday = True
+                    startoncebyday = False
+
+                    send_message("=== 데일리 매매를 종료합니다 ===")
+                    stock_dict = get_stock_balance()
+                    for sym, qty in stock_dict.items():
+                        sell(sym, qty)
                     bought_list = []
                     stock_dict = get_stock_balance()
-                    break
-
-                if t_now.minute == 30 and t_now.second <= 5: 
-                    get_stock_balance()
-                    time.sleep(5)
-
-            if t_exit < t_now:  # PM 03:19 ~ : 데일리 프로그램 종료
-                send_message("장시간 마감으로 데일리 매매를 종료합니다.")
-                stock_dict = get_stock_balance()
-                for sym, qty in stock_dict.items():
-                    sell(sym, qty)
-                soldout = False
-                bought_list = []
-                stock_dict = get_stock_balance()
-                break
+                    continue
     except Exception as e:
         send_message(f"[오류 발생]{e}")
         time.sleep(1)
 
-# 매일 8시55분 마다 데일리 실행
-schedule.every().day.at("08:59").do(AutomaticTrading) 
 
-# 자동매매 스케쥴 시작
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+# 토큰 세팅
+ACCESS_TOKEN = get_access_token()
+
+# 자동 매매
+AutomaticTrading()
+
