@@ -1,9 +1,9 @@
 import schedule
 import time
 
-principal = 10000
+principal = 10
 
-rate = 1.01
+rate = 1.015
 period = 100
 
 print("원금: ", principal)

@@ -329,8 +329,8 @@ try:
                     
                 bought_list = []
 
-                time.sleep(1)
-                get_stock_balance() # 보유 주식 조회
+                time.sleep(0.1)
+                stock_dict = get_stock_balance() # 보유 주식 조회
 
             if t_start < t_now < t_exit and startoncebyday == True:  # AM 09:00 ~ PM 03:18 : 매수
                 
@@ -361,7 +361,8 @@ try:
                                     if sell(sym, qty):
                                         send_message(f"{sym} ({target_price*profit_rate} < {current_price}) {profit_rate}% 익절합니다 ^^ ")
                                         selldone_list.append(sym)
-                                        get_stock_balance()
+                                        time.sleep(0.1)
+                                        stock_dict= get_stock_balance()
                                         continue
                             
                         #손절
@@ -373,7 +374,8 @@ try:
                                     if sell(sym, qty):
                                         send_message(f"{sym} ({get_stck_oprc(sym)} > {current_price}) 시가에서 손절합니다 ㅠ ")
                                         selldone_list.append(sym)
-                                        get_stock_balance()
+                                        time.sleep(0.1)
+                                        stock_dict= get_stock_balance()
                                         continue
                         
                         continue # 종목 이미 샀거나, 이후 익/손절매 했으면 패스
@@ -386,21 +388,21 @@ try:
                             send_message(f"{sym} 목표가 달성({target_price} < {current_price})으로 매수합니다~")
                             if buy(sym, buy_qty):
                                 bought_list.append(sym)
-                                get_stock_balance()
+                                time.sleep(0.1)
+                                stock_dict= get_stock_balance()
 
                 if t_now.minute == 30 and t_now.second <= 5: 
                     get_stock_balance()
-                    time.sleep(5)
                 
-                time.sleep(60) # 1분 주기 모니터링
+                time.sleep(0.2) # 서비스 정책상 (1초 20건 한계)
 
             if t_exit < t_now and startoncebyday == True:  # PM 03:19 ~ : 데일리 프로그램 종료
                 startoncebyday = False
 
-                stock_dict = get_stock_balance()
                 for sym, qty in stock_dict.items():
                     sell(sym, qty)
                 bought_list = []
+                time.sleep(0.1)
                 stock_dict = get_stock_balance()
                 
                 send_message("=== 데일리 매매를 종료합니다 ===")
