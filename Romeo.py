@@ -395,7 +395,7 @@ try:
                     get_stock_balance()
                     time.sleep(5)
                 
-                time.sleep(0.2) # 서비스 정책상 (1초 20건 한계)
+                time.sleep(5) # 서비스 정책상 (1초 20건 한계)
 
             if t_exit < t_now and startoncebyday == True:  # PM 03:19 ~ : 데일리 프로그램 종료
                 startoncebyday = False
