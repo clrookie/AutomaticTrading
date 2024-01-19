@@ -6,6 +6,7 @@ import yaml
 
 #git git git
 
+
 with open('config.yaml', encoding='UTF-8') as f:
     _cfg = yaml.load(f, Loader=yaml.FullLoader)
 APP_KEY = _cfg['APP_KEY']
