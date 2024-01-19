@@ -359,7 +359,7 @@ try:
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
                                     if sell(sym, qty):
-                                        send_message(f"{sym} ({target_price*profit_rate} < {current_price}) {profit_rate}% 익절합니다 ^^ ")
+                                        send_message(f"{sym} ({target_price*profit_rate} < {current_price}) +{profit_rate}% 익절합니다 ^^ ")
                                         selldone_list.append(sym)
                                         time.sleep(0.1)
                                         stock_dict= get_stock_balance()
@@ -372,7 +372,7 @@ try:
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
                                     if sell(sym, qty):
-                                        send_message(f"{sym} ({get_stck_oprc(sym)} > {current_price}) 시가에서 손절합니다 ㅠ ")
+                                        send_message(f"{sym} ({get_stck_oprc(sym)} > {current_price}) -{round((get_stck_oprc(sym)/current_price),2)}% 손절합니다 ㅠ ")
                                         selldone_list.append(sym)
                                         time.sleep(0.1)
                                         stock_dict= get_stock_balance()
@@ -393,6 +393,7 @@ try:
 
                 if t_now.minute == 30 and t_now.second <= 5: 
                     get_stock_balance()
+                    time.sleep(5)
                 
                 time.sleep(0.2) # 서비스 정책상 (1초 20건 한계)
 
