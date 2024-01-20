@@ -167,7 +167,9 @@ def get_target_price_new(code="005930"): # 음봉 윗꼬리 평균 + 보정
     res = requests.get(URL, headers=headers, params=params)
 
     data_period = 30 # 최근 추출 기간
-    rate = 1.2 # 안정 상향 보정 비율
+    rate = 1.15 # 상향 보정 비율
+    cnt = 0 # 음봉 카운트
+
     target_price = 0 # 초기화
 
     for i in range(0,data_period):
@@ -179,7 +181,7 @@ def get_target_price_new(code="005930"): # 음봉 윗꼬리 평균 + 보정
         if stck_oprc >= stck_clpr : #음봉
             target_price += stck_hgpr - stck_oprc
 
-    target_price /= data_period # 평균
+    target_price /= cnt # 평균
     target_price *= rate
 
     return target_price
@@ -217,13 +219,9 @@ def get_stock_balance():
         if int(stock['hldg_qty']) > 0:
             stock_dict[stock['pdno']] = stock['hldg_qty']
             send_message(f"{stock['prdt_name']}({stock['pdno']}): {stock['hldg_qty']}주")
-            time.sleep(0.01)
     send_message(f"주식 평가 금액: {evaluation[0]['scts_evlu_amt']}원")
-    time.sleep(0.01)
     send_message(f"평가 손익 합계: {evaluation[0]['evlu_pfls_smtl_amt']}원")
-    time.sleep(0.01)
     send_message(f"총 평가 금액: {evaluation[0]['tot_evlu_amt']}원")
-    time.sleep(0.01)
     send_message(f"=================")
     return stock_dict
 
@@ -290,7 +288,7 @@ def sell(code="005930", qty="1"):
         "ACNT_PRDT_CD": ACNT_PRDT_CD,
         "PDNO": code,
         "ORD_DVSN": "01",
-        "ORD_QTY": qty,
+        "ORD_QTY": str(int(qty)),
         "ORD_UNPR": "0",
     }
     headers = {"Content-Type":"application/json", 
@@ -345,10 +343,23 @@ try:
                 # symbol_list = ["122630","252670"] 
                 symbol_list = ["003490","034220","124560","084680"] # 매수종목(대한항공, LG디스플레이,태웅로직스,이월드)
                 bought_list = [] # 매수 리스트
-                selldone_list = [] # 중간매매 완료 리스트
+                buyready = symbol_list
                 
-                # 1.2% 매매 (박리다익으로 확률을 높인다)
-                profit_rate = 1.012
+                # 분할매도
+                profit_rate07 = 1.007
+                profit_rate12 = 1.012
+                profit_rate17 = 1.017
+                profit_rate34 = 1.034
+
+                profit_rate07_up = True
+                profit_rate12_up = True
+                profit_rate17_up = True
+                profit_rate34_up = True
+
+                profit_rate07_down = False
+                profit_rate12_down = False
+                profit_rate17_down = False
+                profit_rate34_down = False
 
                 total_cash = get_balance() # 보유 현금 조회
                 stock_dict = get_stock_balance() # 보유 주식 조회
@@ -360,69 +371,131 @@ try:
                 buy_amount = total_cash * buy_percent  # 종목별 주문 금액 계산
 
                 for sym, qty in stock_dict.items(): 
-                    sell(sym, qty)
+                    sell(sym, int(qty))
                     
                 bought_list = []
 
                 time.sleep(0.1)
                 stock_dict = get_stock_balance() # 보유 주식 조회
 
-            if t_start < t_now < t_exit and startoncebyday == True:  # AM 09:00 ~ PM 03:18 : 매수
-                
-                if len(selldone_list) == target_buy_count:
-                    startoncebyday = False
-
-                    bought_list = []
-                    get_stock_balance()
-                    
-                    send_message("=== 익/손절매 전량매도로 매매를 종료합니다 ===")
-                    continue
+            if t_start < t_now < t_exit and startoncebyday == True:  # AM 09:00 ~ PM 03:20 : 매수
 
                 for sym in symbol_list:
                     target_price = get_target_price_new(sym)
                     current_price = get_current_price(sym)
 
-                    if sym in bought_list: #매수한 종목 -> 익절 or 손절 처리만
+                    if sym in bought_list: #매수종목 -> 익절 or 손절
                         
-                        #이미 익절 or 손절 했으면 패스
-                        if (sym in selldone_list):
-                            continue
-                        
+                        sell_fix = False
+                        #상향 익절
+                        if current_price > profit_rate34 and profit_rate34_up:
+                            profit_rate34 = 1.034
+                            profit_rate34_up = False
+
+                            profit_rate17_up = False
+                            profit_rate12_up = False
+                            profit_rate07_up = False
+                            profit_rate17_down = True
+                            profit_rate12_down = True
+                            profit_rate07_down = True
+
+                            sell_fix = True
+
+                        if current_price > profit_rate17 and profit_rate17_up:
+                            profit_rate17_up = False
+
+                            profit_rate12_up = False
+                            profit_rate07_up = False
+                            profit_rate12_down = True
+                            profit_rate07_down = True
+
+                            sell_fix = True
+
+                        if current_price > profit_rate12 and profit_rate12_up:
+                            profit_rate12_up = False
+
+                            profit_rate07_up = False
+                            profit_rate07_down = True
+
+                            sell_fix = True
+
+                        if current_price > profit_rate07 and profit_rate07_up:
+                            profit_rate07_up = False
+
+                            sell_fix = True
+
+                        # 하향 익절
+                        if current_price <= profit_rate17 and profit_rate17_down:
+                            profit_rate17_down = False
+
+                            profit_rate34_up = True
+
+                            sell_fix = True
+
+                        if current_price <= profit_rate12 and profit_rate12_down:
+                            profit_rate12_down = False
+
+                            profit_rate34_up = True
+                            profit_rate17_up = True
+
+                            sell_fix = True
+
+
+                        if current_price <= profit_rate07 and profit_rate07_down:
+                            profit_rate07_down = False
+
+                            profit_rate34_up = True
+                            profit_rate17_up = True
+                            profit_rate12_up = True
+
+                            sell_fix = True
+
+
                         #익절
-                        if ((target_price*profit_rate) < current_price):
+                        if sell_fix:
                             stock_dict = get_stock_balance() # 보유주식 정보 최신화
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
+                                    qty = int(qty)                                    
+                                    sell_qty = int(buy_amount // current_price) * 0.2
+
+                                    if qty > sell_qty: # 20% 물량만 매도
+                                        qty = sell_qty
+                                    else:
+                                        bought_list.remove(sym) # 청산
+
                                     if sell(sym, qty):
-                                        send_message(f"{sym} ({target_price*profit_rate} < {current_price}) +{profit_rate}% 익절합니다 ^^ ")
-                                        selldone_list.append(sym)
+                                        send_message(f"{sym} ({target_price*profit_rate07} < {current_price}) +{profit_rate07}% 익절합니다 ^^ ")
                                         time.sleep(0.1)
                                         stock_dict= get_stock_balance()
                                         continue
                             
-                        #손절
+
+                        #시가 손절
                         stck_oprc = get_stck_oprc(sym)
                         if(stck_oprc > current_price): #오늘 시가 보다 떨어지면                    
                             stock_dict = get_stock_balance() # 보유주식 정보 최신화
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
-                                    if sell(sym, qty):
-                                        send_message(f"{sym} ({get_stck_oprc(sym)} > {current_price}) -{round((get_stck_oprc(sym)/current_price),2)}% 손절합니다 ㅠ ")
-                                        selldone_list.append(sym)
+                                    if sell(sym, int(qty)):
+                                        send_message(f"{sym} ({get_stck_oprc(sym)} > {current_price}) -{round((get_stck_oprc(sym)/current_price),2)}% 시가 손절합니다 ㅠ ")
+                                        bought_list.remove(sym)
+                                        buyready.append(sym) # 시가 손절일때만 재매수 대기
                                         time.sleep(0.1)
                                         stock_dict= get_stock_balance()
                                         continue
                         
-                        continue # 종목 이미 샀거나, 이후 익/손절매 했으면 패스
-                    
-                    # 목표가에 달성했다면
-                    if target_price < current_price:
+                        continue # 보유 주식 있으면 매수하지 않는다.
+
+                    # 목표가 매수
+                    if target_price < current_price and sym in buyready:
                         buy_qty = 0  # 매수할 수량 초기화
                         buy_qty = int(buy_amount // current_price)
                         if buy_qty > 0:
                             send_message(f"{sym} 목표가 달성({target_price} < {current_price})으로 매수합니다~")
                             if buy(sym, buy_qty):
                                 bought_list.append(sym)
+                                buyready.remove(sym) # 손절까지 재매수 안함
                                 time.sleep(0.1)
                                 stock_dict= get_stock_balance()
 
@@ -436,7 +509,7 @@ try:
                 startoncebyday = False
 
                 for sym, qty in stock_dict.items():
-                    sell(sym, qty)
+                    sell(sym, int(qty))
                 bought_list = []
                 time.sleep(0.1)
                 stock_dict = get_stock_balance()

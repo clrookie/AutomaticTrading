@@ -129,6 +129,7 @@ def get_target_price_1(code="005930"):
 
     data_period = 30
     target_price = 0
+    cnt = 0
 
     for i in range(0,data_period):
         stck_hgpr = int(res.json()['output'][i]['stck_hgpr']) #전일 고가
@@ -138,9 +139,10 @@ def get_target_price_1(code="005930"):
 
         if stck_oprc >= stck_clpr : #음봉
             target_price += stck_hgpr - stck_oprc
+            cnt += 1
 
-    target_price /= data_period
-
+    target_price /= cnt
+    target_price *= 1.2
     return target_price
 
 def get_stock_balance():
