@@ -1,7 +1,7 @@
 import schedule
 import time
 
-principal = 10
+principal = 1000
 
 rate = 1.015
 period = 100

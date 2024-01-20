@@ -110,7 +110,7 @@ def get_hotstart(code="005930"):
         return stck_clpr
     return False
 
-def get_target_price(code="005930"):
+def get_target_price(code="005930"): #변동성 돌파 (안씀)
     """변동성 돌파 전략으로 매수 목표가 조회"""
     PATH = "uapi/domestic-stock/v1/quotations/inquire-daily-price"
     URL = f"{URL_BASE}/{PATH}"
@@ -146,6 +146,41 @@ def get_target_price(code="005930"):
         target_price = stck_oprc * 1.01
     else :    
         target_price = stck_oprc + stck_oprc_temp
+
+    return target_price
+
+def get_target_price_new(code="005930"): # 음봉 윗꼬리 평균 + 보정
+    """변동성 돌파 전략으로 매수 목표가 조회"""
+    PATH = "uapi/domestic-stock/v1/quotations/inquire-daily-price"
+    URL = f"{URL_BASE}/{PATH}"
+    headers = {"Content-Type":"application/json", 
+        "authorization": f"Bearer {ACCESS_TOKEN}",
+        "appKey":APP_KEY,
+        "appSecret":APP_SECRET,
+        "tr_id":"FHKST01010400"}
+    params = {
+    "fid_cond_mrkt_div_code":"J",
+    "fid_input_iscd":code,
+    "fid_org_adj_prc":"1",
+    "fid_period_div_code":"D"
+    }
+    res = requests.get(URL, headers=headers, params=params)
+
+    data_period = 30 # 최근 추출 기간
+    rate = 1.2 # 안정 상향 보정 비율
+    target_price = 0 # 초기화
+
+    for i in range(0,data_period):
+        stck_hgpr = int(res.json()['output'][i]['stck_hgpr']) #전일 고가
+        # stck_lwpr = int(res.json()['output'][i]['stck_lwpr']) #전일 저가
+        stck_clpr = int(res.json()['output'][i]['stck_clpr']) #전일 종가
+        stck_oprc = int(res.json()['output'][i]['stck_oprc']) #오늘 시가
+
+        if stck_oprc >= stck_clpr : #음봉
+            target_price += stck_hgpr - stck_oprc
+
+    target_price /= data_period # 평균
+    target_price *= rate
 
     return target_price
 
@@ -344,7 +379,7 @@ try:
                     continue
 
                 for sym in symbol_list:
-                    target_price = get_target_price(sym)
+                    target_price = get_target_price_new(sym)
                     current_price = get_current_price(sym)
 
                     if sym in bought_list: #매수한 종목 -> 익절 or 손절 처리만
@@ -395,7 +430,7 @@ try:
                     get_stock_balance()
                     time.sleep(5)
                 
-                time.sleep(5) # 서비스 정책상 (1초 20건 한계)
+                time.sleep(10) # 서비스 정책상 (1초 20건 한계)
 
             if t_exit < t_now and startoncebyday == True:  # PM 03:19 ~ : 데일리 프로그램 종료
                 startoncebyday = False
