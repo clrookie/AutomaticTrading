@@ -167,7 +167,6 @@ def get_target_price_new(code="005930"): # 음봉 윗꼬리 평균 + 보정
     res = requests.get(URL, headers=headers, params=params)
 
     data_period = 30 # 최근 추출 기간
-    rate = 1.15 # 상향 보정 비율
     cnt = 0 # 음봉 카운트
 
     target_price = 0 # 초기화
@@ -182,7 +181,6 @@ def get_target_price_new(code="005930"): # 음봉 윗꼬리 평균 + 보정
             target_price += stck_hgpr - stck_oprc
 
     target_price /= cnt # 평균
-    target_price *= rate
 
     return target_price
 
@@ -428,8 +426,8 @@ try:
                     symbol_list[sym]['시가'] = get_stck_oprc(sym)
                     send_message(f" -[{symbol_list[sym]['시가']}]")   
                     symbol_list[sym]['목표매수가'] = get_target_price_new(sym)
+                    send_message(f" -[{symbol_list[sym]['목표매수가']}]")
                     symbol_list[sym]['보유'] = False
-                    send_message(f" -[{symbol_list[sym]['목표매수가']}]")  
                     send_message("---------")
                     
 

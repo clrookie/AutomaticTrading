@@ -128,7 +128,9 @@ def get_target_price_1(code="005930"):
     res = requests.get(URL, headers=headers, params=params)
 
     data_period = 30
-    target_price = 0
+    target_price1 = 0
+    target_price2 = 0
+    target_price3 = 0
     cnt = 0
 
     for i in range(0,data_period):
@@ -138,12 +140,49 @@ def get_target_price_1(code="005930"):
         stck_oprc = int(res.json()['output'][i]['stck_oprc']) #오늘 시가
 
         if stck_oprc >= stck_clpr : #음봉
-            target_price += stck_hgpr - stck_oprc
+            target_price1 += stck_hgpr - stck_oprc
             cnt += 1
+        else:
+            target_price2 += stck_hgpr - stck_clpr
 
-    target_price /= cnt
-    target_price *= 1.2
-    return target_price
+    target_price3 = target_price1 + target_price2
+
+    target_price1 /= cnt    
+    target_price3 /= 30
+    return target_price1, target_price3
+
+def get_average_line_5_20(code="005930"):
+    PATH = "uapi/domestic-stock/v1/quotations/inquire-daily-price"
+    URL = f"{URL_BASE}/{PATH}"
+    headers = {"Content-Type":"application/json", 
+        "authorization": f"Bearer {ACCESS_TOKEN}",
+        "appKey":APP_KEY,
+        "appSecret":APP_SECRET,
+        "tr_id":"FHKST01010400"}
+    params = {
+    "fid_cond_mrkt_div_code":"J",
+    "fid_input_iscd":code,
+    "fid_org_adj_prc":"1",
+    "fid_period_div_code":"D"
+    }
+    res = requests.get(URL, headers=headers, params=params)
+
+    data_period = 30
+    avg5 = 0
+    avg20 = 0
+
+    for i in range(0,20):
+        stck_clpr = int(res.json()['output'][i]['stck_clpr']) #전일 종가
+        if i < 5 :
+            avg5 += stck_clpr
+            avg20 += stck_clpr
+        else:
+            avg20 += stck_clpr
+
+    avg5 /= 5
+    avg20 /= 20
+    
+    return avg5, avg20
 
 def get_stock_balance():
     """주식 잔고조회"""
@@ -273,27 +312,32 @@ def sell(code="005930", qty="1"):
 
 # 자동 매매 코드
 try:        
-    holiday = False
-    startoncebyday = False
-    
-    send_message("=== 자동매매를 구동합니다 ===")
-
 
     # 토큰 세팅
     ACCESS_TOKEN = get_access_token()
 
+    # symbol_list = ["122630","252670","233740","251340"] 
     symbol_list = ["003490","034220","124560","084680"] # 매수종목(대한항공, LG디스플레이,태웅로직스,이월드)
     
-    target = get_target_price_1("122630")
+    a1, b1 = get_target_price_1("122630")
+    print(a1, b1)
+    print("-----")
+    
+    a2, b2 = get_target_price_1("252670")
+    print(a2, b2)
+    print("-----")
+    
+    a3, b3 = get_target_price_1("233740")
+    print(a3, b3)
+    print("-----")
 
-    # 1.2% 매매 (박리다익으로 확률을 높인다)
-    profit_rate = 1.012
+    a4, b4 = get_target_price_1("251340")
+    print(a4, b4)
+    print("-----")
 
-    total_cash = get_balance() # 보유 현금 조회
-    stock_dict = get_stock_balance() # 보유 주식 조회
+    avg5, avg20 = get_average_line_5_20("122630")
+    print(avg5, avg20)
 
-
-    time.sleep(0.1)
 except Exception as e:
     send_message(f"[오류 발생]{e}")
     time.sleep(1)
