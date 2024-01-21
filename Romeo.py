@@ -332,7 +332,6 @@ try:
     '실매수가':'0',
     '시가':'0',
     '보유':'False',
-    '재매수':'True',
     'profit_rate07_up':'True',
     'profit_rate12_up':'True',
     'profit_rate17_up':'True',
@@ -348,7 +347,6 @@ try:
     '실매수가':'0',
     '시가':'0',
     '보유':'False',
-    '재매수':'True',
     'profit_rate07_up':'True',
     'profit_rate12_up':'True',
     'profit_rate17_up':'True',
@@ -364,7 +362,6 @@ try:
     '실매수가':'0',
     '시가':'0',
     '보유':'False',
-    '재매수':'True',
     'profit_rate07_up':'True',
     'profit_rate12_up':'True',
     'profit_rate17_up':'True',
@@ -380,7 +377,6 @@ try:
     '실매수가':'0',
     '시가':'0',
     '보유':'False',
-    '재매수':'True',
     'profit_rate07_up':'True',
     'profit_rate12_up':'True',
     'profit_rate17_up':'True',
@@ -432,7 +428,7 @@ try:
                     symbol_list[sym]['시가'] = get_stck_oprc(sym)
                     send_message(f" -[{symbol_list[sym]['시가']}]")   
                     symbol_list[sym]['목표매수가'] = get_target_price_new(sym)
-                    symbol_list[sym]['재매수'] = True
+                    symbol_list[sym]['보유'] = False
                     send_message(f" -[{symbol_list[sym]['목표매수가']}]")  
                     send_message("---------")
                     
@@ -540,7 +536,6 @@ try:
                                     if sell(sym, int(qty)):
                                         send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],1)}%로 시가 손절매합니다 ㅠ")
                                         symbol_list[sym]['보유'] = False
-                                        symbol_list[sym]['재매수'] = True
                                         time.sleep(0.1)
                                         stock_dict= get_stock_balance()
                                         continue
@@ -548,13 +543,12 @@ try:
                         continue # 보유 주식 있으면 매수하지 않는다.
 
                     # 목표가 매수
-                    if symbol_list[sym]['목표매수가'] <= current_price and symbol_list[sym]['재매수']:
+                    if symbol_list[sym]['목표매수가'] <= current_price and symbol_list[sym]['보유'] == False:
                         qty = int(symbol_list[sym]['배분예산'] // current_price)
                         if qty > 0:
                             if buy(sym, qty):
                                 symbol_list[sym]['실매수가'] = current_price
                                 symbol_list[sym]['보유'] = True
-                                symbol_list[sym]['재매수'] = False # 손절까지 재매수 안함
 
                                 send_message(f"[{symbol_list[sym]['종목명']}]")
                                 send_message(f" -목표매수가: [{symbol_list[sym]['목표매수가']}")
@@ -586,7 +580,7 @@ try:
             if t_exit < t_now and startoncebyday == True:  # PM 03:19 ~ : 데일리 프로그램 종료
                 startoncebyday = False
 
-                send_message(f"데일리 일괄매도")
+                send_message(f"=데일리 일괄매도=")
                 for sym, qty in stock_dict.items(): # 있으면 일괄 매도
                     sell(sym, int(qty))
 
