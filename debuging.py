@@ -292,12 +292,6 @@ try:
     total_cash = get_balance() # 보유 현금 조회
     stock_dict = get_stock_balance() # 보유 주식 조회
 
-    target_buy_count = int(len(symbol_list)) # 매수할 종목 수
-    buy_percent = 1 / target_buy_count # 종목당 매수 금액 비율
-    buy_amount = total_cash * buy_percent  # 종목별 주문 금액 계산
-
-    # for sym, qty in stock_dict.items(): 
-    #     sell(sym, qty)
 
     time.sleep(0.1)
 except Exception as e:

@@ -404,6 +404,7 @@ try:
             
             t_9 = t_now.replace(hour=9, minute=0, second=0, microsecond=0)
             t_start = t_now.replace(hour=9, minute=0, second=1, microsecond=0)
+            t_930 = t_now.replace(hour=9, minute=30, second=0, microsecond=0)
             t_exit = t_now.replace(hour=15, minute=19, second=50,microsecond=0)
             
             if t_9 < t_now < t_start and startoncebyday == False: # 매매 준비
@@ -576,7 +577,11 @@ try:
                     get_stock_balance()
                     time.sleep(5)
                 
-                time.sleep(10) # 서비스 정책상 (1초 20건 한계)
+                # 서비스 정책상 (1초 20건 한계)
+                if t_9 <= t_now < t_930:
+                    time.sleep(1)
+                else:
+                    time.sleep(15)
 
             if t_exit < t_now and startoncebyday == True:  # PM 03:19 ~ : 데일리 프로그램 종료
                 startoncebyday = False

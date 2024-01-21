@@ -1,59 +1,85 @@
 
-symbol_list = { # 대한항공, LG디스플레이,태웅로직스,이월드
-                '003490':{'종목명':'대한항공',
-                '보유':'False',
-                '재매수':'False',
-                'profit_rate07_up':'True',
-                'profit_rate12_up':'True',
-                'profit_rate17_up':'True',
-                'profit_rate34_up':'True',
-                'profit_rate07_down':'False',
-                'profit_rate12_down':'False',
-                'profit_rate17_down':'False',
-                'profit_rate34_down':'False'},
+import pandas as pd
+import yfinance as yf
+import matplotlib.pyplot as plt
+from matplotlib import font_manager, rc
 
-                '034220':{'종목명':'LG디스플레이어',
-                '보유':'False',
-                '재매수':'False',
-                'profit_rate07_up':'True',
-                'profit_rate12_up':'True',
-                'profit_rate17_up':'True',
-                'profit_rate34_up':'True',
-                'profit_rate07_down':'False',
-                'profit_rate12_down':'False',
-                'profit_rate17_down':'False',
-                'profit_rate34_down':'False'},
+# 주식 데이터 가져오기 (예: 삼성전자, 2022년 1월 1일부터 현재까지)
+stock_data = yf.download('122630.KS', start='2023-07-01')
 
-                '124560':{'종목명':'태웅로직스',
-                '보유':'False',
-                '재매수':'False',
-                'profit_rate07_up':'True',
-                'profit_rate12_up':'True',
-                'profit_rate17_up':'True',
-                'profit_rate34_up':'True',
-                'profit_rate07_down':'False',
-                'profit_rate12_down':'False',
-                'profit_rate17_down':'False',
-                'profit_rate34_down':'False'},
+# 주식 종가 기준으로 5일 평균 계산
+stock_data['5일평균'] = stock_data['Close'].rolling(window=5).mean()
 
-                '084680':{'종목명':'이월드',
-                '보유':'False',
-                '재매수':'False',
-                'profit_rate07_up':'True',
-                'profit_rate12_up':'True',
-                'profit_rate17_up':'True',
-                'profit_rate34_up':'True',
-                'profit_rate07_down':'False',
-                'profit_rate12_down':'False',
-                'profit_rate17_down':'False',
-                'profit_rate34_down':'False'}               
-                }
-target_buy_count = int(len(symbol_list)) # 매수할 종목 수
-print(target_buy_count)
-print("==========")
+# 한글 폰트 설정
+font_path = "C:/Windows/Fonts/malgun.ttf"  # 사용하는 운영체제의 한글 폰트 경로로 변경
+font_name = font_manager.FontProperties(fname=font_path).get_name()
+rc('font', family=font_name)
 
-for sym in symbol_list:
-    print(symbol_list[sym]['종목명'])
+# 그래프 그리기
+plt.figure(figsize=(10, 6))
+plt.plot(stock_data['Close'], label='종가')
+plt.plot(stock_data['5일평균'], label='5일 평균선', color='orange')
+plt.title('주식 가격 및 5일 평균선')
+plt.xlabel('날짜')
+plt.ylabel('가격')
+plt.legend()
+plt.show()
+
+# symbol_list = { # 대한항공, LG디스플레이,태웅로직스,이월드
+#                 '003490':{'종목명':'대한항공',
+#                 '보유':'False',
+#                 '재매수':'False',
+#                 'profit_rate07_up':'True',
+#                 'profit_rate12_up':'True',
+#                 'profit_rate17_up':'True',
+#                 'profit_rate34_up':'True',
+#                 'profit_rate07_down':'False',
+#                 'profit_rate12_down':'False',
+#                 'profit_rate17_down':'False',
+#                 'profit_rate34_down':'False'},
+
+#                 '034220':{'종목명':'LG디스플레이어',
+#                 '보유':'False',
+#                 '재매수':'False',
+#                 'profit_rate07_up':'True',
+#                 'profit_rate12_up':'True',
+#                 'profit_rate17_up':'True',
+#                 'profit_rate34_up':'True',
+#                 'profit_rate07_down':'False',
+#                 'profit_rate12_down':'False',
+#                 'profit_rate17_down':'False',
+#                 'profit_rate34_down':'False'},
+
+#                 '124560':{'종목명':'태웅로직스',
+#                 '보유':'False',
+#                 '재매수':'False',
+#                 'profit_rate07_up':'True',
+#                 'profit_rate12_up':'True',
+#                 'profit_rate17_up':'True',
+#                 'profit_rate34_up':'True',
+#                 'profit_rate07_down':'False',
+#                 'profit_rate12_down':'False',
+#                 'profit_rate17_down':'False',
+#                 'profit_rate34_down':'False'},
+
+#                 '084680':{'종목명':'이월드',
+#                 '보유':'False',
+#                 '재매수':'False',
+#                 'profit_rate07_up':'True',
+#                 'profit_rate12_up':'True',
+#                 'profit_rate17_up':'True',
+#                 'profit_rate34_up':'True',
+#                 'profit_rate07_down':'False',
+#                 'profit_rate12_down':'False',
+#                 'profit_rate17_down':'False',
+#                 'profit_rate34_down':'False'}               
+#                 }
+# target_buy_count = int(len(symbol_list)) # 매수할 종목 수
+# print(target_buy_count)
+# print("==========")
+
+# for sym in symbol_list:
+#     print(symbol_list[sym]['종목명'])
 
 # symbol_list = {
 # '003490':{'종목명':'대한항공','보유':'0','재매수':'0'},
