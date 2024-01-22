@@ -331,64 +331,64 @@ try:
 
     symbol_list = {
     '122630':{'종목명':'레버리지',
-    '배분예산':'0',
-    '목표매수가':'0',
-    '실매수가':'0',
-    '시가':'0',
-    '보유':'False',
-    'profit_rate07_up':'True',
-    'profit_rate12_up':'True',
-    'profit_rate17_up':'True',
-    'profit_rate22_up':'True',
-    'profit_rate07_down':'False',
-    'profit_rate12_down':'False',
-    'profit_rate17_down':'False',
-    'profit_rate22_down':'False'},
+    '배분예산':0,
+    '목표매수가':0,
+    '실매수가':0,
+    '시가':0,
+    '보유':False,
+    'profit_rate07_up':True,
+    'profit_rate12_up':True,
+    'profit_rate17_up':True,
+    'profit_rate22_up':True,
+    'profit_rate07_down':False,
+    'profit_rate12_down':False,
+    'profit_rate17_down':False,
+    'profit_rate22_down':False},
 
     '252670':{'종목명':'200선물인버스2X',
-    '배분예산':'0',
-    '목표매수가':'0',
-    '실매수가':'0',
-    '시가':'0',
-    '보유':'False',
-    'profit_rate07_up':'True',
-    'profit_rate12_up':'True',
-    'profit_rate17_up':'True',
-    'profit_rate22_up':'True',
-    'profit_rate07_down':'False',
-    'profit_rate12_down':'False',
-    'profit_rate17_down':'False',
-    'profit_rate22_down':'False'},
+    '배분예산':0,
+    '목표매수가':0,
+    '실매수가':0,
+    '시가':0,
+    '보유':False,
+    'profit_rate07_up':True,
+    'profit_rate12_up':True,
+    'profit_rate17_up':True,
+    'profit_rate22_up':True,
+    'profit_rate07_down':False,
+    'profit_rate12_down':False,
+    'profit_rate17_down':False,
+    'profit_rate22_down':False},
 
     '233740':{'종목명':'코스닥150레버리지',
-    '배분예산':'0',
-    '목표매수가':'0',
-    '실매수가':'0',
-    '시가':'0',
-    '보유':'False',
-    'profit_rate07_up':'True',
-    'profit_rate12_up':'True',
-    'profit_rate17_up':'True',
-    'profit_rate22_up':'True',
-    'profit_rate07_down':'False',
-    'profit_rate12_down':'False',
-    'profit_rate17_down':'False',
-    'profit_rate22_down':'False'},
+    '배분예산':0,
+    '목표매수가':0,
+    '실매수가':0,
+    '시가':0,
+    '보유':False,
+    'profit_rate07_up':True,
+    'profit_rate12_up':True,
+    'profit_rate17_up':True,
+    'profit_rate22_up':True,
+    'profit_rate07_down':False,
+    'profit_rate12_down':False,
+    'profit_rate17_down':False,
+    'profit_rate22_down':False},
 
     '251340':{'종목명':'코스닥150선물인버스',
-    '배분예산':'0',
-    '목표매수가':'0',
-    '실매수가':'0',
-    '시가':'0',
-    '보유':'False',
-    'profit_rate07_up':'True',
-    'profit_rate12_up':'True',
-    'profit_rate17_up':'True',
-    'profit_rate22_up':'True',
-    'profit_rate07_down':'False',
-    'profit_rate12_down':'False',
-    'profit_rate17_down':'False',
-    'profit_rate22_down':'False'}               
+    '배분예산':0,
+    '목표매수가':0,
+    '실매수가':0,
+    '시가':0,
+    '보유':False,
+    'profit_rate07_up':True,
+    'profit_rate12_up':True,
+    'profit_rate17_up':True,
+    'profit_rate22_up':True,
+    'profit_rate07_down':False,
+    'profit_rate12_down':False,
+    'profit_rate17_down':False,
+    'profit_rate22_down':False},            
     }
 
     while True:
@@ -407,11 +407,10 @@ try:
             t_930 = t_now.replace(hour=9, minute=30, second=0, microsecond=0)
             t_exit = t_now.replace(hour=15, minute=19, second=50,microsecond=0)
 
-            
             # t_9 = t_now.replace(hour=20, minute=0, second=0, microsecond=0)
-            # t_start = t_now.replace(hour=21, minute=20, second=0, microsecond=0)
-            # t_930 = t_now.replace(hour=21, minute=20, second=0, microsecond=0)
-            # t_exit = t_now.replace(hour=21, minute=20, second=0,microsecond=0)
+            # t_start = t_now.replace(hour=21, minute=45, second=0, microsecond=0)
+            # t_930 = t_now.replace(hour=21, minute=49, second=0, microsecond=0)
+            # t_exit = t_now.replace(hour=21, minute=49, second=0,microsecond=0)
             
             if t_9 < t_now < t_start and startoncebyday == False: # 매매 준비
                 send_message("=== 데일리 자동매매를 준비합니다 ===")
@@ -436,20 +435,21 @@ try:
 
 
                 for sym in symbol_list: # 초기화
+
                     send_message(f"[{symbol_list[sym]['종목명']}] 정보")
                     symbol_list[sym]['배분예산'] = total_cash * (1/target_buy_count)
-                    formatted_amount = "{:,.0f}원".format(int(symbol_list[sym]['배분예산']))
+                    formatted_amount = "{:,.0f}원".format(symbol_list[sym]['배분예산'])
                     send_message(f" - 배분예산: {formatted_amount}")
 
                     symbol_list[sym]['시가'] = get_stck_oprc(sym)
-                    formatted_amount = "{:,.0f}원".format(int(symbol_list[sym]['시가']))
+                    formatted_amount = "{:,.0f}원".format(symbol_list[sym]['시가'])
                     send_message(f" - 시가: {formatted_amount}")   
 
                     symbol_list[sym]['목표매수가'] = get_target_price_new(sym)
-                    formatted_amount = "{:,.0f}원".format(int(symbol_list[sym]['목표매수가']))
+                    formatted_amount = "{:,.0f}원".format(symbol_list[sym]['목표매수가'])
                     send_message(f" - 목표매수가: {formatted_amount}")   
 
-                    send_message(f" - 타겟%: {round(float((symbol_list[sym]['시가']+symbol_list[sym]['목표매수가'])/symbol_list[sym]['시가']),2)}")
+                    send_message(f" - 타겟%: {round((symbol_list[sym]['시가']+symbol_list[sym]['목표매수가'])/symbol_list[sym]['시가'],2)}")
 
                     symbol_list[sym]['보유'] = False
                     send_message("---------------------------------")
@@ -544,7 +544,7 @@ try:
                                         symbol_list[sym]['보유'] = False # 청산
 
                                     if sell(sym, qty):
-                                        send_message(f"[{symbol_list[sym]['종목명']}]: {round(float(current_price/symbol_list[sym]['실매수가']),1)}% 익절매합니다 ^^")
+                                        send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],1)}% 익절매합니다 ^^")
                                         time.sleep(0.1)
                                         stock_dict= get_stock_balance()
                                         continue
@@ -556,7 +556,7 @@ try:
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
                                     if sell(sym, int(qty)):
-                                        send_message(f"[{symbol_list[sym]['종목명']}]: {round(float(current_price/symbol_list[sym]['실매수가']),1)}% 시가 손절매합니다 ㅠ")
+                                        send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],1)}% 시가 손절매합니다 ㅠ")
                                         symbol_list[sym]['보유'] = False
                                         time.sleep(0.1)
                                         stock_dict= get_stock_balance()
@@ -574,10 +574,10 @@ try:
 
                                 send_message(f"[{symbol_list[sym]['종목명']}]")
                                 
-                                formatted_amount = "{:,.0f}원".format(int(symbol_list[sym]['목표매수가']))
+                                formatted_amount = "{:,.0f}원".format(symbol_list[sym]['목표매수가'])
                                 send_message(f" - 목표매수가: {formatted_amount}")   
 
-                                formatted_amount = "{:,.0f}원".format(int(symbol_list[sym]['실매수가']))
+                                formatted_amount = "{:,.0f}원".format(symbol_list[sym]['실매수가'])
                                 send_message(f" -실매수가: [{formatted_amount}")
 
                                 #분할매수 조건 초기화
