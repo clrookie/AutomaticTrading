@@ -150,7 +150,6 @@ def get_target_price(code="005930"): #변동성 돌파 (안씀)
     return target_price
 
 def get_target_price_new(code="005930"): # 음봉 윗꼬리 평균 + 보정
-    """변동성 돌파 전략으로 매수 목표가 조회"""
     PATH = "uapi/domestic-stock/v1/quotations/inquire-daily-price"
     URL = f"{URL_BASE}/{PATH}"
     headers = {"Content-Type":"application/json", 
@@ -170,19 +169,24 @@ def get_target_price_new(code="005930"): # 음봉 윗꼬리 평균 + 보정
     cnt = 0 # 음봉 카운트
 
     target_price = 0 # 초기화
+    delta = 0 # 윗꼬리값
 
     for i in range(0,data_period):
-        stck_hgpr = int(res.json()['output'][i]['stck_hgpr']) #전일 고가
-        # stck_lwpr = int(res.json()['output'][i]['stck_lwpr']) #전일 저가
-        stck_clpr = int(res.json()['output'][i]['stck_clpr']) #전일 종가
-        stck_oprc = int(res.json()['output'][i]['stck_oprc']) #오늘 시가
+        stck_hgpr = int(res.json()['output'][i]['stck_hgpr']) #가
+        # stck_lwpr = int(res.json()['output'][i]['stck_lwpr']) #저가
+        stck_clpr = int(res.json()['output'][i]['stck_clpr']) #종가
+        stck_oprc = int(res.json()['output'][i]['stck_oprc']) #시가
 
         if stck_oprc >= stck_clpr : #음봉
-            target_price += stck_hgpr - stck_oprc
+            delta += stck_hgpr - stck_oprc
             cnt += 1
 
+    target_price = int(res.json()['output'][0]['stck_oprc']) #오늘 시가
+    
     if cnt > 0:
-        target_price /= cnt # 평균
+        delta /= cnt # 평균
+
+    target_price += delta
 
     return target_price
 
@@ -402,15 +406,15 @@ try:
         else:
             t_now = datetime.datetime.now()
             
-            t_9 = t_now.replace(hour=9, minute=0, second=0, microsecond=0)
-            t_start = t_now.replace(hour=9, minute=0, second=1, microsecond=0)
-            t_930 = t_now.replace(hour=9, minute=30, second=0, microsecond=0)
-            t_exit = t_now.replace(hour=15, minute=19, second=50,microsecond=0)
+            # t_9 = t_now.replace(hour=9, minute=0, second=1, microsecond=0)
+            # t_start = t_now.replace(hour=9, minute=0, second=2, microsecond=0)
+            # t_930 = t_now.replace(hour=9, minute=30, second=0, microsecond=0)
+            # t_exit = t_now.replace(hour=15, minute=19, second=50,microsecond=0)
 
-            # t_9 = t_now.replace(hour=20, minute=0, second=0, microsecond=0)
-            # t_start = t_now.replace(hour=21, minute=45, second=0, microsecond=0)
-            # t_930 = t_now.replace(hour=21, minute=49, second=0, microsecond=0)
-            # t_exit = t_now.replace(hour=21, minute=49, second=0,microsecond=0)
+            t_9 = t_now.replace(hour=20, minute=0, second=0, microsecond=0)
+            t_start = t_now.replace(hour=22, minute=2, second=0, microsecond=0)
+            t_930 = t_now.replace(hour=22, minute=59, second=0, microsecond=0)
+            t_exit = t_now.replace(hour=22, minute=59, second=0,microsecond=0)
             
             if t_9 < t_now < t_start and startoncebyday == False: # 매매 준비
                 send_message("=== 데일리 자동매매를 준비합니다 ===")
@@ -449,7 +453,7 @@ try:
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['목표매수가'])
                     send_message(f" - 목표매수가: {formatted_amount}")   
 
-                    send_message(f" - 타겟%: {round((symbol_list[sym]['시가']+symbol_list[sym]['목표매수가'])/symbol_list[sym]['시가'],2)}")
+                    send_message(f" - 타겟%: {round((symbol_list[sym]['목표매수가'])/symbol_list[sym]['시가'],2)}")
 
                     symbol_list[sym]['보유'] = False
                     send_message("---------------------------------")
