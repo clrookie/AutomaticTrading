@@ -406,15 +406,15 @@ try:
         else:
             t_now = datetime.datetime.now()
             
-            # t_9 = t_now.replace(hour=9, minute=0, second=1, microsecond=0)
-            # t_start = t_now.replace(hour=9, minute=0, second=2, microsecond=0)
-            # t_930 = t_now.replace(hour=9, minute=30, second=0, microsecond=0)
-            # t_exit = t_now.replace(hour=15, minute=19, second=50,microsecond=0)
+            t_9 = t_now.replace(hour=9, minute=0, second=1, microsecond=0)
+            t_start = t_now.replace(hour=9, minute=0, second=2, microsecond=0)
+            t_930 = t_now.replace(hour=9, minute=30, second=0, microsecond=0)
+            t_exit = t_now.replace(hour=15, minute=19, second=50,microsecond=0)
 
-            t_9 = t_now.replace(hour=20, minute=0, second=0, microsecond=0)
-            t_start = t_now.replace(hour=22, minute=2, second=0, microsecond=0)
-            t_930 = t_now.replace(hour=22, minute=59, second=0, microsecond=0)
-            t_exit = t_now.replace(hour=22, minute=59, second=0,microsecond=0)
+            # t_9 = t_now.replace(hour=20, minute=0, second=0, microsecond=0)
+            # t_start = t_now.replace(hour=22, minute=2, second=0, microsecond=0)
+            # t_930 = t_now.replace(hour=22, minute=59, second=0, microsecond=0)
+            # t_exit = t_now.replace(hour=22, minute=59, second=0,microsecond=0)
             
             if t_9 < t_now < t_start and startoncebyday == False: # 매매 준비
                 send_message("=== 데일리 자동매매를 준비합니다 ===")
