@@ -14,14 +14,20 @@ print("  ")
 result = 0
 for i in range(period):
     result += (principal * rate) - principal
-print("기대수익: ", int(principal+result))
+
+formatted_amount1 = "{:,.0f}원".format(principal+result)
+print("수익: ", formatted_amount1)
+
 
 for i in range(period):
-    principal *= rate    
-print("복리수익: ", int(principal))
+    principal *= rate   
+
+formatted_amount1 = "{:,.0f}원".format(principal) 
+print("복리수익: ", formatted_amount1)
 
 
-
+aaa = 1.16645
+print("소수점: ", round(aaa,2))
 
 """ 자동매매 스케쥴 시작
 schedule.every().day.at("09:31").do() 

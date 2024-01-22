@@ -172,7 +172,7 @@ def get_target_price_new(code="005930"): # 음봉 윗꼬리 평균 + 보정
     delta = 0 # 윗꼬리값
 
     for i in range(0,data_period):
-        stck_hgpr = int(res.json()['output'][i]['stck_hgpr']) #가
+        stck_hgpr = int(res.json()['output'][i]['stck_hgpr']) #고가
         # stck_lwpr = int(res.json()['output'][i]['stck_lwpr']) #저가
         stck_clpr = int(res.json()['output'][i]['stck_clpr']) #종가
         stck_oprc = int(res.json()['output'][i]['stck_oprc']) #시가
@@ -409,12 +409,12 @@ try:
             t_9 = t_now.replace(hour=9, minute=0, second=1, microsecond=0)
             t_start = t_now.replace(hour=9, minute=0, second=2, microsecond=0)
             t_930 = t_now.replace(hour=9, minute=30, second=0, microsecond=0)
-            t_exit = t_now.replace(hour=15, minute=19, second=50,microsecond=0)
+            t_exit = t_now.replace(hour=15, minute=19, second=55,microsecond=0)
 
             # t_9 = t_now.replace(hour=20, minute=0, second=0, microsecond=0)
-            # t_start = t_now.replace(hour=22, minute=2, second=0, microsecond=0)
-            # t_930 = t_now.replace(hour=22, minute=59, second=0, microsecond=0)
-            # t_exit = t_now.replace(hour=22, minute=59, second=0,microsecond=0)
+            # t_start = t_now.replace(hour=23, minute=35, second=0, microsecond=0)
+            # t_930 = t_now.replace(hour=23, minute=59, second=0, microsecond=0)
+            # t_exit = t_now.replace(hour=23, minute=59, second=0,microsecond=0)
             
             if t_9 < t_now < t_start and startoncebyday == False: # 매매 준비
                 send_message("=== 데일리 자동매매를 준비합니다 ===")
@@ -435,12 +435,12 @@ try:
 
                 for sym, qty in stock_dict.items(): # 있으면 일괄 매도
                     sell(sym, int(qty))
-                    send_message(f">>> [{symbol_list[sym]['종목명']}] 시가에 매도했습니다~")
+                    send_message(f">>> [{symbol_list[sym]['종목명']}] 시가({get_stck_oprc(sym)})원에 매도했습니다~")
 
 
                 for sym in symbol_list: # 초기화
 
-                    send_message(f"[{symbol_list[sym]['종목명']}] 정보")
+                    send_message(f"[{symbol_list[sym]['종목명']}]")
                     symbol_list[sym]['배분예산'] = total_cash * (1/target_buy_count)
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['배분예산'])
                     send_message(f" - 배분예산: {formatted_amount}")
@@ -453,7 +453,7 @@ try:
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['목표매수가'])
                     send_message(f" - 목표매수가: {formatted_amount}")   
 
-                    send_message(f" - 타겟%: {round((symbol_list[sym]['목표매수가'])/symbol_list[sym]['시가'],2)}")
+                    send_message(f" - 타겟%: {round((symbol_list[sym]['목표매수가'])/symbol_list[sym]['시가'],4)}")
 
                     symbol_list[sym]['보유'] = False
                     send_message("---------------------------------")
@@ -469,53 +469,54 @@ try:
                     current_price = get_current_price(sym)
 
                     if symbol_list[sym]['보유']: # 보유중이면
+
                         sell_fix = False
                         
                         #상향 익절
                         if current_price > symbol_list[sym]['목표매수가']*profit_rate22 and symbol_list[sym]['profit_rate22_up']:
                             symbol_list[sym]['profit_rate22_up'] = False
-
                             symbol_list[sym]['profit_rate17_up'] = False
                             symbol_list[sym]['profit_rate12_up'] = False
                             symbol_list[sym]['profit_rate07_up'] = False
+
                             symbol_list[sym]['profit_rate17_down'] = True
                             symbol_list[sym]['profit_rate12_down'] = True
                             symbol_list[sym]['profit_rate07_down'] = True
 
                             sell_fix = True
 
-                        if current_price > symbol_list[sym]['목표매수가']*profit_rate17 and symbol_list[sym]['profit_rate17_up']:
+                        elif current_price > symbol_list[sym]['목표매수가']*profit_rate17 and symbol_list[sym]['profit_rate17_up']:
                             symbol_list[sym]['profit_rate17_up'] = False
-
                             symbol_list[sym]['profit_rate12_up'] = False
                             symbol_list[sym]['profit_rate07_up'] = False
+
                             symbol_list[sym]['profit_rate12_down'] = True
                             symbol_list[sym]['profit_rate07_down'] = True
 
                             sell_fix = True
 
-                        if current_price > symbol_list[sym]['목표매수가']*profit_rate12 and symbol_list[sym]['profit_rate12_up']:
+                        elif current_price > symbol_list[sym]['목표매수가']*profit_rate12 and symbol_list[sym]['profit_rate12_up']:
                             symbol_list[sym]['profit_rate12_up'] = False
-
                             symbol_list[sym]['profit_rate07_up'] = False
+
                             symbol_list[sym]['profit_rate07_down'] = True
 
                             sell_fix = True
 
-                        if current_price > symbol_list[sym]['목표매수가']*profit_rate07 and symbol_list[sym]['profit_rate07_up']:
+                        elif current_price > symbol_list[sym]['목표매수가']*profit_rate07 and symbol_list[sym]['profit_rate07_up']:
                             symbol_list[sym]['profit_rate07_up'] = False
 
                             sell_fix = True
 
                         # 하향 익절
-                        if current_price <= symbol_list[sym]['목표매수가']*profit_rate17 and symbol_list[sym]['profit_rate17_down']:
+                        elif current_price <= symbol_list[sym]['목표매수가']*profit_rate17 and symbol_list[sym]['profit_rate17_down']:
                             symbol_list[sym]['profit_rate17_down'] = False
 
                             symbol_list[sym]['profit_rate22_up'] = True
 
                             sell_fix = True
 
-                        if current_price <= symbol_list[sym]['목표매수가']*profit_rate12 and symbol_list[sym]['profit_rate12_down']:
+                        elif current_price <= symbol_list[sym]['목표매수가']*profit_rate12 and symbol_list[sym]['profit_rate12_down']:
                             symbol_list[sym]['profit_rate12_down'] = False
 
                             symbol_list[sym]['profit_rate22_up'] = True
@@ -524,7 +525,7 @@ try:
                             sell_fix = True
 
 
-                        if current_price <= symbol_list[sym]['목표매수가']*profit_rate07 and symbol_list[sym]['profit_rate07_down']:
+                        elif current_price <= symbol_list[sym]['목표매수가']*profit_rate07 and symbol_list[sym]['profit_rate07_down']:
                             symbol_list[sym]['profit_rate07_down'] = False
 
                             symbol_list[sym]['profit_rate22_up'] = True
@@ -548,19 +549,19 @@ try:
                                         symbol_list[sym]['보유'] = False # 청산
 
                                     if sell(sym, qty):
-                                        send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],1)}% 익절매합니다 ^^")
+                                        send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 익절매합니다 ^^")
                                         time.sleep(0.1)
                                         stock_dict= get_stock_balance()
                                         continue
                             
 
                         #시가 손절
-                        if(symbol_list[sym]['시가'] > current_price): # 오늘 시가 보다 떨어지면                    
+                        elif(symbol_list[sym]['시가'] > current_price): # 오늘 시가 보다 떨어지면                    
                             stock_dict = get_stock_balance() # 보유주식 정보 최신화
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
                                     if sell(sym, int(qty)):
-                                        send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],1)}% 시가 손절매합니다 ㅠ")
+                                        send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 시가 손절매합니다 ㅠ")
                                         symbol_list[sym]['보유'] = False
                                         time.sleep(0.1)
                                         stock_dict= get_stock_balance()
@@ -569,7 +570,7 @@ try:
                         continue # 보유 주식 있으면 매수하지 않는다.
 
                     # 목표가 매수
-                    if symbol_list[sym]['목표매수가'] <= current_price and symbol_list[sym]['보유'] == False:
+                    elif symbol_list[sym]['목표매수가'] <= current_price and symbol_list[sym]['보유'] == False:
                         qty = int(symbol_list[sym]['배분예산'] // current_price)
                         if qty > 0:
                             if buy(sym, qty):
@@ -614,7 +615,7 @@ try:
                 for sym, qty in stock_dict.items(): # 있으면 일괄 매도
                     sell(sym, int(qty))
 
-                    send_message(f">>> [{symbol_list[sym]['종목명']}]: {round(float(get_current_price(sym)/symbol_list[sym]['목표매수가']),1)}% 매도합니다")
+                    send_message(f">>> [{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/symbol_list[sym]['목표매수가'],4)}% 매도합니다")
                 send_message(f"---")
 
                 time.sleep(0.1)
