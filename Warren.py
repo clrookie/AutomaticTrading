@@ -49,6 +49,23 @@ def hashkey(datas): #사고팔때 필요함
     hashkey = res.json()["HASH"]
     return hashkey
 
+def get_holiday(day="YYYYMMDD"):
+    PATH = "/uapi/domestic-stock/v1/quotations/chk-holiday"
+    URL = f"{URL_BASE}/{PATH}"
+    headers = {"Content-Type":"application/json", 
+            "authorization": f"Bearer {ACCESS_TOKEN}",
+            "appKey":APP_KEY,
+            "appSecret":APP_SECRET,
+            "tr_id":"FHKST01010100",
+            "custtype":"P"}
+    params = {
+    "BASS_DT":day,
+    "CTX_AREA_NK":"",
+    "CTX_AREA_FK":""
+    }
+    res = requests.get(URL, headers=headers, params=params)
+    return int(res.json()['Output']['opnd_yn'])
+
 def get_current_price(code="005930"):
     """현재가 조회"""
     PATH = "uapi/domestic-stock/v1/quotations/inquire-price"
@@ -324,7 +341,9 @@ def sell(code="005930", qty="1"):
 
 # 자동 매매 코드
 try:        
+    send_message("")
     send_message("=== 자동매매를 초기화합니다 ===")
+    send_message("")
     
     holiday = False
     startoncebyday = False
@@ -414,14 +433,18 @@ try:
             t_exit = t_now.replace(hour=15, minute=19, second=40,microsecond=0)
             
             if t_start < t_now < t_exit and startoncebyday == False: # 매매 준비
+            
+                send_message("")
                 send_message("=== 데일리 자동매매를 준비합니다 ===")
+                send_message("")
+
+                
+                # 토큰 세팅
+                ACCESS_TOKEN = get_access_token()
                 
                 startoncebyday = True
                 holiday = False
-
-                # 토큰 세팅
-                ACCESS_TOKEN = get_access_token()
-
+                
                 total_cash = get_balance() # 보유 현금 조회
 
                 # 일단 100만원으로 테스팅 ===============================================================================
@@ -596,7 +619,9 @@ try:
                                 stock_dict= get_stock_balance()
 
                 if t_now.minute == 30 and t_now.second <= 5: 
-                    send_message(f"===30분========30분========30분========30분========30분========30분========30분===")
+                    send_message("")
+                    send_message("===30분===30분===30분===30분===30분===")
+                    send_message("")
                     get_stock_balance()
                     time.sleep(5)
                 
