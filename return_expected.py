@@ -1,10 +1,11 @@
 import schedule
 import time
+import datetime
 
-principal = 1000
+principal = 15000000
 
-rate = 1.015
-period = 100
+rate = 1.005
+period = 207
 
 print("원금: ", principal)
 print("수익률: ", rate)
@@ -23,11 +24,20 @@ for i in range(period):
     principal *= rate   
 
 formatted_amount1 = "{:,.0f}원".format(principal) 
-print("복리수익: ", formatted_amount1)
+print("복리: ", formatted_amount1)
 
 
-aaa = 1.16645
-print("소수점: ", round(aaa,2))
+
+now = datetime.datetime.now()
+message = {"content": f"[{now.strftime('%m-%d %H:%M:%S')}] {str("msg")}"}
+print(message)
+
+
+aa = (round(100/99.5,4))
+print(aa)
+
+aa = round(((100/99-1)*100),4)
+print(aa)
 
 """ 자동매매 스케쥴 시작
 schedule.every().day.at("09:31").do() 

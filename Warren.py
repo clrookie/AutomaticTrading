@@ -20,7 +20,7 @@ URL_BASE = _cfg['URL_BASE']
 def send_message(msg):
     """디스코드 메세지 전송"""
     now = datetime.datetime.now()
-    message = {"content": f"[[KOSPI]{now.strftime('%Y-%m-%d %H:%M:%S')}] {str(msg)}"}
+    message = {"content": f"[{now.strftime('%m-%d %H:%M:%S')}] {str(msg)}"}
     requests.post(DISCORD_WEBHOOK_URL, data=message)
     print(message)
 
@@ -334,7 +334,7 @@ try:
     sell_rate = 0.2
 
     symbol_list = {
-    '122630':{'종목명':'레버리지',
+    '122630':{'종목명':'코스피_레버리지',
     '배분예산':0,
     '목표매수가':0,
     '실매수가':0,
@@ -349,7 +349,7 @@ try:
     'profit_rate17_down':False,
     'profit_rate22_down':False},
 
-    '252670':{'종목명':'200선물인버스2X',
+    '252670':{'종목명':'코스피_인버스',
     '배분예산':0,
     '목표매수가':0,
     '실매수가':0,
@@ -364,7 +364,7 @@ try:
     'profit_rate17_down':False,
     'profit_rate22_down':False},
 
-    '233740':{'종목명':'코스닥150레버리지',
+    '233740':{'종목명':'코스닥_레버리지',
     '배분예산':0,
     '목표매수가':0,
     '실매수가':0,
@@ -379,7 +379,7 @@ try:
     'profit_rate17_down':False,
     'profit_rate22_down':False},
 
-    '251340':{'종목명':'코스닥150선물인버스',
+    '251340':{'종목명':'코스닥_인버스',
     '배분예산':0,
     '목표매수가':0,
     '실매수가':0,
@@ -406,17 +406,16 @@ try:
         else:
             t_now = datetime.datetime.now()
             
-            t_9 = t_now.replace(hour=9, minute=0, second=1, microsecond=0)
-            t_start = t_now.replace(hour=9, minute=0, second=2, microsecond=0)
+            t_start = t_now.replace(hour=9, minute=0, second=15, microsecond=0)
             t_930 = t_now.replace(hour=9, minute=30, second=0, microsecond=0)
-            t_exit = t_now.replace(hour=15, minute=19, second=55,microsecond=0)
+            t_exit = t_now.replace(hour=15, minute=19, second=40,microsecond=0)
 
-            # t_9 = t_now.replace(hour=20, minute=0, second=0, microsecond=0)
-            # t_start = t_now.replace(hour=23, minute=35, second=0, microsecond=0)
-            # t_930 = t_now.replace(hour=23, minute=59, second=0, microsecond=0)
-            # t_exit = t_now.replace(hour=23, minute=59, second=0,microsecond=0)
+            # t_9 = t_now.replace(hour=9, minute=0, second=1, microsecond=0)
+            # t_start = t_now.replace(hour=9, minute=0, second=2, microsecond=0)
+            # t_930 = t_now.replace(hour=9, minute=30, second=0, microsecond=0)
+            # t_exit = t_now.replace(hour=15, minute=19, second=55,microsecond=0)
             
-            if t_9 < t_now < t_start and startoncebyday == False: # 매매 준비
+            if t_start < t_now < t_exit and startoncebyday == False: # 매매 준비
                 send_message("=== 데일리 자동매매를 준비합니다 ===")
                 
                 startoncebyday = True
@@ -461,7 +460,7 @@ try:
 
 
                 time.sleep(0.1)
-                stock_dict = get_stock_balance() # 보유 주식 조회
+                # stock_dict = get_stock_balance() # 보유 주식 조회
 
             if t_start < t_now < t_exit and startoncebyday == True:  # AM 09:00 ~ PM 03:20 : 매수
 
@@ -555,9 +554,9 @@ try:
                                         continue
                             
 
-                        #시가 손절
-                        elif(symbol_list[sym]['시가'] > current_price): # 오늘 시가 보다 떨어지면                    
-                            stock_dict = get_stock_balance() # 보유주식 정보 최신화
+                        #시가 손절 : 99.5% 보정
+                        elif(symbol_list[sym]['시가']*0.995 > current_price): # 오늘 시가 보다 떨어지면                    
+                            # stock_dict = get_stock_balance() # 보유주식 정보 최신화
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
                                     if sell(sym, int(qty)):
@@ -577,13 +576,13 @@ try:
                                 symbol_list[sym]['실매수가'] = current_price
                                 symbol_list[sym]['보유'] = True
 
-                                send_message(f"[{symbol_list[sym]['종목명']}]")
+                                send_message(f"[{symbol_list[sym]['종목명']}] 매수가")
                                 
                                 formatted_amount = "{:,.0f}원".format(symbol_list[sym]['목표매수가'])
                                 send_message(f" - 목표매수가: {formatted_amount}")   
 
                                 formatted_amount = "{:,.0f}원".format(symbol_list[sym]['실매수가'])
-                                send_message(f" -실매수가: [{formatted_amount}")
+                                send_message(f" -실매수가: {formatted_amount}")
 
                                 #분할매수 조건 초기화
                                 symbol_list[sym]['profit_rate07_up'] = True
@@ -603,7 +602,7 @@ try:
                     time.sleep(5)
                 
                 # 서비스 정책상 (1초 20건 한계)
-                if t_9 <= t_now < t_930:
+                if t_start <= t_now < t_930:
                     time.sleep(1)
                 else:
                     time.sleep(15)
