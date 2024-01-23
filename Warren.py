@@ -218,7 +218,9 @@ def get_stock_balance():
     stock_list = res.json()['output1']
     evaluation = res.json()['output2']
     stock_dict = {}
-    send_message(f"====주식 보유잔고====")
+    
+    send_message("")
+    send_message("====주식 보유잔고====")
     for stock in stock_list:
         if int(stock['hldg_qty']) > 0:
             stock_dict[stock['pdno']] = stock['hldg_qty']
@@ -232,7 +234,8 @@ def get_stock_balance():
 
     formatted_amount = "{:,.0f}원".format(int(evaluation[0]['tot_evlu_amt']))
     send_message(f"총 평가 금액: {formatted_amount}")
-    send_message(f"=================")
+    send_message("=================")
+    send_message("")
     return stock_dict
 
 def get_balance():
@@ -284,7 +287,7 @@ def buy(code="005930", qty="1"):
     }
     res = requests.post(URL, headers=headers, data=json.dumps(data))
     if res.json()['rt_cd'] == '0':
-        send_message(f"[매수 성공]{str(res.json())}")
+        send_message("-+-+-매수 성공-+-+-")
         return True
     else:
         send_message(f"[매수 실패]{str(res.json())}")
@@ -312,7 +315,7 @@ def sell(code="005930", qty="1"):
     }
     res = requests.post(URL, headers=headers, data=json.dumps(data))
     if res.json()['rt_cd'] == '0':
-        send_message(f"[매도 성공]{str(res.json())}")
+        send_message(f"-----매도 성공-----")
         return True
     else:
         send_message(f"[매도 실패]{str(res.json())}")
@@ -455,7 +458,7 @@ try:
 
 
                 time.sleep(0.1)
-                # stock_dict = get_stock_balance() # 보유 주식 조회
+                stock_dict = get_stock_balance() # 보유 주식 조회
 
             if t_start < t_now < t_exit and startoncebyday == True:  # AM 09:00 ~ PM 03:20 : 매수
 
@@ -551,7 +554,7 @@ try:
 
                         #시가 손절 : 99.5% 보정
                         elif(symbol_list[sym]['시가']*0.995 > current_price): # 오늘 시가 보다 떨어지면                    
-                            # stock_dict = get_stock_balance() # 보유주식 정보 최신화
+                            stock_dict = get_stock_balance() # 보유주식 정보 최신화
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
                                     if sell(sym, int(qty)):
@@ -577,7 +580,7 @@ try:
                                 send_message(f" - 목표매수가: {formatted_amount}")   
 
                                 formatted_amount = "{:,.0f}원".format(symbol_list[sym]['실매수가'])
-                                send_message(f" -실매수가: {formatted_amount}")
+                                send_message(f" - 실매수가: {formatted_amount}")
 
                                 #분할매수 조건 초기화
                                 symbol_list[sym]['profit_rate07_up'] = True
