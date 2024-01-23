@@ -409,11 +409,6 @@ try:
             t_start = t_now.replace(hour=9, minute=0, second=15, microsecond=0)
             t_930 = t_now.replace(hour=9, minute=30, second=0, microsecond=0)
             t_exit = t_now.replace(hour=15, minute=19, second=40,microsecond=0)
-
-            # t_9 = t_now.replace(hour=9, minute=0, second=1, microsecond=0)
-            # t_start = t_now.replace(hour=9, minute=0, second=2, microsecond=0)
-            # t_930 = t_now.replace(hour=9, minute=30, second=0, microsecond=0)
-            # t_exit = t_now.replace(hour=15, minute=19, second=55,microsecond=0)
             
             if t_start < t_now < t_exit and startoncebyday == False: # 매매 준비
                 send_message("=== 데일리 자동매매를 준비합니다 ===")
@@ -598,6 +593,7 @@ try:
                                 stock_dict= get_stock_balance()
 
                 if t_now.minute == 30 and t_now.second <= 5: 
+                    send_message(f"===30분========30분========30분========30분========30분========30분========30분===")
                     get_stock_balance()
                     time.sleep(5)
                 
