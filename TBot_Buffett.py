@@ -306,6 +306,7 @@ try:
     startoncebyday = False
     t_0 = True
     t_30 = True
+    start_total_cash = 0
 
     # 분할매도 기준선
     profit_rate07 = 1.007
@@ -423,6 +424,7 @@ try:
 
                 # 일단 200만원으로 테스팅 ===============================================================================
                 total_cash /= 5 
+                start_total_cash = total_cash
 
                 stock_dict = get_stock_balance() # 보유 주식 조회
                 target_buy_count = int(len(symbol_list)) # 매수종목 수량
@@ -631,8 +633,14 @@ try:
                 send_message(f"---")
 
                 time.sleep(1)
-                stock_dict = get_stock_balance()
-                get_balance() # 보유 현금 조회
+                get_stock_balance()
+                total_cash = get_balance() # 보유 현금 조회
+
+                formatted_amount = "{:,.0f}원".format(int(start_total_cash))
+                send_message(f"장시작 잔고: {formatted_amount}")
+                formatted_amount = "{:,.0f}원".format(int(total_cash-start_total_cash))
+                send_message(f"오늘의 차익: {formatted_amount}")
+                send_message("")
 
                 send_message("=== 뉴욕증시 자동매매를 종료합니다 ===")
                 continue
