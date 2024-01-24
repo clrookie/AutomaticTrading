@@ -455,8 +455,8 @@ try:
                 
                 total_cash = get_balance() # 보유 현금 조회
 
-                # 일단 100만원으로 테스팅 ===============================================================================
-                total_cash /= 10 
+                # 일단 500만원으로 테스팅 ===============================================================================
+                total_cash /= 2 
 
                 stock_dict = get_stock_balance() # 보유 주식 조회
                 target_buy_count = int(len(symbol_list)) # 매수종목 수량
@@ -665,7 +665,7 @@ try:
 
                 time.sleep(0.1)
                 stock_dict = get_stock_balance()
-                
+                get_balance() # 보유 현금 조회
                 send_message("=== 데일리 자동매매를 종료합니다 ===")
                 continue
 except Exception as e:
