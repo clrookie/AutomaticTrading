@@ -86,7 +86,7 @@ def get_stck_oprc(market="NAS", code="AAPL"):
     }
     res = requests.get(URL, headers=headers, params=params)
 
-    stck_oprc = int(res.json()['output2'][0]['open']) #오늘 시가
+    stck_oprc = float(res.json()['output2'][0]['open']) #오늘 시가
     
     return stck_oprc
 
@@ -115,15 +115,15 @@ def get_target_price_new(market="NAS", code="AAPL"): # 음봉 윗꼬리 평균 +
     delta = 0 # 윗꼬리값
 
     for i in range(0,data_period):
-        stck_hgpr = int(res.json()['output2'][i]['high']) #고가
-        stck_clpr = int(res.json()['output2'][i]['clos']) #종가
-        stck_oprc = int(res.json()['output2'][i]['open']) #시가
+        stck_hgpr = float(res.json()['output2'][i]['high']) #고가
+        stck_clpr = float(res.json()['output2'][i]['clos']) #종가
+        stck_oprc = float(res.json()['output2'][i]['open']) #시가
 
         if stck_oprc >= stck_clpr : #음봉
             delta += stck_hgpr - stck_oprc
             cnt += 1
 
-    target_price = int(res.json()['output2'][0]['open']) #오늘 시가
+    target_price = float(res.json()['output2'][0]['open']) #오늘 시가
     
     if cnt > 0:
         delta /= cnt # 평균
@@ -297,8 +297,8 @@ try:
     sell_rate = 0.2
 
     symbol_list = {
-    'UDOW':{'종목명':'다우_레버리지',
-    '마켓':'AMEX',
+    'UPRO':{'종목명':'S&P_레버리지',
+    '마켓':'AMS',
     '배분예산':0,
     '목표매수가':0,
     '실매수가':0,
@@ -313,8 +313,8 @@ try:
     'profit_rate17_down':False,
     'profit_rate22_down':False},
 
-    'SDOW':{'종목명':'다우_인버스', # 다우 인버스
-    '마켓':'AMEX',
+    'SPXU':{'종목명':'S&P_인버스', # 다우 인버스
+    '마켓':'AMS',
     '배분예산':0,
     '목표매수가':0,
     '실매수가':0,
@@ -330,7 +330,7 @@ try:
     'profit_rate22_down':False},
 
     'TQQQ':{'종목명':'나스닥_레버리지',
-    '마켓':'NASD',
+    '마켓':'NAS',
     '배분예산':0,
     '목표매수가':0,
     '실매수가':0,
@@ -346,7 +346,7 @@ try:
     'profit_rate22_down':False},
 
     'SQQQ':{'종목명':'나스닥 인버스', # 나스닥 인버스
-    '마켓':'NASD',
+    '마켓':'NAS',
     '배분예산':0,
     '목표매수가':0,
     '실매수가':0,
@@ -410,15 +410,15 @@ try:
 
                     send_message(f"[{symbol_list[sym]['종목명']}]")
                     symbol_list[sym]['배분예산'] = (total_cash * (1/target_buy_count)) / exchange_rate # 환율 적용
-                    formatted_amount = "{:,.0f}$".format(symbol_list[sym]['배분예산'])
+                    formatted_amount = "{:,.4f}$".format(symbol_list[sym]['배분예산'])
                     send_message(f" - 배분예산: {formatted_amount}")
 
                     symbol_list[sym]['시가'] = get_stck_oprc(symbol_list[sym]['마켓'],sym)
-                    formatted_amount = "{:,.0f}$".format(symbol_list[sym]['시가'])
+                    formatted_amount = "{:,.4f}$".format(symbol_list[sym]['시가'])
                     send_message(f" - 시가: {formatted_amount}")   
 
                     symbol_list[sym]['목표매수가'] = get_target_price_new(symbol_list[sym]['마켓'],sym)
-                    formatted_amount = "{:,.0f}$".format(symbol_list[sym]['목표매수가'])
+                    formatted_amount = "{:,.4f}$".format(symbol_list[sym]['목표매수가'])
                     send_message(f" - 목표매수가: {formatted_amount}")   
 
                     send_message(f" - 타겟%: {round((symbol_list[sym]['목표매수가'])/symbol_list[sym]['시가'],4)}")
@@ -547,10 +547,10 @@ try:
 
                                 send_message(f"[{symbol_list[sym]['종목명']}] 매수가")
                                 
-                                formatted_amount = "{:,.0f}$".format(symbol_list[sym]['목표매수가'])
+                                formatted_amount = "{:,.4f}$".format(symbol_list[sym]['목표매수가'])
                                 send_message(f" - 목표매수가: {formatted_amount}")   
 
-                                formatted_amount = "{:,.0f}$".format(symbol_list[sym]['실매수가'])
+                                formatted_amount = "{:,.4f}$".format(symbol_list[sym]['실매수가'])
                                 send_message(f" - 실매수가: {formatted_amount}")
 
                                 #분할매수 조건 초기화
