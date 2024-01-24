@@ -348,6 +348,8 @@ try:
     
     holiday = False
     startoncebyday = False
+    t_0 = True
+    t_30 = True
 
     # 분할매도 기준선
     profit_rate07 = 1.007
@@ -447,6 +449,9 @@ try:
                 
                 startoncebyday = True
                 holiday = False
+                
+                t_0 = True
+                t_30 = True
                 
                 total_cash = get_balance() # 보유 현금 조회
 
@@ -625,12 +630,20 @@ try:
                                 time.sleep(0.1)
                                 stock_dict= get_stock_balance()
 
-                if t_now.minute == 30 and t_now.second <= 5: 
+                if t_now.minute == 30 and t_30: 
+                    t_30 = False
+                    t_0 = True
                     send_message("")
-                    send_message("===30분===30분===30분===30분===30분===")
+                    send_message("===30분===30분===30분===30분===")
                     send_message("")
                     get_stock_balance()
-                    time.sleep(5)
+                if t_now.minute == 0 and t_0:
+                    t_0 = False
+                    t_30 = True
+                    send_message("")
+                    send_message("===0분===0분===0분===0분===")
+                    send_message("")
+                    get_stock_balance()
                 
                 # 서비스 정책상 (1초 20건 한계)
                 if t_start <= t_now < t_930:
@@ -644,9 +657,9 @@ try:
                 startoncebyday = False
 
                 send_message(f"=데일리 일괄매도=")
+                stock_dict = get_stock_balance()
                 for sym, qty in stock_dict.items(): # 있으면 일괄 매도
                     sell(sym, int(qty))
-
                     send_message(f">>> [{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/symbol_list[sym]['목표매수가'],4)}% 매도합니다")
                 send_message(f"---")
 
