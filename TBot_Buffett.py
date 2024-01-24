@@ -406,7 +406,7 @@ try:
                 target_buy_count = int(len(symbol_list)) # 매수종목 수량
 
                 for sym, qty in stock_dict.items(): # 있으면 일괄 매도
-                    sell(symbol_list[sym]['마켓'], sym, int(qty),get_current_price(symbol_list[sym]['마켓'],sym))
+                    sell(symbol_list[sym]['마켓_sb'], sym, int(qty),get_current_price(symbol_list[sym]['마켓'],sym))
                     send_message(f">>> [{symbol_list[sym]['종목명']}] 시가({get_stck_oprc(symbol_list[sym]['마켓'],sym)})$에 매도했습니다~")
 
 
@@ -520,7 +520,7 @@ try:
                                     else:
                                         symbol_list[sym]['보유'] = False # 청산
 
-                                    if sell(symbol_list[sym]['마켓'], sym, qty, current_price):
+                                    if sell(symbol_list[sym]['마켓_sb'], sym, qty, current_price):
                                         send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 익절매합니다 ^^")
                                         time.sleep(0.1)
                                         stock_dict= get_stock_balance()
@@ -532,7 +532,7 @@ try:
                             stock_dict = get_stock_balance() # 보유주식 정보 최신화
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
-                                    if sell(symbol_list[sym]['마켓'], sym, int(qty), current_price):
+                                    if sell(symbol_list[sym]['마켓_sb'], sym, int(qty), current_price):
                                         send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 시가 손절매합니다 ㅠ")
                                         symbol_list[sym]['보유'] = False
                                         time.sleep(0.1)
@@ -545,7 +545,7 @@ try:
                     elif symbol_list[sym]['목표매수가'] <= current_price and symbol_list[sym]['보유'] == False:
                         qty = int(symbol_list[sym]['배분예산'] // current_price)
                         if qty > 0:
-                            if buy(symbol_list[sym]['마켓'], sym, qty, current_price):
+                            if buy(symbol_list[sym]['마켓_sb'], sym, qty, current_price):
                                 symbol_list[sym]['실매수가'] = current_price
                                 symbol_list[sym]['보유'] = True
 
@@ -590,7 +590,7 @@ try:
 
                 send_message(f"=데일리 일괄매도=")
                 for sym, qty in stock_dict.items(): # 있으면 일괄 매도
-                    sell(symbol_list[sym]['마켓'], sym, int(qty),get_current_price(symbol_list[sym]['마켓'],sym))
+                    sell(symbol_list[sym]['마켓_sb'], sym, int(qty),get_current_price(symbol_list[sym]['마켓'],sym))
 
                     send_message(f">>> [{symbol_list[sym]['종목명']}]: {round(get_current_price(symbol_list[sym]['마켓'],sym)/symbol_list[sym]['목표매수가'],4)}% 매도합니다")
                 send_message(f"---")
