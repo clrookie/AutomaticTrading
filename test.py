@@ -1,29 +1,51 @@
 
 import pandas as pd
-import yfinance as yf
-import matplotlib.pyplot as plt
-from matplotlib import font_manager, rc
+import FinanceDataReader as fdr
+from datetime import datetime
 
-# 주식 데이터 가져오기 (예: 삼성전자, 2022년 1월 1일부터 현재까지)
-stock_data = yf.download('122630.KS', start='2023-07-01')
+# 오늘 날짜 가져오기
+today_date = datetime.today().date()
 
-# 주식 종가 기준으로 5일 평균 계산
-stock_data['5일평균'] = stock_data['Close'].rolling(window=5).mean()
+# FinanceDataReader를 사용하여 코스피의 개장일 정보를 가져오기
+kospi_market_dates = fdr.StockListing('KOSPI')
 
-# 한글 폰트 설정
-font_path = "C:/Windows/Fonts/malgun.ttf"  # 사용하는 운영체제의 한글 폰트 경로로 변경
-font_name = font_manager.FontProperties(fname=font_path).get_name()
-rc('font', family=font_name)
+# 코스피 개장일 목록에서 오늘 날짜가 있는지 확인
+is_market_open_today = today_date in kospi_market_dates['ListingDate'].dt.date.values
 
-# 그래프 그리기
-plt.figure(figsize=(10, 6))
-plt.plot(stock_data['Close'], label='종가')
-plt.plot(stock_data['5일평균'], label='5일 평균선', color='orange')
-plt.title('주식 가격 및 5일 평균선')
-plt.xlabel('날짜')
-plt.ylabel('가격')
-plt.legend()
-plt.show()
+# 결과 출력
+if is_market_open_today:
+    print("오늘은 코스피의 개장일입니다.")
+else:
+    print("오늘은 코스피의 휴장일이거나 개장되지 않은 날입니다.")
+
+
+
+# import pandas as pd
+# import yfinance as yf
+# import matplotlib.pyplot as plt
+# from matplotlib import font_manager, rc
+
+
+# # 주식 데이터 가져오기 (예: 삼성전자, 2022년 1월 1일부터 현재까지)
+# stock_data = yf.download('122630.KS', start='2023-07-01')
+
+# # 주식 종가 기준으로 5일 평균 계산
+# stock_data['5일평균'] = stock_data['Close'].rolling(window=5).mean()
+
+# # 한글 폰트 설정
+# font_path = "C:/Windows/Fonts/malgun.ttf"  # 사용하는 운영체제의 한글 폰트 경로로 변경
+# font_name = font_manager.FontProperties(fname=font_path).get_name()
+# rc('font', family=font_name)
+
+# # 그래프 그리기
+# plt.figure(figsize=(10, 6))
+# plt.plot(stock_data['Close'], label='종가')
+# plt.plot(stock_data['5일평균'], label='5일 평균선', color='orange')
+# plt.title('주식 가격 및 5일 평균선')
+# plt.xlabel('날짜')
+# plt.ylabel('가격')
+# plt.legend()
+# plt.show()
 
 # symbol_list = { # 대한항공, LG디스플레이,태웅로직스,이월드
 #                 '003490':{'종목명':'대한항공',

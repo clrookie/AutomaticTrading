@@ -4,7 +4,7 @@ import datetime
 import time
 import yaml
 
-#git git git
+# KOSPI
 
 
 with open('config.yaml', encoding='UTF-8') as f:
