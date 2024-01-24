@@ -343,7 +343,7 @@ def sell(code="005930", qty="1"):
 # 자동 매매 코드
 try:        
     send_message("")
-    send_message("=== 자동매매를 초기화합니다 ===")
+    send_message("=== 한국증시 자동매매를 초기화합니다 ===")
     send_message("")
     
     holiday = False
