@@ -19,7 +19,6 @@ else:
     print("오늘은 코스피의 휴장일이거나 개장되지 않은 날입니다.")
 
 
-
 # import pandas as pd
 # import yfinance as yf
 # import matplotlib.pyplot as plt

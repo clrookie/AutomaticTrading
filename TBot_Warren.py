@@ -50,22 +50,9 @@ def hashkey(datas): #사고팔때 필요함
     return hashkey
 
 def get_holiday(day="YYYYMMDD"):
-    PATH = "/uapi/domestic-stock/v1/quotations/chk-holiday"
-    URL = f"{URL_BASE}/{PATH}"
-    headers = {"Content-Type":"application/json", 
-            "authorization": f"Bearer {ACCESS_TOKEN}",
-            "appKey":APP_KEY,
-            "appSecret":APP_SECRET,
-            "tr_id":"FHKST01010100",
-            "custtype":"P"}
-    params = {
-    "BASS_DT":day,
-    "CTX_AREA_NK":"",
-    "CTX_AREA_FK":""
-    }
-    res = requests.get(URL, headers=headers, params=params)
-    return int(res.json()['Output']['opnd_yn'])
-
+    date = ["2204MMDD",
+    "YYYYMMDD",
+    "YYYYMMDD"]
 def get_current_price(code="005930"):
     """현재가 조회"""
     PATH = "uapi/domestic-stock/v1/quotations/inquire-price"
