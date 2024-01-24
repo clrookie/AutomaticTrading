@@ -50,9 +50,23 @@ def hashkey(datas): #사고팔때 필요함
     return hashkey
 
 def get_holiday(day="YYYYMMDD"):
-    date = ["2204MMDD",
-    "YYYYMMDD",
-    "YYYYMMDD"]
+    date = ["20240209",
+    "20240212",
+    "20240301",
+    "20240410",
+    "20240501", "20240506","20240515",
+    "20240606",
+    "20240815",
+    "20240916","20240916","20240918",
+    "20241003","20241009",
+    "20241225","20241231"]
+
+    i =""
+    for i in date:
+        if i == day:
+            return True
+    return False
+
 def get_current_price(code="005930"):
     """현재가 조회"""
     PATH = "uapi/domestic-stock/v1/quotations/inquire-price"
@@ -406,10 +420,11 @@ try:
 
     while True:
         today = datetime.datetime.today().weekday()
+        today_date = datetime.datetime.today().strftime("%Y%m%d")
         
-        if today == 5 or today == 6:  # 토,일 자동종료
+        if today == 5 or today == 6 or get_holiday(today_date):  # 토,일 자동종료, 2024 공휴일 포함
             if holiday == False:
-                send_message("KOSPI 주말이라 쉽니다~")
+                send_message("KOSPI 휴장일 입니다~")
                 holiday = True
             continue
         else:
@@ -423,7 +438,7 @@ try:
             if t_start < t_now < t_exit and startoncebyday == False: # 매매 준비
             
                 send_message("")
-                send_message("=== 데일리 자동매매를 준비합니다 ===")
+                send_message("=== 한국증시 자동매매를 준비합니다 ===")
                 send_message("")
 
                 
@@ -470,6 +485,10 @@ try:
 
                 time.sleep(0.1)
                 stock_dict = get_stock_balance() # 보유 주식 조회
+                
+                send_message("")
+                send_message("한국증시 매매를 시작합니다~")
+                send_message("")
 
             if t_start < t_now < t_exit and startoncebyday == True:  # AM 09:00 ~ PM 03:20 : 매수
 

@@ -1,22 +1,44 @@
 
 import pandas as pd
 import FinanceDataReader as fdr
-from datetime import datetime
+import datetime
+
+def get_holiday(day="YYYYMMDD"):
+    date = ["20240209",
+    "20240212",
+    "20240301",
+    "20240410",
+    "20240501", "20240506","20240515",
+    "20240606",
+    "20240815",
+    "20240916","20240916","20240918",
+    "20241003","20241009",
+    "20241225","20241231"]
+
+    i =""
+    for i in date:
+        if i == day:
+            return True
+    return False
 
 # 오늘 날짜 가져오기
-today_date = datetime.today().date()
 
+
+today = datetime.datetime.today().weekday()
+today_date = datetime.datetime.today().strftime("%Y%m%d")
+
+get_holiday(today)
 # FinanceDataReader를 사용하여 코스피의 개장일 정보를 가져오기
 kospi_market_dates = fdr.StockListing('KOSPI')
 
-# 코스피 개장일 목록에서 오늘 날짜가 있는지 확인
-is_market_open_today = today_date in kospi_market_dates['ListingDate'].dt.date.values
+# # 코스피 개장일 목록에서 오늘 날짜가 있는지 확인
+# is_market_open_today = today_date in kospi_market_dates['ListingDate'].dt.date.values
 
-# 결과 출력
-if is_market_open_today:
-    print("오늘은 코스피의 개장일입니다.")
-else:
-    print("오늘은 코스피의 휴장일이거나 개장되지 않은 날입니다.")
+# # 결과 출력
+# if is_market_open_today:
+#     print("오늘은 코스피의 개장일입니다.")
+# else:
+#     print("오늘은 코스피의 휴장일이거나 개장되지 않은 날입니다.")
 
 
 # import pandas as pd

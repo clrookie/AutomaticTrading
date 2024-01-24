@@ -51,6 +51,22 @@ def hashkey(datas): #사고팔때 필요함
     return hashkey
 
 # 뉴욕증시 함수
+def get_holiday(day="YYYYMMDD"):
+    date = ["20240219",
+    "20240329",
+    "20240527",
+    "20240619",
+    "20240704",
+    "20240902",
+    "20241128",
+    "20241225","20241231"]
+
+    i =""
+    for i in date:
+        if i == day:
+            return True
+    return False
+
 def get_current_price(market="NAS", code="AAPL"):
     """현재가 조회"""
     PATH = "uapi/overseas-price/v1/quotations/price"
@@ -369,10 +385,11 @@ try:
     while True:
         t_now = datetime.datetime.now(timezone('America/New_York')) # 뉴욕 기준 현재 시간
         today = t_now.weekday()
+        today_date = datetime.datetime.today().strftime("%Y%m%d")
         
-        if today == 5 or today == 6:  # 토,일 자동종료
+        if today == 5 or today == 6 or get_holiday(today_date):  # 토,일 자동종료, 2024 공휴일 포함
             if holiday == False:
-                send_message("뉴욕증시 주말이라 쉽니다~")
+                send_message("뉴욕증시 휴장일 입니다~")
                 holiday = True
             continue
         else:
@@ -386,7 +403,7 @@ try:
             if t_start < t_now < t_exit and startoncebyday == False: # 매매 준비
             
                 send_message("")
-                send_message("=== 뉴욕증시 데일리 자동매매를 준비합니다 ===")
+                send_message("=== 뉴욕증시 자동매매를 준비합니다 ===")
                 send_message("")
 
                 
@@ -434,6 +451,10 @@ try:
 
                 time.sleep(0.1)
                 stock_dict = get_stock_balance() # 보유 주식 조회
+
+                send_message("")
+                send_message("뉴욕증시 매매를 시작합니다~")
+                send_message("")
 
             if t_start < t_now < t_exit and startoncebyday == True:  # AM 09:00 ~ PM 03:20 : 매수
 
@@ -522,7 +543,7 @@ try:
 
                                     if sell(symbol_list[sym]['마켓_sb'], sym, qty, current_price):
                                         send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 익절매합니다 ^^")
-                                        time.sleep(0.1)
+                                        time.sleep(1)
                                         stock_dict= get_stock_balance()
                                         continue
                             
@@ -535,7 +556,7 @@ try:
                                     if sell(symbol_list[sym]['마켓_sb'], sym, int(qty), current_price):
                                         send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 시가 손절매합니다 ㅠ")
                                         symbol_list[sym]['보유'] = False
-                                        time.sleep(0.1)
+                                        time.sleep(1)
                                         stock_dict= get_stock_balance()
                                         continue
                         
@@ -567,7 +588,7 @@ try:
                                 symbol_list[sym]['profit_rate17_down'] = False
                                 symbol_list[sym]['profit_rate22_down'] = False
                                 
-                                time.sleep(0.1)
+                                time.sleep(1)
                                 stock_dict= get_stock_balance()
 
                 if t_now.minute == 30 and t_now.second <= 5: 
@@ -595,10 +616,10 @@ try:
                     send_message(f">>> [{symbol_list[sym]['종목명']}]: {round(get_current_price(symbol_list[sym]['마켓'],sym)/symbol_list[sym]['목표매수가'],4)}% 매도합니다")
                 send_message(f"---")
 
-                time.sleep(0.1)
+                time.sleep(1)
                 stock_dict = get_stock_balance()
                 
-                send_message("=== 뉴욕증시 데일리 자동매매를 종료합니다 ===")
+                send_message("=== 뉴욕증시 자동매매를 종료합니다 ===")
                 continue
 except Exception as e:
     send_message(f"[오류 발생]{e}")
