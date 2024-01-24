@@ -422,7 +422,7 @@ try:
         
         if today == 5 or today == 6:  # 토,일 자동종료
             if holiday == False:
-                send_message("주말이라 쉽니다~")
+                send_message("KOSPI 주말이라 쉽니다~")
                 holiday = True
             continue
         else:
@@ -430,6 +430,7 @@ try:
             
             t_start = t_now.replace(hour=9, minute=0, second=15, microsecond=0)
             t_930 = t_now.replace(hour=9, minute=30, second=0, microsecond=0)
+            t_1510 = t_now.replace(hour=15, minute=10, second=40,microsecond=0)
             t_exit = t_now.replace(hour=15, minute=19, second=40,microsecond=0)
             
             if t_start < t_now < t_exit and startoncebyday == False: # 매매 준비
@@ -627,6 +628,8 @@ try:
                 
                 # 서비스 정책상 (1초 20건 한계)
                 if t_start <= t_now < t_930:
+                    time.sleep(1)
+                elif t_1510 <= t_now < t_exit:
                     time.sleep(1)
                 else:
                     time.sleep(15)

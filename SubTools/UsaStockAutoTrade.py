@@ -260,6 +260,7 @@ try:
         t_sell = t_now.replace(hour=15, minute=45, second=0, microsecond=0)
         t_exit = t_now.replace(hour=15, minute=50, second=0,microsecond=0)
         today = t_now.weekday()
+        
         if today == 5 or today == 6:  # 토요일이나 일요일이면 자동 종료
             send_message("주말이므로 프로그램을 종료합니다.")
             break
