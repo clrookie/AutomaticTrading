@@ -456,10 +456,10 @@ try:
                 t_30 = True
                 
                 total_cash = get_balance() # 보유 현금 조회
+                start_total_cash = total_cash
 
                 # 일단 200만원으로 테스팅 ===============================================================================
                 total_cash /= 5 
-                start_total_cash = total_cash
 
                 stock_dict = get_stock_balance() # 보유 주식 조회
                 target_buy_count = int(len(symbol_list)) # 매수종목 수량

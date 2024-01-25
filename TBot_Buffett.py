@@ -419,12 +419,12 @@ try:
                 t_0 = True
                 t_30 = True
                 
+                start_total_cash = total_cash
                 total_cash = get_balance() # 보유 현금 조회
                 exchange_rate = get_exchange_rate() # 환율 조회
 
                 # 일단 200만원으로 테스팅 ===============================================================================
                 total_cash /= 5 
-                start_total_cash = total_cash
 
                 stock_dict = get_stock_balance() # 보유 주식 조회
                 target_buy_count = int(len(symbol_list)) # 매수종목 수량
