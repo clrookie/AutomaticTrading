@@ -519,7 +519,7 @@ try:
                 start_total_cash = total_cash
 
                 # 일단 200만원으로 테스팅 ===============================================================================
-                total_cash /= 5 
+                #total_cash /= 5 
 
                 stock_dict = get_stock_balance() # 보유 주식 조회
                 target_buy_count = int(len(symbol_list)) # 매수종목 수량
