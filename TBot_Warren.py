@@ -519,7 +519,7 @@ try:
                 start_total_cash = total_cash
 
                 # 일단 200만원으로 테스팅 ===============================================================================
-                #total_cash /= 5 
+                # total_cash /= 5 
 
                 stock_dict = get_stock_balance() # 보유 주식 조회
                 target_buy_count = int(len(symbol_list)) # 매수종목 수량
@@ -638,10 +638,8 @@ try:
                                     qty = int(qty)                                    
                                     sell_qty = int(symbol_list[sym]['배분예산'] // current_price) * sell_rate
 
-                                    if qty > sell_qty: # sell_rate 매도
+                                    if qty > sell_qty: # sell_rate 분할매도
                                         qty = sell_qty
-                                    else:
-                                        symbol_list[sym]['보유'] = False # 청산
 
                                     if sell(sym, qty):
                                         send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 익절매합니다 ^^")
@@ -651,13 +649,13 @@ try:
                             
 
                         #시가 손절 : 99.5% 보정
-                        elif(symbol_list[sym]['시가']*0.995 > current_price): # 오늘 시가 보다 떨어지면                    
+                        elif(symbol_list[sym]['시가']*0.995 > current_price): # 오늘 시가 보다 떨어지면 
+                            symbol_list[sym]['보유'] = False                   
                             stock_dict = get_stock_balance() # 보유주식 정보 최신화
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
                                     if sell(sym, int(qty)):
                                         send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 시가 손절매합니다 ㅠ")
-                                        symbol_list[sym]['보유'] = False
                                         time.sleep(0.1)
                                         stock_dict= get_stock_balance()
                                         continue
@@ -680,7 +678,7 @@ try:
                                 formatted_amount = "{:,.0f}원".format(symbol_list[sym]['실매수가'])
                                 send_message(f" - 실매수가: {formatted_amount}")
 
-                                #분할매수 조건 초기화
+                                #분할매도 조건 초기화
                                 symbol_list[sym]['profit_rate07_up'] = True
                                 symbol_list[sym]['profit_rate12_up'] = True
                                 symbol_list[sym]['profit_rate17_up'] = True

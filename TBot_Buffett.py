@@ -534,10 +534,10 @@ try:
         else:
             t_now = datetime.datetime.now(timezone('America/New_York')) # 뉴욕 기준 현재 시간
             
-            t_start = t_now.replace(hour=9, minute=30, second=15, microsecond=0)
+            t_start = t_now.replace(hour=9, minute=31, second=0, microsecond=0)
             t_10 = t_now.replace(hour=10, minute=0, second=0, microsecond=0)
             t_1550 = t_now.replace(hour=15, minute=50, second=0, microsecond=0)
-            t_exit = t_now.replace(hour=15, minute=59, second=40,microsecond=0)
+            t_exit = t_now.replace(hour=15, minute=59, second=0,microsecond=0)
             
             if t_start < t_now < t_exit and startoncebyday == False: # 매매 준비
             
@@ -679,10 +679,8 @@ try:
                                     qty = int(qty)                                    
                                     sell_qty = int(symbol_list[sym]['배분예산'] // current_price) * sell_rate
 
-                                    if qty > sell_qty: # sell_rate 매도
+                                    if qty > sell_qty: # sell_rate 분할매도
                                         qty = sell_qty
-                                    else:
-                                        symbol_list[sym]['보유'] = False # 청산
 
                                     if sell(symbol_list[sym]['마켓_sb'], sym, qty, current_price):
                                         send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 익절매합니다 ^^")
@@ -692,13 +690,13 @@ try:
                             
 
                         #시가 손절 : 99.5% 보정
-                        elif(symbol_list[sym]['시가']*0.995 > current_price): # 오늘 시가 보다 떨어지면                    
+                        elif(symbol_list[sym]['시가']*0.995 > current_price): # 오늘 시가 보다 떨어지면 
+                            symbol_list[sym]['보유'] = False                   
                             stock_dict = get_stock_balance() # 보유주식 정보 최신화
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
                                     if sell(symbol_list[sym]['마켓_sb'], sym, int(qty), current_price):
                                         send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 시가 손절매합니다 ㅠ")
-                                        symbol_list[sym]['보유'] = False
                                         time.sleep(1)
                                         stock_dict= get_stock_balance()
                                         continue
@@ -721,7 +719,7 @@ try:
                                 formatted_amount = "{:,.4f}$".format(symbol_list[sym]['실매수가'])
                                 send_message(f" - 실매수가: {formatted_amount}")
 
-                                #분할매수 조건 초기화
+                                #분할매도 조건 초기화
                                 symbol_list[sym]['profit_rate07_up'] = True
                                 symbol_list[sym]['profit_rate12_up'] = True
                                 symbol_list[sym]['profit_rate17_up'] = True
