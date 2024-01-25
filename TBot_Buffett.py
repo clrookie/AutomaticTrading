@@ -316,7 +316,7 @@ try:
     sell_rate = 0.2
 
     symbol_list = {
-    'DDM':{'종목명':'다우_레버리지X2',
+    'DDM':{'종목명':'다우_레버리지X2', #1
     '마켓':'AMS',
     '마켓_sb':'AMEX',
     '배분예산':0,
@@ -333,7 +333,7 @@ try:
     'profit_rate17_down':False,
     'profit_rate22_down':False},
 
-    'DXD':{'종목명':'다우_인버스X2',
+    'DXD':{'종목명':'다우_인버스X2', #2
     '마켓':'AMS',
     '마켓_sb':'AMEX',
     '배분예산':0,
@@ -350,7 +350,7 @@ try:
     'profit_rate17_down':False,
     'profit_rate22_down':False},
 
-    'SSO':{'종목명':'S&P_레버리지X2',
+    'SSO':{'종목명':'S&P_레버리지X2', #3
     '마켓':'AMS',
     '마켓_sb':'AMEX',
     '배분예산':0,
@@ -367,7 +367,7 @@ try:
     'profit_rate17_down':False,
     'profit_rate22_down':False},
 
-    'SDS':{'종목명':'S&P_인버스X2', # 다우 인버스
+    'SDS':{'종목명':'S&P_인버스X2', #4
     '마켓':'AMS',
     '마켓_sb':'AMEX',
     '배분예산':0,
@@ -384,7 +384,7 @@ try:
     'profit_rate17_down':False,
     'profit_rate22_down':False},
 
-    'QLD':{'종목명':'나스닥_레버리지X2',
+    'QLD':{'종목명':'나스닥_레버리지X2', #5
     '마켓':'NAS',
     '마켓_sb':'NASD',
     '배분예산':0,
@@ -401,7 +401,7 @@ try:
     'profit_rate17_down':False,
     'profit_rate22_down':False},
 
-    'QID':{'종목명':'나스닥 인버스X2', # 나스닥 인버스
+    'QID':{'종목명':'나스닥 인버스X2', #6
     '마켓':'NAS',
     '마켓_sb':'NASD',
     '배분예산':0,
@@ -418,7 +418,7 @@ try:
     'profit_rate17_down':False,
     'profit_rate22_down':False},         
     # ---------
-    'UDOW':{'종목명':'다우_레버리지X3',
+    'UDOW':{'종목명':'다우_레버리지X3', #7
     '마켓':'AMS',
     '마켓_sb':'AMEX',
     '배분예산':0,
@@ -435,7 +435,7 @@ try:
     'profit_rate17_down':False,
     'profit_rate22_down':False},
 
-    'SDOW':{'종목명':'다우_인버스X3',
+    'SDOW':{'종목명':'다우_인버스X3',   #8
     '마켓':'AMS',
     '마켓_sb':'AMEX',
     '배분예산':0,
@@ -452,7 +452,7 @@ try:
     'profit_rate17_down':False,
     'profit_rate22_down':False},
 
-    'UPRO':{'종목명':'S&P_레버리지X3',
+    'UPRO':{'종목명':'S&P_레버리지X3',  #9
     '마켓':'AMS',
     '마켓_sb':'AMEX',
     '배분예산':0,
@@ -469,7 +469,7 @@ try:
     'profit_rate17_down':False,
     'profit_rate22_down':False},
 
-    'SPXU':{'종목명':'S&P_인버스X3', # 다우 인버스
+    'SPXU':{'종목명':'S&P_인버스X3', #10
     '마켓':'AMS',
     '마켓_sb':'AMEX',
     '배분예산':0,
@@ -486,7 +486,7 @@ try:
     'profit_rate17_down':False,
     'profit_rate22_down':False},
 
-    'TQQQ':{'종목명':'나스닥_레버리지X3',
+    'TQQQ':{'종목명':'나스닥_레버리지X3',   #11
     '마켓':'NAS',
     '마켓_sb':'NASD',
     '배분예산':0,
@@ -503,7 +503,7 @@ try:
     'profit_rate17_down':False,
     'profit_rate22_down':False},
 
-    'SQQQ':{'종목명':'나스닥 인버스X3', # 나스닥 인버스
+    'SQQQ':{'종목명':'나스닥 인버스X3', #12
     '마켓':'NAS',
     '마켓_sb':'NASD',
     '배분예산':0,
