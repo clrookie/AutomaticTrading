@@ -419,8 +419,8 @@ try:
                 t_0 = True
                 t_30 = True
                 
-                start_total_cash = total_cash
                 total_cash = get_balance() # 보유 현금 조회
+                start_total_cash = total_cash
                 exchange_rate = get_exchange_rate() # 환율 조회
 
                 # 일단 200만원으로 테스팅 ===============================================================================

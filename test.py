@@ -2,8 +2,8 @@
 import pandas as pd
 import FinanceDataReader as fdr
 
-
-print(int(1-2))
+a = 1-1-1-1+1-1+1+1+1+1+1-1-1+1
+print(a)
 # 오늘 날짜 가져오기
 
 
