@@ -333,7 +333,7 @@ def sell(code="005930", qty="1"):
     }
     res = requests.post(URL, headers=headers, data=json.dumps(data))
     if res.json()['rt_cd'] == '0':
-        send_message(f"-----매도 성공-----")
+        send_message(f"-#-#-매도 성공-#-#-")
         return True
     else:
         send_message(f"[매도 실패]{str(res.json())}")
@@ -350,6 +350,10 @@ try:
     startoncebyday = False
     t_0 = True
     t_30 = True
+
+    buy_cnt = 0
+    good_sell_cnt = 0
+    bad_sell_cnt = 0
 
     start_total_cash = 0
 
@@ -514,6 +518,10 @@ try:
                 
                 t_0 = True
                 t_30 = True
+
+                buy_cnt = 0
+                good_sell_cnt = 0
+                bad_sell_cnt = 0
                 
                 total_cash = get_balance() # 보유 현금 조회
                 start_total_cash = total_cash
@@ -642,9 +650,9 @@ try:
                                         qty = sell_qty
 
                                     if sell(sym, qty):
+                                        good_sell_cnt += 1
                                         send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 익절매합니다 ^^")
-                                        time.sleep(0.1)
-                                        stock_dict= get_stock_balance()
+                                    
                                         continue
                             
 
@@ -655,9 +663,9 @@ try:
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
                                     if sell(sym, int(qty)):
+                                        bad_sell_cnt += 1
                                         send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 시가 손절매합니다 ㅠ")
-                                        time.sleep(0.1)
-                                        stock_dict= get_stock_balance()
+                                        
                                         continue
                         
                         continue # 보유 주식 있으면 매수하지 않는다.
@@ -667,6 +675,7 @@ try:
                         qty = int(symbol_list[sym]['배분예산'] // current_price)
                         if qty > 0:
                             if buy(sym, qty):
+                                buy_cnt += 1
                                 symbol_list[sym]['실매수가'] = current_price
                                 symbol_list[sym]['보유'] = True
 
@@ -721,12 +730,17 @@ try:
                 stock_dict = get_stock_balance()
                 for sym, qty in stock_dict.items(): # 있으면 일괄 매도
                     sell(sym, int(qty))
+                    send_message(f">>> [{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(sym)} / 매수가 {symbol_list[sym]['목표매수가']}")
                     send_message(f">>> [{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/symbol_list[sym]['목표매수가'],4)}% 매도합니다")
                 send_message(f"---")
 
                 time.sleep(0.1)
                 get_stock_balance()
                 total_cash = get_balance() # 보유 현금 조회
+
+                send_message(f"buy cnt: {good_sell_cnt}")
+                send_message(f"Good Sell cnt: {good_sell_cnt}")
+                send_message(f"bad Sell cnt: {bad_sell_cnt}")
 
                 formatted_amount = "{:,.0f}원".format(int(start_total_cash))
                 send_message(f"장시작 잔고: {formatted_amount}")

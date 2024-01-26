@@ -385,8 +385,8 @@ try:
     'profit_rate22_down':False},
 
     'QLD':{'종목명':'나스닥_레버리지X2', #5
-    '마켓':'NAS',
-    '마켓_sb':'NASD',
+    '마켓':'AMS',
+    '마켓_sb':'AMEX',
     '배분예산':0,
     '목표매수가':0,
     '실매수가':0,
@@ -402,8 +402,8 @@ try:
     'profit_rate22_down':False},
 
     'QID':{'종목명':'나스닥 인버스X2', #6
-    '마켓':'NAS',
-    '마켓_sb':'NASD',
+    '마켓':'AMS',
+    '마켓_sb':'AMEX',
     '배분예산':0,
     '목표매수가':0,
     '실매수가':0,
@@ -684,8 +684,7 @@ try:
 
                                     if sell(symbol_list[sym]['마켓_sb'], sym, qty, current_price):
                                         send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 익절매합니다 ^^")
-                                        time.sleep(1)
-                                        stock_dict= get_stock_balance()
+                                        
                                         continue
                             
 
@@ -697,8 +696,7 @@ try:
                                 if sym == symtemp:
                                     if sell(symbol_list[sym]['마켓_sb'], sym, int(qty), current_price):
                                         send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 시가 손절매합니다 ㅠ")
-                                        time.sleep(1)
-                                        stock_dict= get_stock_balance()
+                                        
                                         continue
                         
                         continue # 보유 주식 있으면 매수하지 않는다.
