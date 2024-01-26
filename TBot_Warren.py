@@ -14,7 +14,7 @@ APP_SECRET = _cfg['APP_SECRET']
 ACCESS_TOKEN = ""
 CANO = _cfg['CANO']
 ACNT_PRDT_CD = _cfg['ACNT_PRDT_CD']
-DISCORD_WEBHOOK_URL = _cfg['DISCORD_WEBHOOK_URL']
+DISCORD_WEBHOOK_URL = _cfg['DISCORD_WEBHOOK_URL_KOREA']
 URL_BASE = _cfg['URL_BASE']
 
 def send_message(msg):
@@ -208,6 +208,35 @@ def get_target_price_new(code="005930"): # 음봉 윗꼬리 평균 + 보정
 
     return target_price
 
+def get_total():
+    """총 평가 금액"""
+    PATH = "uapi/domestic-stock/v1/trading/inquire-balance"
+    URL = f"{URL_BASE}/{PATH}"
+    headers = {"Content-Type":"application/json", 
+        "authorization":f"Bearer {ACCESS_TOKEN}",
+        "appKey":APP_KEY,
+        "appSecret":APP_SECRET,
+        "tr_id":"TTTC8434R",
+        "custtype":"P",
+    }
+    params = {
+        "CANO": CANO,
+        "ACNT_PRDT_CD": ACNT_PRDT_CD,
+        "AFHR_FLPR_YN": "N",
+        "OFL_YN": "",
+        "INQR_DVSN": "02",
+        "UNPR_DVSN": "01",
+        "FUND_STTL_ICLD_YN": "N",
+        "FNCG_AMT_AUTO_RDPT_YN": "N",
+        "PRCS_DVSN": "01",
+        "CTX_AREA_FK100": "",
+        "CTX_AREA_NK100": ""
+    }
+    res = requests.get(URL, headers=headers, params=params)
+    evaluation = res.json()['output2']
+
+    return int(evaluation[0]['tot_evlu_amt'])
+
 def get_stock_balance():
     """주식 잔고조회"""
     PATH = "uapi/domestic-stock/v1/trading/inquire-balance"
@@ -343,7 +372,7 @@ def sell(code="005930", qty="1"):
 # 자동 매매 코드
 try:        
     send_message("")
-    send_message("=== 한국증시 자동매매를 초기화합니다 ===")
+    send_message("=== 국내증시 초기화합니다 ===")
     send_message("")
     
     holiday = False
@@ -354,8 +383,10 @@ try:
     buy_cnt = 0
     good_sell_cnt = 0
     bad_sell_cnt = 0
+    end_sell_cnt = 0
 
     start_total_cash = 0
+    max_buy = 0
 
     # 분할매도 기준선
     profit_rate07 = 1.007
@@ -371,6 +402,8 @@ try:
     '실매수가':0,
     '시가':0,
     '보유':False,
+    '예산_가중치':1.5,
+    '익절_가중치':0.5,
     'profit_rate07_up':True,
     'profit_rate12_up':True,
     'profit_rate17_up':True,
@@ -386,6 +419,8 @@ try:
     '실매수가':0,
     '시가':0,
     '보유':False,
+    '예산_가중치':1.5,
+    '익절_가중치':0.5,
     'profit_rate07_up':True,
     'profit_rate12_up':True,
     'profit_rate17_up':True,
@@ -401,6 +436,8 @@ try:
     '실매수가':0,
     '시가':0,
     '보유':False,
+    '예산_가중치':1.0,
+    '익절_가중치':1.0,
     'profit_rate07_up':True,
     'profit_rate12_up':True,
     'profit_rate17_up':True,
@@ -416,6 +453,8 @@ try:
     '실매수가':0,
     '시가':0,
     '보유':False,
+    '예산_가중치':1.0,
+    '익절_가중치':1.0,
     'profit_rate07_up':True,
     'profit_rate12_up':True,
     'profit_rate17_up':True,
@@ -431,6 +470,8 @@ try:
     '실매수가':0,
     '시가':0,
     '보유':False,
+    '예산_가중치':1.0,
+    '익절_가중치':1.0,
     'profit_rate07_up':True,
     'profit_rate12_up':True,
     'profit_rate17_up':True,
@@ -446,6 +487,8 @@ try:
     '실매수가':0,
     '시가':0,
     '보유':False,
+    '예산_가중치':1.0,
+    '익절_가중치':1.5,
     'profit_rate07_up':True,
     'profit_rate12_up':True,
     'profit_rate17_up':True,
@@ -461,6 +504,8 @@ try:
     '실매수가':0,
     '시가':0,
     '보유':False,
+    '예산_가중치':1.0,
+    '익절_가중치':1.5,
     'profit_rate07_up':True,
     'profit_rate12_up':True,
     'profit_rate17_up':True,
@@ -476,6 +521,8 @@ try:
     '실매수가':0,
     '시가':0,
     '보유':False,
+    '예산_가중치':0.5,
+    '익절_가중치':2.0,
     'profit_rate07_up':True,
     'profit_rate12_up':True,
     'profit_rate17_up':True,
@@ -506,7 +553,7 @@ try:
             if t_start < t_now < t_exit and startoncebyday == False: # 매매 준비
             
                 send_message("")
-                send_message("=== 한국증시 자동매매를 준비합니다 ===")
+                send_message("=== 국내증시 자동매매를 준비합니다 ===")
                 send_message("")
 
                 
@@ -522,9 +569,12 @@ try:
                 buy_cnt = 0
                 good_sell_cnt = 0
                 bad_sell_cnt = 0
+                end_sell_cnt = 0
+                
+                max_buy = 0
                 
                 total_cash = get_balance() # 보유 현금 조회
-                start_total_cash = total_cash
+                start_total_cash = get_total()
 
                 # 일단 200만원으로 테스팅 ===============================================================================
                 # total_cash /= 5 
@@ -540,7 +590,7 @@ try:
                 for sym in symbol_list: # 초기화
 
                     send_message(f"[{symbol_list[sym]['종목명']}]")
-                    symbol_list[sym]['배분예산'] = total_cash * (1/target_buy_count)
+                    symbol_list[sym]['배분예산'] = total_cash * (1/target_buy_count) * symbol_list[sym]['예산_가중치']
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['배분예산'])
                     send_message(f" - 배분예산: {formatted_amount}")
 
@@ -557,13 +607,9 @@ try:
                     symbol_list[sym]['보유'] = False
                     send_message("---------------------------------")
                     
-
-
-                time.sleep(0.1)
-                stock_dict = get_stock_balance() # 보유 주식 조회
                 
                 send_message("")
-                send_message("한국증시 매매를 시작합니다~")
+                send_message("국내증시 매매를 시작합니다~")
                 send_message("")
 
             if t_start < t_now < t_exit and startoncebyday == True:  # AM 09:00 ~ PM 03:20 : 매수
@@ -576,7 +622,7 @@ try:
                         sell_fix = False
                         
                         #상향 익절
-                        if current_price > symbol_list[sym]['목표매수가']*profit_rate22 and symbol_list[sym]['profit_rate22_up']:
+                        if current_price > symbol_list[sym]['목표매수가']*profit_rate22*symbol_list[sym]['익절_가중치'] and symbol_list[sym]['profit_rate22_up']:
                             symbol_list[sym]['profit_rate22_up'] = False
                             symbol_list[sym]['profit_rate17_up'] = False
                             symbol_list[sym]['profit_rate12_up'] = False
@@ -588,7 +634,7 @@ try:
 
                             sell_fix = True
 
-                        elif current_price > symbol_list[sym]['목표매수가']*profit_rate17 and symbol_list[sym]['profit_rate17_up']:
+                        elif current_price > symbol_list[sym]['목표매수가']*profit_rate17*symbol_list[sym]['익절_가중치'] and symbol_list[sym]['profit_rate17_up']:
                             symbol_list[sym]['profit_rate17_up'] = False
                             symbol_list[sym]['profit_rate12_up'] = False
                             symbol_list[sym]['profit_rate07_up'] = False
@@ -598,7 +644,7 @@ try:
 
                             sell_fix = True
 
-                        elif current_price > symbol_list[sym]['목표매수가']*profit_rate12 and symbol_list[sym]['profit_rate12_up']:
+                        elif current_price > symbol_list[sym]['목표매수가']*profit_rate12*symbol_list[sym]['익절_가중치'] and symbol_list[sym]['profit_rate12_up']:
                             symbol_list[sym]['profit_rate12_up'] = False
                             symbol_list[sym]['profit_rate07_up'] = False
 
@@ -606,20 +652,20 @@ try:
 
                             sell_fix = True
 
-                        elif current_price > symbol_list[sym]['목표매수가']*profit_rate07 and symbol_list[sym]['profit_rate07_up']:
+                        elif current_price > symbol_list[sym]['목표매수가']*profit_rate07*symbol_list[sym]['익절_가중치'] and symbol_list[sym]['profit_rate07_up']:
                             symbol_list[sym]['profit_rate07_up'] = False
 
                             sell_fix = True
 
                         # 하향 익절
-                        elif current_price <= symbol_list[sym]['목표매수가']*profit_rate17 and symbol_list[sym]['profit_rate17_down']:
+                        elif current_price <= symbol_list[sym]['목표매수가']*profit_rate17*symbol_list[sym]['익절_가중치'] and symbol_list[sym]['profit_rate17_down']:
                             symbol_list[sym]['profit_rate17_down'] = False
 
                             symbol_list[sym]['profit_rate22_up'] = True
 
                             sell_fix = True
 
-                        elif current_price <= symbol_list[sym]['목표매수가']*profit_rate12 and symbol_list[sym]['profit_rate12_down']:
+                        elif current_price <= symbol_list[sym]['목표매수가']*profit_rate12*symbol_list[sym]['익절_가중치'] and symbol_list[sym]['profit_rate12_down']:
                             symbol_list[sym]['profit_rate12_down'] = False
 
                             symbol_list[sym]['profit_rate22_up'] = True
@@ -628,7 +674,7 @@ try:
                             sell_fix = True
 
 
-                        elif current_price <= symbol_list[sym]['목표매수가']*profit_rate07 and symbol_list[sym]['profit_rate07_down']:
+                        elif current_price <= symbol_list[sym]['목표매수가']*profit_rate07*symbol_list[sym]['익절_가중치'] and symbol_list[sym]['profit_rate07_down']:
                             symbol_list[sym]['profit_rate07_down'] = False
 
                             symbol_list[sym]['profit_rate22_up'] = True
@@ -697,7 +743,7 @@ try:
                                 symbol_list[sym]['profit_rate17_down'] = False
                                 symbol_list[sym]['profit_rate22_down'] = False
                                 
-                                time.sleep(0.1)
+                                time.sleep(3)
                                 stock_dict= get_stock_balance()
 
                 if t_now.minute == 30 and t_30: 
@@ -729,26 +775,26 @@ try:
                 send_message(f"=데일리 일괄매도=")
                 stock_dict = get_stock_balance()
                 for sym, qty in stock_dict.items(): # 있으면 일괄 매도
+                    end_sell_cnt += 1
                     sell(sym, int(qty))
                     send_message(f">>> [{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(sym)} / 매수가 {symbol_list[sym]['목표매수가']}")
                     send_message(f">>> [{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/symbol_list[sym]['목표매수가'],4)}% 매도합니다")
                 send_message(f"---")
 
-                time.sleep(0.1)
-                get_stock_balance()
-                total_cash = get_balance() # 보유 현금 조회
+                send_message(f"buy: {buy_cnt}")
+                send_message(f"good Sell: {good_sell_cnt}")
+                send_message(f"bad Sell: {bad_sell_cnt}")
+                send_message(f"end Sell: {end_sell_cnt}")
 
-                send_message(f"buy cnt: {good_sell_cnt}")
-                send_message(f"Good Sell cnt: {good_sell_cnt}")
-                send_message(f"bad Sell cnt: {bad_sell_cnt}")
-
-                formatted_amount = "{:,.0f}원".format(int(start_total_cash))
+                formatted_amount = "{:,.0f}원".format(start_total_cash)
                 send_message(f"장시작 잔고: {formatted_amount}")
-                formatted_amount = "{:,.0f}원".format(int(total_cash-start_total_cash))
+
+                last_total_cash = get_total()
+                formatted_amount = "{:,.0f}원".format(int(last_total_cash-start_total_cash))
                 send_message(f"오늘의 차익: {formatted_amount}")
                 send_message("")
 
-                send_message("=== 데일리 자동매매를 종료합니다 ===")
+                send_message("=== 국내증시 자동매매를 종료합니다 ===")
                 continue
 except Exception as e:
     send_message(f"[오류 발생]{e}")
