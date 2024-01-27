@@ -584,7 +584,7 @@ try:
     while True:
         t_now = datetime.datetime.now(timezone('America/New_York')) # 뉴욕 기준 현재 시간
         today = t_now.weekday()
-        today_date = datetime.datetime.today().strftime("%Y%m%d")
+        today_date = t_now.strftime("%Y%m%d")
         
         if today == 5 or today == 6 or get_holiday(today_date):  # 토,일 자동종료, 2024 공휴일 포함
             if holiday == False:
