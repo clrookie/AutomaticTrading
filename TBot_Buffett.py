@@ -337,7 +337,6 @@ try:
     startoncebyday = False
     t_0 = True
     t_30 = True
-    start_total_cash = 0
 
     buy_cnt = 0
     good_sell_cnt = 0
@@ -621,7 +620,6 @@ try:
                 end_sell_cnt = 0
                 
                 total_cash = get_balance() # 보유 현금 조회
-                start_total_cash = total_cash
                 exchange_rate = get_exchange_rate() # 환율 조회
 
                 # 일단 200만원으로 테스팅 ===============================================================================
@@ -828,8 +826,6 @@ try:
 
                     send_message(f">>> [{symbol_list[sym]['종목명']}]: {round(get_current_price(symbol_list[sym]['마켓'],sym)/symbol_list[sym]['목표매수가'],4)}% 매도합니다")
                 send_message(f"---")
-
-                total_cash = get_balance() # 보유 현금 조회
 
                 
                 send_message("[매매 카운트]")

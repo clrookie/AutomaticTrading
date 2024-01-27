@@ -208,15 +208,14 @@ def get_target_price_new(code="005930"): # 음봉 윗꼬리 평균 + 보정
 
     return target_price
 
-def get_total():
-    """총 평가 금액"""
-    PATH = "uapi/domestic-stock/v1/trading/inquire-balance"
+def get_real_total():
+    PATH = "uapi/domestic-stock/v1/trading/inquire-balance-rlz-pl"
     URL = f"{URL_BASE}/{PATH}"
     headers = {"Content-Type":"application/json", 
         "authorization":f"Bearer {ACCESS_TOKEN}",
         "appKey":APP_KEY,
         "appSecret":APP_SECRET,
-        "tr_id":"TTTC8434R",
+        "tr_id":"TTTC8494R",
         "custtype":"P",
     }
     params = {
@@ -224,18 +223,22 @@ def get_total():
         "ACNT_PRDT_CD": ACNT_PRDT_CD,
         "AFHR_FLPR_YN": "N",
         "OFL_YN": "",
-        "INQR_DVSN": "02",
+        "INQR_DVSN": "00",
         "UNPR_DVSN": "01",
         "FUND_STTL_ICLD_YN": "N",
         "FNCG_AMT_AUTO_RDPT_YN": "N",
         "PRCS_DVSN": "01",
+        "COST_ICLD_YN": "N",
         "CTX_AREA_FK100": "",
         "CTX_AREA_NK100": ""
     }
     res = requests.get(URL, headers=headers, params=params)
-    evaluation = res.json()['output2']
 
-    return int(evaluation[0]['tot_evlu_amt'])
+    evaluation1 = float(res.json()['output2'][0]['asst_icdc_amt'])
+    evaluation2 = float(res.json()['output2'][0]['asst_icdc_erng_rt'])
+
+    
+    return evaluation1, evaluation2
 
 def get_stock_balance():
     """주식 잔고조회"""
@@ -384,9 +387,6 @@ try:
     good_sell_cnt = 0
     bad_sell_cnt = 0
     end_sell_cnt = 0
-
-    start_total_cash = 0
-    max_buy = 0
 
     # 분할매도 기준선
     profit_rate07 = 1.007
@@ -571,10 +571,8 @@ try:
                 bad_sell_cnt = 0
                 end_sell_cnt = 0
                 
-                max_buy = 0
                 
                 total_cash = get_balance() # 보유 현금 조회
-                start_total_cash = get_total()
 
                 # 일단 200만원으로 테스팅 ===============================================================================
                 # total_cash /= 5 
@@ -781,17 +779,20 @@ try:
                     send_message(f">>> [{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/symbol_list[sym]['목표매수가'],4)}% 매도합니다")
                 send_message(f"---")
 
-                send_message(f"buy: {buy_cnt}")
-                send_message(f"good Sell: {good_sell_cnt}")
-                send_message(f"bad Sell: {bad_sell_cnt}")
-                send_message(f"end Sell: {end_sell_cnt}")
+                
+                send_message("[매매 카운트]")
+                send_message(f" -buy: {buy_cnt}")
+                send_message(f" -good Sell: {good_sell_cnt}")
+                send_message(f" -bad Sell: {bad_sell_cnt}")
+                send_message(f" -end Sell: {end_sell_cnt}")
 
-                formatted_amount = "{:,.0f}원".format(start_total_cash)
-                send_message(f"장시작 잔고: {formatted_amount}")
-
-                last_total_cash = get_total()
-                formatted_amount = "{:,.0f}원".format(int(last_total_cash-start_total_cash))
+                a,b = get_real_total()
+                send_message("")
+                formatted_amount = "{:,.0f}원".format(a)
                 send_message(f"오늘의 차익: {formatted_amount}")
+
+                formatted_amount = "{:,.3f}%".format(b)
+                send_message(f"수익율: {formatted_amount}")
                 send_message("")
 
                 send_message("=== 국내증시 자동매매를 종료합니다 ===")
