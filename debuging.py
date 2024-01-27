@@ -14,7 +14,7 @@ APP_SECRET = _cfg['APP_SECRET']
 ACCESS_TOKEN = ""
 CANO = _cfg['CANO']
 ACNT_PRDT_CD = _cfg['ACNT_PRDT_CD']
-DISCORD_WEBHOOK_URL = _cfg['DISCORD_WEBHOOK_URL']
+DISCORD_WEBHOOK_URL = _cfg['DISCORD_WEBHOOK_URL_KOREA']
 URL_BASE = _cfg['URL_BASE']
 
 def send_message(msg):
@@ -309,34 +309,121 @@ def sell(code="005930", qty="1"):
         send_message(f"[매도 실패]{str(res.json())}")
         return False
     
+def get_real_total():
+    PATH = "uapi/domestic-stock/v1/trading/inquire-balance-rlz-pl"
+    URL = f"{URL_BASE}/{PATH}"
+    headers = {"Content-Type":"application/json", 
+        "authorization":f"Bearer {ACCESS_TOKEN}",
+        "appKey":APP_KEY,
+        "appSecret":APP_SECRET,
+        "tr_id":"TTTC8494R",
+        "custtype":"P",
+    }
+    params = {
+        "CANO": CANO,
+        "ACNT_PRDT_CD": ACNT_PRDT_CD,
+        "AFHR_FLPR_YN": "N",
+        "OFL_YN": "",
+        "INQR_DVSN": "00",
+        "UNPR_DVSN": "01",
+        "FUND_STTL_ICLD_YN": "N",
+        "FNCG_AMT_AUTO_RDPT_YN": "N",
+        "PRCS_DVSN": "01",
+        "COST_ICLD_YN": "N",
+        "CTX_AREA_FK100": "",
+        "CTX_AREA_NK100": ""
+    }
+    res = requests.get(URL, headers=headers, params=params)
+
+    evaluation1 = float(res.json()['output2'][0]['asst_icdc_amt'])
+    evaluation2 = float(res.json()['output2'][0]['asst_icdc_erng_rt'])
+
+    
+    return evaluation1, evaluation2
+
+def get_total():
+    PATH = "uapi/overseas-stock/v1/trading/inquire-period-profit"
+    URL = f"{URL_BASE}/{PATH}"
+    headers = { "Content-Type":"application/json",
+        "authorization":f"Bearer {ACCESS_TOKEN}",
+        "appKey":APP_KEY,
+        "appSecret":APP_SECRET,
+        "tr_id":"TTTS3012R",
+        "custtype":"P"
+    }
+    params = {
+        "CANO": CANO,
+        "ACNT_PRDT_CD": ACNT_PRDT_CD,
+        "OVRS_EXCG_CD": "NASD",
+        
+        "NATN_CD": "",
+        "CRCY_CD": "USD",
+        "PDNO": "",
+
+        "INQR_STRT_DT": "20240126",
+        "INQR_END_DT": "20240126",
+        "WCRC_FRCR_DVSN_CD": "01",
+
+
+        "CTX_AREA_FK200": "",
+        "CTX_AREA_NK200": ""
+    }
+    res = requests.get(URL, headers=headers, params=params)
+    
+    return float(res.json()['output2']['ovrs_rlzt_pfls_amt'])
+    
+    # evaluation2 = float(res.json()['output2']['ovrs_rlzt_pfls_amt'])
+    # evaluation3 = float(res.json()['output2']['ovrs_rlzt_pfls_amt'])
+    # evaluation4 = float(res.json()['output2']['ovrs_rlzt_pfls_amt'])
+    # evaluation5 = float(res.json()['output2']['ovrs_rlzt_pfls_amt'])
+
+    # return evaluation1, evaluation2, evaluation3, evaluation4, evaluation5
 
 # 자동 매매 코드
 try:        
 
     # 토큰 세팅
     ACCESS_TOKEN = get_access_token()
+    a,b = get_real_total()
+    print("")
+    formatted_amount = "{:,.0f}원".format(a)
+    print(f"차익: {formatted_amount}")
 
-    # symbol_list = ["122630","252670","233740","251340"] 
-    symbol_list = ["003490","034220","124560","084680"] # 매수종목(대한항공, LG디스플레이,태웅로직스,이월드)
-    
-    a1, b1 = get_target_price_1("122630")
-    print(a1, b1)
-    print("-----")
-    
-    a2, b2 = get_target_price_1("252670")
-    print(a2, b2)
-    print("-----")
-    
-    a3, b3 = get_target_price_1("233740")
-    print(a3, b3)
-    print("-----")
+    formatted_amount = "{:,.3f}%".format(b)
+    print(f"수익율: {formatted_amount}")
+    print("=======")
 
-    a4, b4 = get_target_price_1("251340")
-    print(a4, b4)
-    print("-----")
+    # a,b,c,d,e = get_total()
+    
+    # formatted_amount = "{:,.0f}$".format(c)
+    # print(f"차익: {formatted_amount}")
 
-    avg5, avg20 = get_average_line_5_20("122630")
-    print(avg5, avg20)
+    print(get_total())
+    # print(b)
+    # print(c)
+    # print(d)
+    # print(e)
+    # # symbol_list = ["122630","252670","233740","251340"] 
+    # symbol_list = ["003490","034220","124560","084680"] # 매수종목(대한항공, LG디스플레이,태웅로직스,이월드)
+    
+    # a1, b1 = get_target_price_1("122630")
+    # print(a1, b1)
+    # print("-----")
+    
+    # a2, b2 = get_target_price_1("252670")
+    # print(a2, b2)
+    # print("-----")
+    
+    # a3, b3 = get_target_price_1("233740")
+    # print(a3, b3)
+    # print("-----")
+
+    # a4, b4 = get_target_price_1("251340")
+    # print(a4, b4)
+    # print("-----")
+
+    # avg5, avg20 = get_average_line_5_20("122630")
+    # print(avg5, avg20)
 
 except Exception as e:
     send_message(f"[오류 발생]{e}")
