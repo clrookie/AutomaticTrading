@@ -22,6 +22,7 @@ URL_BASE: "https://openapi.koreainvestment.com:9443"
 #디스코드 웹훅 URL
 DISCORD_WEBHOOK_URL_KOREA: "https://discord.com/api/webhooks/1194279003780030504/rqKzj3UsulRDqvN4yJmElBYvs1od4GxUZypz_DLJKleMAifyx3rjCRq9-nIwnnvlM6xe"
 DISCORD_WEBHOOK_URL_USA: https://discord.com/api/webhooks/1200468050701451264/3ziU0xou7bKbVk9OLwYJrTtifupiO1E0YhIPkRYDCsrRxP2AsH8bTYfnAjiIRVJd_b3r
+DISCORD_WEBHOOK_URL_COIN: https://discord.com/api/webhooks/1200644595919360010/IGX1ctpFUQLHuMchUET2N7qfIkV4VedBfzg3JRppv3SyHAm3v6pV1tGrz-UvLXdnpmBj
 
 # 대한항공, LG디스플레이,태웅로직스,이월드
 symbol_list : { 
