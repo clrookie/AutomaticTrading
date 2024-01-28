@@ -13,11 +13,33 @@ def send_message(msg):
     requests.post('https://discord.com/api/webhooks/1200644595919360010/IGX1ctpFUQLHuMchUET2N7qfIkV4VedBfzg3JRppv3SyHAm3v6pV1tGrz-UvLXdnpmBj', data=message)
     print(message)
 
-def get_target_price(ticker, k):
-    """변동성 돌파 전략으로 매수 목표가 조회"""
-    df = pyupbit.get_ohlcv(ticker, interval="day", count=2)
-    target_price = df.iloc[0]['close'] + (df.iloc[0]['high'] - df.iloc[0]['low']) * k
+def get_target_price(ticker): # 음봉 윗꼬리 평균 + 보정
+
+    data_period = 180 # 최근 추출 기간
+    cnt = 0 # 음봉 카운트
+    target_price = 0 # 초기화
+    delta = 0 # 윗꼬리값
+
+    df = pyupbit.get_ohlcv(ticker, interval="minute240", count=data_period)
+
+    for i in range(0,data_period-1):
+        stck_hgpr = int(df.iloc[i]['high']) #고가
+        stck_clpr = int(df.iloc[i]['close']) #종가
+        stck_oprc = int(df.iloc[i]['open']) #시가
+
+        if stck_oprc >= stck_clpr : #음봉
+            delta += stck_hgpr - stck_oprc
+            cnt += 1
+
+    target_price = int(df.iloc[data_period-1]['open']) #현재 구간 시가
+    
+    if cnt > 0:
+        delta /= cnt # 평균
+
+    target_price += delta
+
     return target_price
+
 
 def get_start_time(ticker):
     """시작 시간 조회"""
@@ -46,34 +68,189 @@ def get_current_price(ticker):
     """현재가 조회"""
     return pyupbit.get_orderbook(ticker=ticker)["orderbook_units"][0]["ask_price"]
 
-# 로그인
-upbit = pyupbit.Upbit(access, secret)
-print("autotrade start")
-# 시작 메세지 슬랙 전송
-send_message("autotrade start")
+def get_stck_oprc(ticker):
 
-while True:
-    try:
-        now = datetime.datetime.now()
-        start_time = get_start_time("KRW-BTC")
-        end_time = start_time + datetime.timedelta(days=1)
+    df = pyupbit.get_ohlcv(ticker, interval="minute240", count=1)
+    stck_oprc = int(df.iloc[0]['open']) #오늘 시가
+    
+    return stck_oprc
 
-        if start_time < now < end_time - datetime.timedelta(seconds=10):
-            target_price = get_target_price("KRW-BTC", 0.5)
-            ma15 = get_ma15("KRW-BTC")
-            current_price = get_current_price("KRW-BTC")
-            if target_price < current_price and ma15 < current_price:
-                krw = get_balance("KRW")
-                if krw > 5000:
-                    buy_result = upbit.buy_market_order("KRW-BTC", krw*0.9995)
-                    send_message(f"BTC buy : {buy_result}")
+# COIN 자동매매 구동
+try:
+    
+    # 로그인
+    access = ""
+    secret = ""
+    upbit = pyupbit.Upbit(access, secret)
+    send_message("=== 코인거래 초기화 합니다 ===")
+
+    last_hour = 0
+
+    buy_cnt = 0
+    good_sell_cnt = 0
+    bad_sell_cnt = 0
+    end_sell_cnt = 0
+
+ # 분할매도 기준선
+    profit_rate07 = 1.007
+    profit_rate12 = 1.012
+    profit_rate17 = 1.017
+    profit_rate22 = 1.022
+    sell_rate = 0.2
+
+    symbol_list = {
+    'KRW-BTC':{'종목명':'비트코인',
+    '배분예산':0,
+    '목표매수가':0,
+    '실매수가':0,
+    '시가':0,
+    '보유':False,
+    '예산_가중치':1.0,
+    '익절_가중치':1.0,
+    'profit_rate07_up':True,
+    'profit_rate12_up':True,
+    'profit_rate17_up':True,
+    'profit_rate22_up':True,
+    'profit_rate07_down':False,
+    'profit_rate12_down':False,
+    'profit_rate17_down':False,
+    'profit_rate22_down':False},
+
+    'KRW-ZRX':{'종목명':'제로엑스',
+    '배분예산':0,
+    '목표매수가':0,
+    '실매수가':0,
+    '시가':0,
+    '보유':False,
+    '예산_가중치':1.0,
+    '익절_가중치':1.0,
+    'profit_rate07_up':True,
+    'profit_rate12_up':True,
+    'profit_rate17_up':True,
+    'profit_rate22_up':True,
+    'profit_rate07_down':False,
+    'profit_rate12_down':False,
+    'profit_rate17_down':False,
+    'profit_rate22_down':False},
+
+    'KRW-ETC':{'종목명':'이더리움클래식',
+    '배분예산':0,
+    '목표매수가':0,
+    '실매수가':0,
+    '시가':0,
+    '보유':False,
+    '예산_가중치':1.0,
+    '익절_가중치':1.0,
+    'profit_rate07_up':True,
+    'profit_rate12_up':True,
+    'profit_rate17_up':True,
+    'profit_rate22_up':True,
+    'profit_rate07_down':False,
+    'profit_rate12_down':False,
+    'profit_rate17_down':False,
+    'profit_rate22_down':False},
+
+    'KRW-XRP':{'종목명':'리플',
+    '배분예산':0,
+    '목표매수가':0,
+    '실매수가':0,
+    '시가':0,
+    '보유':False,
+    '예산_가중치':1.0,
+    '익절_가중치':1.0,
+    'profit_rate07_up':True,
+    'profit_rate12_up':True,
+    'profit_rate17_up':True,
+    'profit_rate22_up':True,
+    'profit_rate07_down':False,
+    'profit_rate12_down':False,
+    'profit_rate17_down':False,
+    'profit_rate22_down':False},
+    }
+
+
+    while True:
+        # t_now = datetime.datetime.now()
+        
+        df = pyupbit.get_ohlcv("KRW-BTC", interval="minute240", count=1)
+
+        if df.index[0].hour != last_hour:    # 240분 캔들 갱신
+            last_hour = df.index[0].hour
+            
+            send_message("")
+            send_message("=== 코인거래 240분봉 갱신합니다 ===")
+            send_message("")
+
+            buy_cnt = 0
+            good_sell_cnt = 0
+            bad_sell_cnt = 0
+            end_sell_cnt = 0
+
+            total_cash = get_balance("KRW") # 보유 현금 조회
+
+            # 일단 테스팅 ===============================================================================
+            total_cash /= 10
+
+            stock_dict = get_balance() # 보유 주식 조회
+            target_buy_count = int(len(symbol_list)) # 매수종목 수량
+
+            for sym, qty in stock_dict.items(): # 있으면 일괄 매도
+                sell(sym, int(qty))
+                send_message(f">>> [{symbol_list[sym]['종목명']}] 시가({get_stck_oprc(sym)})원에 매도했습니다~")
+
+            for sym in symbol_list: # 초기화
+                send_message(f"[{symbol_list[sym]['종목명']}]")
+                symbol_list[sym]['배분예산'] = total_cash * (1/target_buy_count) * symbol_list[sym]['예산_가중치']
+                formatted_amount = "{:,.0f}원".format(symbol_list[sym]['배분예산'])
+                send_message(f" - 배분예산: {formatted_amount}")
+
+                symbol_list[sym]['시가'] = get_stck_oprc(sym)
+                formatted_amount = "{:,.0f}원".format(symbol_list[sym]['시가'])
+                send_message(f" - 시가: {formatted_amount}")   
+
+                symbol_list[sym]['목표매수가'] = get_target_price(sym)
+                formatted_amount = "{:,.0f}원".format(symbol_list[sym]['목표매수가'])
+                send_message(f" - 목표매수가: {formatted_amount}")   
+
+                send_message(f" - 타겟%: {round((symbol_list[sym]['목표매수가'])/symbol_list[sym]['시가'],4)}")
+
+                symbol_list[sym]['보유'] = False
+                send_message("---------------------------------")
+            
+            send_message("")
+            send_message("코인 매매를 시작합니다~")
+            send_message("")
+
         else:
-            btc = get_balance("BTC")
-            if btc > 0.00008:
-                sell_result = upbit.sell_market_order("KRW-BTC", btc*0.9995)
-                send_message(f"BTC buy : {sell_result}")
-        time.sleep(1)
-    except Exception as e:
-        print(e)
-        send_message(f"[오류 발생]{e}")
-        time.sleep(1)
+            bb =1
+
+
+
+
+
+
+    # now = datetime.datetime.now()
+    # start_time = get_start_time("KRW-BTC")
+    # end_time = start_time + datetime.timedelta(days=1)
+
+    # if start_time < now < end_time - datetime.timedelta(seconds=10):
+    #     target_price = get_target_price("KRW-BTC")
+    #     ma15 = get_ma15("KRW-BTC")
+    #     current_price = get_current_price("KRW-BTC")
+    #     if target_price < current_price and ma15 < current_price:
+    #         krw = get_balance("KRW")
+    #         if krw > 5000:
+    #             buy_result = upbit.buy_market_order("KRW-BTC", krw*0.9995)
+    #             send_message(f"BTC buy : {buy_result}")
+    # else:
+    #     btc = get_balance("BTC")
+    #     if btc > 0.00008:
+    #         sell_result = upbit.sell_market_order("KRW-BTC", btc*0.9995)
+    #         send_message(f"BTC buy : {sell_result}")
+    # time.sleep(1)
+
+
+except Exception as e:
+    print(e)
+    send_message(f"[오류 발생]{e}")
+    time.sleep(1)
