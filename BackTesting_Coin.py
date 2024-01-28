@@ -1,52 +1,48 @@
 import pyupbit
-import matplotlib.pyplot as plt
-import time
-import pandas as pd
+import numpy as np
 
-def short_trading_for_1percent(ticker):
-    dfs = [ ]
-    df = pyupbit.get_ohlcv(ticker, interval="minute1", to="20210414 23:00:00")
-    dfs.append(df)
 
-    for i in range(60):
-        df = pyupbit.get_ohlcv(ticker, interval="minute1", to=df.index[0])
-        dfs.append(df)
-        time.sleep(0.2)
+total_period = 60
+half = int(total_period / 2)
+delta = 0
+cnt = 0
+target_price = 0
 
-    df = pd.concat(dfs)
-    df = df.sort_index()
+df = pyupbit.get_ohlcv("KRW-BTC", interval="minute240", count=total_period)
 
-    # df['close'].plot()
-    # plt.show()
 
-    # 1) 매수 일자 판별
-    cond = df['high'] >= df['open'] * 1.01
+for i in range(0,half):
+        stck_hgpr = int(df.iloc[i]['high']) #고가
+        stck_clpr = int(df.iloc[i]['close']) #종가
+        stck_oprc = int(df.iloc[i]['open']) #시가
 
-    acc_ror = 1
-    sell_date = None
+        if stck_oprc >= stck_clpr : #음봉
+            delta += stck_hgpr - stck_oprc
+            cnt += 1
+    
+if cnt > 0:
+    delta /= cnt # 평균
 
-    # 2) 매도 조건 탐색 및 수익률 계산
-    for buy_date in df.index[cond]:
-        if sell_date != None and buy_date <= sell_date:
-            continue
+target_price = int(df.iloc[data_period-1]['open']) #현재 구간 시가
+target_price += delta
 
-        target = df.loc[ buy_date :  ]
 
-        cond = target['high'] >= target['open'] * 1.02
-        sell_candidate = target.index[cond]
+df = pyupbit.get_ohlcv("KRW-BTC", interval="minute240", count=half)
 
-        if len(sell_candidate) == 0:
-            buy_price = df.loc[buy_date, 'open'] * 1.01
-            sell_price = df.iloc[-1, 3]
-            acc_ror *= (sell_price / buy_price)
-            break
-        else:
-            sell_date = sell_candidate[0]
-            acc_ror *= 1.005
-            # 수수료 0.001 + 슬리피지 0.004
 
-    return acc_ror
 
-for ticker in ["KRW-BTC", "KRW-LTC", "KRW-ETH", "KRW-ADA"]:
-    ror = short_trading_for_1percent(ticker)
-    print(ticker, ror)
+df['range'] = delta
+df['target'] = target_price
+
+df['ror'] = np.where(df['high'] > df['target'],
+                        df['close'] / df['target'],
+                    1)
+
+print(df)
+    
+#     ror = df['ror'].cumprod().iloc[-2]
+#     return ror
+
+# for k in np.arange(0.1, 1.0, 0.1):
+#     ror = get_ror(k)
+#     print("%.1f %f" % (k, ror))

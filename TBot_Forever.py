@@ -103,7 +103,7 @@ try:
     profit_rate22 = 1.022
     sell_rate = 0.2
 
-    symbol_list = {
+    symbol_list = { # 거래대금 top5 등록
     'KRW-BTC':{'종목명':'비트코인',
     '배분예산':0,
     '목표매수가':0,
