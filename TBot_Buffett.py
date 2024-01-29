@@ -59,7 +59,7 @@ def get_holiday(day="YYYYMMDD"):
     "20240704",
     "20240902",
     "20241128",
-    "20241225","20241231"]
+    "20241225"]
 
     i =""
     for i in date:
@@ -584,7 +584,7 @@ try:
             t_start = t_now.replace(hour=9, minute=31, second=0, microsecond=0)
             t_10 = t_now.replace(hour=10, minute=0, second=0, microsecond=0)
             t_1550 = t_now.replace(hour=15, minute=50, second=0, microsecond=0)
-            t_exit = t_now.replace(hour=15, minute=59, second=0,microsecond=0)
+            t_exit = t_now.replace(hour=15, minute=58, second=0,microsecond=0)
             
             if t_start < t_now < t_exit and startoncebyday == False: # 매매 준비
             
@@ -618,7 +618,7 @@ try:
 
                 for sym, qty in stock_dict.items(): # 있으면 일괄 매도
                     sell(symbol_list[sym]['마켓_sb'], sym, int(qty),get_current_price(symbol_list[sym]['마켓'],sym))
-                    send_message(f">>> [{symbol_list[sym]['종목명']}] 시가({get_stck_oprc(symbol_list[sym]['마켓'],sym)})$에 매도했습니다~")
+                    send_message(f">>> open [{symbol_list[sym]['종목명']}] ({get_stck_oprc(symbol_list[sym]['마켓'],sym)})$에 매도했습니다~")
 
 
                 for sym in symbol_list: # 초기화
@@ -737,7 +737,7 @@ try:
                             
 
                         #시가 손절 : 99.5% 보정
-                        elif(symbol_list[sym]['시가']*0.995 > current_price): # 오늘 시가 보다 떨어지면 
+                        elif(symbol_list[sym]['시가']*0.997 > current_price): # 오늘 시가 보다 떨어지면 
                             symbol_list[sym]['보유'] = False                   
                             stock_dict = get_stock_balance() # 보유주식 정보 최신화
                             for symtemp, qty in stock_dict.items():
@@ -809,9 +809,15 @@ try:
                 stock_dict = get_stock_balance()
                 for sym, qty in stock_dict.items(): # 있으면 일괄 매도
                     end_sell_cnt += 1
-                    sell(symbol_list[sym]['마켓_sb'], sym, int(qty),get_current_price(symbol_list[sym]['마켓'],sym))
-
-                    send_message(f">>> [{symbol_list[sym]['종목명']}]: {round(get_current_price(symbol_list[sym]['마켓'],sym)/symbol_list[sym]['목표매수가'],4)}% 매도합니다")
+                    current_price = get_current_price(symbol_list[sym]['마켓'],sym)
+                    if sell(symbol_list[sym]['마켓_sb'], sym, int(qty), current_price):
+                        send_message(f">>> [{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(symbol_list[sym]['마켓'],sym)} / 매수가 {symbol_list[sym]['목표매수가']}")
+                        send_message(f">>> [{symbol_list[sym]['종목명']}]: {round(get_current_price(symbol_list[sym]['마켓'],sym)/symbol_list[sym]['목표매수가'],4)}% 매도합니다")
+                    else:
+                        current_price = get_current_price(symbol_list[sym]['마켓'],sym)
+                        sell(symbol_list[sym]['마켓_sb'], sym, int(qty), current_price)
+                        send_message(f">>> retry [{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(symbol_list[sym]['마켓'],sym)} / 매수가 {symbol_list[sym]['목표매수가']}")
+                        send_message(f">>> retry [{symbol_list[sym]['종목명']}]: {round(get_current_price(symbol_list[sym]['마켓'],sym)/symbol_list[sym]['목표매수가'],4)}% 매도합니다")
                 send_message(f"---")
 
                 

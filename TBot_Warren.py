@@ -57,7 +57,7 @@ def get_holiday(day="YYYYMMDD"):
     "20240501", "20240506","20240515",
     "20240606",
     "20240815",
-    "20240916","20240916","20240918",
+    "20240916","20240917","20240918",
     "20241003","20241009",
     "20241225","20241231"]
 
@@ -396,39 +396,39 @@ try:
     sell_rate = 0.2
 
     symbol_list = {
-    '069500':{'종목명':'코스피_200',
-    '배분예산':0,
-    '목표매수가':0,
-    '실매수가':0,
-    '시가':0,
-    '보유':False,
-    '예산_가중치':1.35,
-    '익절_가중치':0.65,
-    'profit_rate07_up':True,
-    'profit_rate12_up':True,
-    'profit_rate17_up':True,
-    'profit_rate22_up':True,
-    'profit_rate07_down':False,
-    'profit_rate12_down':False,
-    'profit_rate17_down':False},
+    # '069500':{'종목명':'KOSPI_200', #1
+    # '배분예산':0,
+    # '목표매수가':0,
+    # '실매수가':0,
+    # '시가':0,
+    # '보유':False,
+    # '예산_가중치':1.35,
+    # '익절_가중치':0.65,
+    # 'profit_rate07_up':True,
+    # 'profit_rate12_up':True,
+    # 'profit_rate17_up':True,
+    # 'profit_rate22_up':True,
+    # 'profit_rate07_down':False,
+    # 'profit_rate12_down':False,
+    # 'profit_rate17_down':False},
 
-    '114800':{'종목명':'코스피_인버스',
-    '배분예산':0,
-    '목표매수가':0,
-    '실매수가':0,
-    '시가':0,
-    '보유':False,
-    '예산_가중치':1.35,
-    '익절_가중치':0.65,
-    'profit_rate07_up':True,
-    'profit_rate12_up':True,
-    'profit_rate17_up':True,
-    'profit_rate22_up':True,
-    'profit_rate07_down':False,
-    'profit_rate12_down':False,
-    'profit_rate17_down':False},
+    # '114800':{'종목명':'KOSPI_인버스', #2
+    # '배분예산':0,
+    # '목표매수가':0,
+    # '실매수가':0,
+    # '시가':0,
+    # '보유':False,
+    # '예산_가중치':1.35,
+    # '익절_가중치':0.65,
+    # 'profit_rate07_up':True,
+    # 'profit_rate12_up':True,
+    # 'profit_rate17_up':True,
+    # 'profit_rate22_up':True,
+    # 'profit_rate07_down':False,
+    # 'profit_rate12_down':False,
+    # 'profit_rate17_down':False},
 
-    '122630':{'종목명':'KOSPI_레버리지',
+    '122630':{'종목명':'KOSPI_레버리지', #3
     '배분예산':0,
     '목표매수가':0,
     '실매수가':0,
@@ -444,7 +444,7 @@ try:
     'profit_rate12_down':False,
     'profit_rate17_down':False},
 
-    '252670':{'종목명':'KOSPI_인버스X2',
+    '252670':{'종목명':'KOSPI_인버스X2', #4
     '배분예산':0,
     '목표매수가':0,
     '실매수가':0,
@@ -460,23 +460,23 @@ try:
     'profit_rate12_down':False,
     'profit_rate17_down':False},
 
-    '229200':{'종목명':'KOSDAQ_150',
-    '배분예산':0,
-    '목표매수가':0,
-    '실매수가':0,
-    '시가':0,
-    '보유':False,
-    '예산_가중치':1.0,
-    '익절_가중치':1.0,
-    'profit_rate07_up':True,
-    'profit_rate12_up':True,
-    'profit_rate17_up':True,
-    'profit_rate22_up':True,
-    'profit_rate07_down':False,
-    'profit_rate12_down':False,
-    'profit_rate17_down':False},
+    # '229200':{'종목명':'KOSDAQ_150', #5
+    # '배분예산':0,
+    # '목표매수가':0,
+    # '실매수가':0,
+    # '시가':0,
+    # '보유':False,
+    # '예산_가중치':1.0,
+    # '익절_가중치':1.0,
+    # 'profit_rate07_up':True,
+    # 'profit_rate12_up':True,
+    # 'profit_rate17_up':True,
+    # 'profit_rate22_up':True,
+    # 'profit_rate07_down':False,
+    # 'profit_rate12_down':False,
+    # 'profit_rate17_down':False},
 
-    '233740':{'종목명':'KOSDAQ_레버리지',
+    '233740':{'종목명':'KOSDAQ_레버리지', #6
     '배분예산':0,
     '목표매수가':0,
     '실매수가':0,
@@ -492,7 +492,7 @@ try:
     'profit_rate12_down':False,
     'profit_rate17_down':False},
 
-    '251340':{'종목명':'KOSDAQ_인버스X2',
+    '251340':{'종목명':'KOSDAQ_인버스X2', #7
     '배분예산':0,
     '목표매수가':0,
     '실매수가':0,
@@ -508,7 +508,7 @@ try:
     'profit_rate12_down':False,
     'profit_rate17_down':False},
 
-    '371460':{'종목명':'TIGER_차이나',
+    '371460':{'종목명':'TIGER_차이나', #8
     '배분예산':0,
     '목표매수가':0,
     '실매수가':0,
@@ -693,7 +693,7 @@ try:
                             
 
                         #시가 손절 : 99.5% 보정
-                        elif(symbol_list[sym]['시가']*0.995 > current_price): # 오늘 시가 보다 떨어지면 
+                        elif(symbol_list[sym]['시가']*0.997 > current_price): # 오늘 시가 보다 떨어지면 
                             symbol_list[sym]['보유'] = False                   
                             stock_dict = get_stock_balance() # 보유주식 정보 최신화
                             for symtemp, qty in stock_dict.items():
@@ -765,9 +765,13 @@ try:
                 stock_dict = get_stock_balance()
                 for sym, qty in stock_dict.items(): # 있으면 일괄 매도
                     end_sell_cnt += 1
-                    sell(sym, int(qty))
-                    send_message(f">>> [{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(sym)} / 매수가 {symbol_list[sym]['목표매수가']}")
-                    send_message(f">>> [{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/symbol_list[sym]['목표매수가'],4)}% 매도합니다")
+                    if sell(sym, int(qty)):
+                        send_message(f">>> [{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(sym)} / 매수가 {symbol_list[sym]['목표매수가']}")
+                        send_message(f">>> [{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/symbol_list[sym]['목표매수가'],4)}% 매도합니다")
+                    else:
+                        sell(sym, int(qty))
+                        send_message(f">>> retry [{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(sym)} / 매수가 {symbol_list[sym]['목표매수가']}")
+                        send_message(f">>> retry [{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/symbol_list[sym]['목표매수가'],4)}% 매도합니다")
                 send_message(f"---")
 
                 
