@@ -2,10 +2,10 @@ import schedule
 import time
 import datetime
 
-principal = 15000000
+principal = 150000000
 
-rate = 1.005
-period = 207
+rate = 1.1
+period = 10
 
 print("원금: ", principal)
 print("수익률: ", rate)
