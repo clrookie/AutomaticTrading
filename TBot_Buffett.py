@@ -359,8 +359,8 @@ try:
     '실매수가':0,
     '시가':0,
     '보유':False,
-    '예산_가중치':1.5,
-    '익절_가중치':0.5,
+    '예산_가중치':1.35,
+    '익절_가중치':0.65,
     'profit_rate07_up':True,
     'profit_rate12_up':True,
     'profit_rate17_up':True,
@@ -378,8 +378,8 @@ try:
     '실매수가':0,
     '시가':0,
     '보유':False,
-    '예산_가중치':1.5,
-    '익절_가중치':0.5,
+    '예산_가중치':1.35,
+    '익절_가중치':0.65,
     'profit_rate07_up':True,
     'profit_rate12_up':True,
     'profit_rate17_up':True,
@@ -397,8 +397,8 @@ try:
     '실매수가':0,
     '시가':0,
     '보유':False,
-    '예산_가중치':1.5,
-    '익절_가중치':0.5,
+    '예산_가중치':1.35,
+    '익절_가중치':0.65,
     'profit_rate07_up':True,
     'profit_rate12_up':True,
     'profit_rate17_up':True,
@@ -416,8 +416,8 @@ try:
     '실매수가':0,
     '시가':0,
     '보유':False,
-    '예산_가중치':1.5,
-    '익절_가중치':0.5,
+    '예산_가중치':1.35,
+    '익절_가중치':0.65,
     'profit_rate07_up':True,
     'profit_rate12_up':True,
     'profit_rate17_up':True,
@@ -435,8 +435,8 @@ try:
     '실매수가':0,
     '시가':0,
     '보유':False,
-    '예산_가중치':1.5,
-    '익절_가중치':0.5,
+    '예산_가중치':1.35,
+    '익절_가중치':0.65,
     'profit_rate07_up':True,
     'profit_rate12_up':True,
     'profit_rate17_up':True,
@@ -454,8 +454,8 @@ try:
     '실매수가':0,
     '시가':0,
     '보유':False,
-    '예산_가중치':1.5,
-    '익절_가중치':0.5,
+    '예산_가중치':1.35,
+    '익절_가중치':0.65,
     'profit_rate07_up':True,
     'profit_rate12_up':True,
     'profit_rate17_up':True,
@@ -474,7 +474,7 @@ try:
     '시가':0,
     '보유':False,
     '예산_가중치':1.0,
-    '익절_가중치':1.5,
+    '익절_가중치':1.3,
     'profit_rate07_up':True,
     'profit_rate12_up':True,
     'profit_rate17_up':True,
@@ -493,7 +493,7 @@ try:
     '시가':0,
     '보유':False,
     '예산_가중치':1.0,
-    '익절_가중치':1.5,
+    '익절_가중치':1.3,
     'profit_rate07_up':True,
     'profit_rate12_up':True,
     'profit_rate17_up':True,
@@ -512,7 +512,7 @@ try:
     '시가':0,
     '보유':False,
     '예산_가중치':1.0,
-    '익절_가중치':1.5,
+    '익절_가중치':1.3,
     'profit_rate07_up':True,
     'profit_rate12_up':True,
     'profit_rate17_up':True,
@@ -531,7 +531,7 @@ try:
     '시가':0,
     '보유':False,
     '예산_가중치':1.0,
-    '익절_가중치':1.5,
+    '익절_가중치':1.3,
     'profit_rate07_up':True,
     'profit_rate12_up':True,
     'profit_rate17_up':True,
@@ -550,7 +550,7 @@ try:
     '시가':0,
     '보유':False,
     '예산_가중치':1.0,
-    '익절_가중치':1.5,
+    '익절_가중치':1.3,
     'profit_rate07_up':True,
     'profit_rate12_up':True,
     'profit_rate17_up':True,
@@ -569,7 +569,7 @@ try:
     '시가':0,
     '보유':False,
     '예산_가중치':1.0,
-    '익절_가중치':1.5,
+    '익절_가중치':1.3,
     'profit_rate07_up':True,
     'profit_rate12_up':True,
     'profit_rate17_up':True,
@@ -668,7 +668,7 @@ try:
                         sell_fix = False
                         
                         #상향 익절
-                        if current_price > symbol_list[sym]['목표매수가']*profit_rate22*symbol_list[sym]['익절_가중치'] and symbol_list[sym]['profit_rate22_up']:
+                        if current_price > symbol_list[sym]['목표매수가']*(((profit_rate22-1)*symbol_list[sym]['익절_가중치'])+1) and symbol_list[sym]['profit_rate22_up']:
                             symbol_list[sym]['profit_rate22_up'] = False
                             symbol_list[sym]['profit_rate17_up'] = False
                             symbol_list[sym]['profit_rate12_up'] = False
@@ -680,7 +680,7 @@ try:
 
                             sell_fix = True
 
-                        elif current_price > symbol_list[sym]['목표매수가']*profit_rate17*symbol_list[sym]['익절_가중치'] and symbol_list[sym]['profit_rate17_up']:
+                        elif current_price > symbol_list[sym]['목표매수가']*(((profit_rate17-1)*symbol_list[sym]['익절_가중치'])+1) and symbol_list[sym]['profit_rate17_up']:
                             symbol_list[sym]['profit_rate17_up'] = False
                             symbol_list[sym]['profit_rate12_up'] = False
                             symbol_list[sym]['profit_rate07_up'] = False
@@ -690,7 +690,7 @@ try:
 
                             sell_fix = True
 
-                        elif current_price > symbol_list[sym]['목표매수가']*profit_rate12*symbol_list[sym]['익절_가중치'] and symbol_list[sym]['profit_rate12_up']:
+                        elif current_price > symbol_list[sym]['목표매수가']*(((profit_rate12-1)*symbol_list[sym]['익절_가중치'])+1) and symbol_list[sym]['profit_rate12_up']:
                             symbol_list[sym]['profit_rate12_up'] = False
                             symbol_list[sym]['profit_rate07_up'] = False
 
@@ -698,20 +698,20 @@ try:
 
                             sell_fix = True
 
-                        elif current_price > symbol_list[sym]['목표매수가']*profit_rate07*symbol_list[sym]['익절_가중치'] and symbol_list[sym]['profit_rate07_up']:
+                        elif current_price > symbol_list[sym]['목표매수가']*(((profit_rate07-1)*symbol_list[sym]['익절_가중치'])+1) and symbol_list[sym]['profit_rate07_up']:
                             symbol_list[sym]['profit_rate07_up'] = False
 
                             sell_fix = True
 
                         # 하향 익절
-                        elif current_price <= symbol_list[sym]['목표매수가']*profit_rate17*symbol_list[sym]['익절_가중치'] and symbol_list[sym]['profit_rate17_down']:
+                        elif current_price <= symbol_list[sym]['목표매수가']*(((profit_rate17-1)*symbol_list[sym]['익절_가중치'])+1) and symbol_list[sym]['profit_rate17_down']:
                             symbol_list[sym]['profit_rate17_down'] = False
 
                             symbol_list[sym]['profit_rate22_up'] = True
 
                             sell_fix = True
 
-                        elif current_price <= symbol_list[sym]['목표매수가']*profit_rate12*symbol_list[sym]['익절_가중치'] and symbol_list[sym]['profit_rate12_down']:
+                        elif current_price <= symbol_list[sym]['목표매수가']*(((profit_rate12-1)*symbol_list[sym]['익절_가중치'])+1) and symbol_list[sym]['profit_rate12_down']:
                             symbol_list[sym]['profit_rate12_down'] = False
 
                             symbol_list[sym]['profit_rate22_up'] = True
@@ -720,7 +720,7 @@ try:
                             sell_fix = True
 
 
-                        elif current_price <= symbol_list[sym]['목표매수가']*profit_rate07*symbol_list[sym]['익절_가중치'] and symbol_list[sym]['profit_rate07_down']:
+                        elif current_price <= symbol_list[sym]['목표매수가']*(((profit_rate07-1)*symbol_list[sym]['익절_가중치'])+1) and symbol_list[sym]['profit_rate07_down']:
                             symbol_list[sym]['profit_rate07_down'] = False
 
                             symbol_list[sym]['profit_rate22_up'] = True
