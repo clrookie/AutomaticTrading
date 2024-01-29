@@ -16,7 +16,7 @@ def send_message(msg):
 
 def get_target_price(ticker): # 음봉 윗꼬리 평균 + 보정
 
-    data_period = 180 # 최근 추출 기간
+    data_period = 50 # 최근 추출 기간
     cnt = 0 # 음봉 카운트
     target_price = 0 # 초기화
     delta = 0 # 윗꼬리값
