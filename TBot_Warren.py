@@ -410,8 +410,7 @@ try:
     'profit_rate22_up':True,
     'profit_rate07_down':False,
     'profit_rate12_down':False,
-    'profit_rate17_down':False,
-    'profit_rate22_down':False},
+    'profit_rate17_down':False},
 
     '114800':{'종목명':'코스피_인버스',
     '배분예산':0,
@@ -427,8 +426,7 @@ try:
     'profit_rate22_up':True,
     'profit_rate07_down':False,
     'profit_rate12_down':False,
-    'profit_rate17_down':False,
-    'profit_rate22_down':False},
+    'profit_rate17_down':False},
 
     '122630':{'종목명':'KOSPI_레버리지',
     '배분예산':0,
@@ -444,8 +442,7 @@ try:
     'profit_rate22_up':True,
     'profit_rate07_down':False,
     'profit_rate12_down':False,
-    'profit_rate17_down':False,
-    'profit_rate22_down':False},
+    'profit_rate17_down':False},
 
     '252670':{'종목명':'KOSPI_인버스X2',
     '배분예산':0,
@@ -461,8 +458,7 @@ try:
     'profit_rate22_up':True,
     'profit_rate07_down':False,
     'profit_rate12_down':False,
-    'profit_rate17_down':False,
-    'profit_rate22_down':False},
+    'profit_rate17_down':False},
 
     '229200':{'종목명':'KOSDAQ_150',
     '배분예산':0,
@@ -478,8 +474,7 @@ try:
     'profit_rate22_up':True,
     'profit_rate07_down':False,
     'profit_rate12_down':False,
-    'profit_rate17_down':False,
-    'profit_rate22_down':False},
+    'profit_rate17_down':False},
 
     '233740':{'종목명':'KOSDAQ_레버리지',
     '배분예산':0,
@@ -495,8 +490,7 @@ try:
     'profit_rate22_up':True,
     'profit_rate07_down':False,
     'profit_rate12_down':False,
-    'profit_rate17_down':False,
-    'profit_rate22_down':False},
+    'profit_rate17_down':False},
 
     '251340':{'종목명':'KOSDAQ_인버스X2',
     '배분예산':0,
@@ -512,8 +506,7 @@ try:
     'profit_rate22_up':True,
     'profit_rate07_down':False,
     'profit_rate12_down':False,
-    'profit_rate17_down':False,
-    'profit_rate22_down':False},
+    'profit_rate17_down':False},
 
     '371460':{'종목명':'TIGER_차이나',
     '배분예산':0,
@@ -529,8 +522,7 @@ try:
     'profit_rate22_up':True,
     'profit_rate07_down':False,
     'profit_rate12_down':False,
-    'profit_rate17_down':False,
-    'profit_rate22_down':False},            
+    'profit_rate17_down':False},            
     }
 
     while True:
@@ -739,7 +731,6 @@ try:
                                 symbol_list[sym]['profit_rate07_down'] = False
                                 symbol_list[sym]['profit_rate12_down'] = False
                                 symbol_list[sym]['profit_rate17_down'] = False
-                                symbol_list[sym]['profit_rate22_down'] = False
                                 
                                 time.sleep(3)
                                 stock_dict= get_stock_balance()

@@ -118,8 +118,7 @@ try:
     'profit_rate22_up':True,
     'profit_rate07_down':False,
     'profit_rate12_down':False,
-    'profit_rate17_down':False,
-    'profit_rate22_down':False},
+    'profit_rate17_down':False},
 
     'KRW-ZRX':{'종목명':'제로엑스',
     '배분예산':0,
@@ -135,8 +134,7 @@ try:
     'profit_rate22_up':True,
     'profit_rate07_down':False,
     'profit_rate12_down':False,
-    'profit_rate17_down':False,
-    'profit_rate22_down':False},
+    'profit_rate17_down':False},
 
     'KRW-ETC':{'종목명':'이더리움클래식',
     '배분예산':0,
@@ -152,8 +150,7 @@ try:
     'profit_rate22_up':True,
     'profit_rate07_down':False,
     'profit_rate12_down':False,
-    'profit_rate17_down':False,
-    'profit_rate22_down':False},
+    'profit_rate17_down':False},
 
     'KRW-XRP':{'종목명':'리플',
     '배분예산':0,
@@ -169,8 +166,7 @@ try:
     'profit_rate22_up':True,
     'profit_rate07_down':False,
     'profit_rate12_down':False,
-    'profit_rate17_down':False,
-    'profit_rate22_down':False},
+    'profit_rate17_down':False},
     }
 
 
@@ -371,7 +367,6 @@ try:
                         symbol_list[sym]['profit_rate07_down'] = False
                         symbol_list[sym]['profit_rate12_down'] = False
                         symbol_list[sym]['profit_rate17_down'] = False
-                        symbol_list[sym]['profit_rate22_down'] = False
 
         # for문 끝 라인..
 
