@@ -876,9 +876,9 @@ try:
                                     qty = int(qty)
     
                                     send_message(f"[{symbol_list[sym]['종목명']}]: 1차 손절매 시도 ({qty}/{symbol_list[sym]['최대보유']}개)")
-                                    symbol_list[sym]['최대보유'] -= qty # 최대보유 감소
                                     if sell(symbol_list[sym]['마켓_sb'], sym, qty, current_price):
                                         symbol_list[sym]['손절_1차'] = True         
+                                        symbol_list[sym]['최대보유'] -= qty # 최대보유 감소
                                         send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 1차 손절매 성공")
                         # 2차 손절
                         elif(symbol_list[sym]['시가']*loss_cut2 > current_price and symbol_list[sym]['손절_2차'] == False):
@@ -889,31 +889,29 @@ try:
                                     qty = int(qty)
 
                                     send_message(f"[{symbol_list[sym]['종목명']}]: 2차 손절매 시도 ({qty}/{symbol_list[sym]['최대보유']}개)")
-                                    symbol_list[sym]['최대보유'] -= qty # 최대보유 감소
                                     
                                     if sell(symbol_list[sym]['마켓_sb'], sym, qty, current_price):
                                         symbol_list[sym]['손절_2차'] = True            
+                                        symbol_list[sym]['최대보유'] -= qty # 최대보유 감소
                                         send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 2차 손절매 성공")
                         # 3차 손절
                         elif(symbol_list[sym]['시가']*loss_cut3 > current_price and symbol_list[sym]['손절_3차'] == False):
-                           
-                            # 1차 매수 unlock... ;;
-                            symbol_list[sym]['보유'] = False
-                            symbol_list[sym]['최대보유'] = 0
-                            symbol_list[sym]['매수_1차'] = False
-                            symbol_list[sym]['매수_2차'] = False
-                            symbol_list[sym]['매수_3차'] = False  
-
                             stock_dict = get_stock_balance() # 보유주식 정보 최신화
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp: # 전량 손절
                                     
                                     send_message(f"[{symbol_list[sym]['종목명']}]: 3차 손절매 시도 ({qty}/{symbol_list[sym]['최대보유']}개)")
-                                    symbol_list[sym]['최대보유'] -= qty # 최대보유 감소
                                     if sell(symbol_list[sym]['마켓_sb'], sym, int(qty), current_price):
                                         symbol_list[sym]['손절_3차'] = True
-                                        send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 3차 손절매 성공")
                                         
+                                        # 1차 매수 unlock... ;;
+                                        symbol_list[sym]['보유'] = False
+                                        symbol_list[sym]['최대보유'] = 0
+                                        symbol_list[sym]['매수_1차'] = False
+                                        symbol_list[sym]['매수_2차'] = False
+                                        symbol_list[sym]['매수_3차'] = False  
+                                        
+                                        send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 3차 손절매 성공")
                         
 #---------------------- 보유중 루프 -----------------------------------------------------------------------------
 
