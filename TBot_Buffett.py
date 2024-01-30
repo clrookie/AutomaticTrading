@@ -702,7 +702,7 @@ try:
             t_ready = t_now.replace(hour=9, minute=31, second=0, microsecond=0)
             t_start = t_now.replace(hour=9, minute=40, second=0, microsecond=0)
             t_10 = t_now.replace(hour=10, minute=0, second=0, microsecond=0)
-            t_1230 = t_now.replace(hour=12, minute=30, second=0, microsecond=0)
+            t_1330 = t_now.replace(hour=13, minute=30, second=0, microsecond=0)
             t_1550 = t_now.replace(hour=15, minute=50, second=0, microsecond=0)
             t_exit = t_now.replace(hour=15, minute=58, second=0,microsecond=0)
             
@@ -910,7 +910,7 @@ try:
                                         symbol_list[sym]['매수_1차'] = False
                                         symbol_list[sym]['매수_2차'] = False
                                         symbol_list[sym]['매수_3차'] = False  
-                                        
+
                                         send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 3차 손절매 성공")
                         
 #---------------------- 보유중 루프 -----------------------------------------------------------------------------
@@ -955,7 +955,7 @@ try:
                                 time.sleep(3)
                                 stock_dict= get_stock_balance()
                     
-                    elif t_now < t_1230:    # 점심 이후로 추매 안함
+                    elif t_now < t_1330:    # 점심 이후로 추매 안함
                         second_target = (((symbol_list[sym]['목표매수가']-symbol_list[sym]['시가'])/2)+symbol_list[sym]['시가'])
                         # 2차 매수
                         if (second_target >= current_price and

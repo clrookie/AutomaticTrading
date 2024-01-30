@@ -622,7 +622,7 @@ try:
             t_ready = t_now.replace(hour=9, minute=0, second=15, microsecond=0)
             t_start = t_now.replace(hour=9, minute=10, second=0, microsecond=0)
             t_930 = t_now.replace(hour=9, minute=30, second=0, microsecond=0)
-            t_1230 = t_now.replace(hour=12, minute=30, second=0, microsecond=0)
+            t_1330 = t_now.replace(hour=13, minute=30, second=0, microsecond=0)
             t_1510 = t_now.replace(hour=15, minute=10, second=30,microsecond=0)
             t_exit = t_now.replace(hour=15, minute=19, second=30,microsecond=0)
             
@@ -875,7 +875,7 @@ try:
                                 time.sleep(3)
                                 stock_dict= get_stock_balance()
                     
-                    elif t_now < t_1230:   # 점심 이후로 추매 안함
+                    elif t_now < t_1330:   # 점심 이후로 추매 안함
                         second_target = (((symbol_list[sym]['목표매수가']-symbol_list[sym]['시가'])/2)+symbol_list[sym]['시가'])
                         # 2차 매수
                         if (second_target >= current_price and
