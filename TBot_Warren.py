@@ -656,8 +656,12 @@ try:
                 target_buy_count = int(len(symbol_list)) # 매수종목 수량
 
                 for sym, qty in stock_dict.items(): # 있으면 일괄 매도
-                    sell(sym, int(qty))
-                    send_message(f">>> [{symbol_list[sym]['종목명']}] 시가({get_stck_oprc(sym)})원에 매도했습니다~")
+                    
+                    current_price = get_current_price(sym)
+                    send_message(f">>> [{symbol_list[sym]['종목명']}] {current_price}원에 매도 시도 ({sym}개)")
+
+                    if sell(sym, int(qty)):
+                        send_message(f">>> [{symbol_list[sym]['종목명']}] 일괄 매도 성공 !!")
 
 
                 for sym in symbol_list: # 초기화
@@ -775,35 +779,42 @@ try:
 
                                     if qty > sell_qty: # 분할 익절
                                         qty = sell_qty
+                                        send_message(f"[{symbol_list[sym]['종목명']}]: 분할 익절 시도 ({sell_qty}/{qty}개)")
                                     else:
                                         symbol_list[sym]['보유'] = False # 전량 익절
+                                        send_message(f"[{symbol_list[sym]['종목명']}]: 전량 익절 시도 ({qty}개)")
 
                                     if sell(sym, qty):
                                         send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 익절매합니다 ^^ ({qty}개)")
                            
                         # 1차 손절하거나
                         elif(symbol_list[sym]['시가']*loss_cut1 > current_price and symbol_list[sym]['손절_1차'] == False):
-                            symbol_list[sym]['손절_1차'] = True         
                             stock_dict = get_stock_balance() # 보유주식 정보 최신화
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
                                     qty *= 0.33 # 분할 손절
+
+                                    qty = int(qty)
+                                    send_message(f"[{symbol_list[sym]['종목명']}]: 1차 손절매 시도 ({qty}/{symbol_list[sym]['최대보유']}개)")
                                     symbol_list[sym]['최대보유'] -= qty # 최대보유 감소
                                     if sell(sym, int(qty)):
-                                        send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 1차 손절매합니다 ㅠ")
+                                        symbol_list[sym]['손절_1차'] = True         
+                                        send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 1차 손절매 성공")
                         # 2차 손절
                         elif(symbol_list[sym]['시가']*loss_cut2 > current_price and symbol_list[sym]['손절_2차'] == False):
-                            symbol_list[sym]['손절_2차'] = True            
                             stock_dict = get_stock_balance() # 보유주식 정보 최신화
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
-                                    qty *= 0.5
+                                    qty *= 0.5  # 분할 손절
+
+                                    qty = int(qty)
+                                    send_message(f"[{symbol_list[sym]['종목명']}]: 2차 손절매 시도 ({qty}/{symbol_list[sym]['최대보유']}개)")
                                     symbol_list[sym]['최대보유'] -= qty # 최대보유 감소
-                                    if sell(sym, int(qty)):
-                                        send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 2차 손절매합니다 ㅠ")
+                                    if sell(sym, qty):
+                                        symbol_list[sym]['손절_2차'] = True            
+                                        send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 2차 손절매 성공")
                         # 3차 손절
                         elif(symbol_list[sym]['시가']*loss_cut3 > current_price and symbol_list[sym]['손절_3차'] == False):
-                            symbol_list[sym]['손절_3차'] = True
 
                             # 1차 매수 unlock... ;;
                             symbol_list[sym]['보유'] = False
@@ -815,8 +826,12 @@ try:
                             stock_dict = get_stock_balance() # 보유주식 정보 최신화
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
-                                    if sell(sym, int(qty)):
-                                        send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 3차 손절매합니다 ㅠ")
+                                    qty = int(qty)
+                                    send_message(f"[{symbol_list[sym]['종목명']}]: 3차 손절매 시도 ({qty}/{symbol_list[sym]['최대보유']}개)")
+                                    symbol_list[sym]['최대보유'] -= qty # 최대보유 감소
+                                    if sell(sym, qty):
+                                        symbol_list[sym]['손절_3차'] = True
+                                        send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 3차 손절매 성공")
 
 #---------------------- 보유중 루프 -----------------------------------------------------------------------------
 
@@ -825,11 +840,12 @@ try:
                     # 목표가 1차 매수
                     if symbol_list[sym]['목표매수가'] <= current_price and symbol_list[sym]['매수_1차'] == False:
 
-                        symbol_list[sym]['매수_1차'] = True
 
-                        qty = int((symbol_list[sym]['배분예산'] / current_price) * buy_rate) # 33% 분할 매수
+                        qty = int((symbol_list[sym]['배분예산'] // current_price) * buy_rate) # 33% 분할 매수
+                        send_message(f"[{symbol_list[sym]['종목명']}] 1차 매수 시도 ({qty}개)")
                         if qty > 0:
                             if buy(sym, qty):
+                                symbol_list[sym]['매수_1차'] = True
                                 symbol_list[sym]['최대보유'] += qty  # 익절매 분할 기준값
                                 symbol_list[sym]['실매수가'] = current_price
                                 symbol_list[sym]['보유'] = True
@@ -839,7 +855,7 @@ try:
                                 symbol_list[sym]['손절_2차'] = False
                                 symbol_list[sym]['손절_3차'] = False     
 
-                                send_message(f"[{symbol_list[sym]['종목명']}] 1차 매수")
+                                send_message(f"[{symbol_list[sym]['종목명']}] 1차 매수 성공")
                                 
                                 formatted_amount = "{:,.0f}원".format(symbol_list[sym]['목표매수가'])
                                 send_message(f" - 목표매수가: {formatted_amount}")   
@@ -866,17 +882,17 @@ try:
                         if (second_target >= current_price and
                             symbol_list[sym]['매수_1차'] == True and
                             symbol_list[sym]['매수_2차'] == False):
-                            
-                            symbol_list[sym]['매수_2차'] = True
-                            
-                            qty = int((symbol_list[sym]['배분예산'] / current_price) * buy_rate) # 33% 분할 매수
+                                                        
+                            qty = int((symbol_list[sym]['배분예산'] // current_price) * buy_rate) # 33% 분할 매수
+                            send_message(f"[{symbol_list[sym]['종목명']}] 2차 매수 시도 ({qty}개)")
                             if qty > 0:
                                 if buy(sym, qty):
+                                    symbol_list[sym]['매수_2차'] = True
                                     symbol_list[sym]['최대보유'] += qty  # 익절매 분할 기준값
                                     symbol_list[sym]['실매수가'] = current_price
                                     symbol_list[sym]['보유'] = True
 
-                                    send_message(f"[{symbol_list[sym]['종목명']}] 2차 매수")
+                                    send_message(f"[{symbol_list[sym]['종목명']}] 2차 매수 성공")
                                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['목표매수가'])
                                     send_message(f" - 목표매수가: {formatted_amount}")   
                                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['실매수가'])
@@ -902,16 +918,16 @@ try:
                             symbol_list[sym]['매수_2차'] == True and
                             symbol_list[sym]['매수_3차'] == False):
 
-                            symbol_list[sym]['매수_3차'] = True
-
-                            qty = int((symbol_list[sym]['배분예산'] / current_price) * buy_rate) # 33% 분할 매수
+                            qty = int((symbol_list[sym]['배분예산'] // current_price) * buy_rate) # 33% 분할 매수
+                            send_message(f"[{symbol_list[sym]['종목명']}] 3차 매수 시도 ({qty}개)")
                             if qty > 0:
                                 if buy(sym, qty):
+                                    symbol_list[sym]['매수_3차'] = True
                                     symbol_list[sym]['최대보유'] += qty  # 익절매 분할 기준값
                                     symbol_list[sym]['실매수가'] = current_price
                                     symbol_list[sym]['보유'] = True
 
-                                    send_message(f"[{symbol_list[sym]['종목명']}] 3차 매수")
+                                    send_message(f"[{symbol_list[sym]['종목명']}] 3차 매수 성공")
                                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['목표매수가'])
                                     send_message(f" - 목표매수가: {formatted_amount}")   
                                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['실매수가'])
