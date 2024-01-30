@@ -805,7 +805,14 @@ try:
                         # 3차 손절
                         elif(symbol_list[sym]['시가']*loss_cut3 > current_price and symbol_list[sym]['손절_3차'] == False):
                             symbol_list[sym]['손절_3차'] = True
-                            symbol_list[sym]['보유'] = False               
+
+                            # 1차 매수 unlock... ;;
+                            symbol_list[sym]['보유'] = False
+                            symbol_list[sym]['최대보유'] = 0
+                            symbol_list[sym]['매수_1차'] = False
+                            symbol_list[sym]['매수_2차'] = False
+                            symbol_list[sym]['매수_3차'] = False
+
                             stock_dict = get_stock_balance() # 보유주식 정보 최신화
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
@@ -827,6 +834,11 @@ try:
                                 symbol_list[sym]['최대보유'] += qty  # 익절매 분할 기준값
                                 symbol_list[sym]['실매수가'] = current_price
                                 symbol_list[sym]['보유'] = True
+
+                                # 손절 1차 unlock... ;;
+                                symbol_list[sym]['손절_1차'] = False
+                                symbol_list[sym]['손절_2차'] = False
+                                symbol_list[sym]['손절_3차'] = False     
 
                                 send_message(f"[{symbol_list[sym]['종목명']}] 1차 매수")
                                 
