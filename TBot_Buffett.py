@@ -854,7 +854,6 @@ try:
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
                                     qty = int(qty)
-
                                     sell_qty = int(symbol_list[sym]['최대보유'] * sell_rate)
 
                                     if qty > sell_qty: # 분할 익절
