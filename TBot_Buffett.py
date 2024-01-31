@@ -529,7 +529,6 @@ try:
                     symbol_list[sym]['손절_2차'] = False
                     symbol_list[sym]['손절_3차'] = False
                     symbol_list[sym]['목표매수가_down'] = False
-                    symbol_list[sym]['목표매수가_up'] = False
                     send_message("---------------------------------")
                     
 
@@ -545,12 +544,7 @@ try:
                     # 반템포 늦은 장진입 시, 목표매수가 밑에서 매수하려고..
                     if current_price < symbol_list[sym]['목표매수가'] and symbol_list[sym]['목표매수가_down'] == False:
                         symbol_list[sym]['목표매수가_down'] = True
-                        symbol_list[sym]['목표매수가_up'] = False
                         send_message(f"[{symbol_list[sym]['종목명']}] 목표매수가 보다 하향~")
-                    elif current_price > symbol_list[sym]['목표매수가'] and symbol_list[sym]['목표매수가_up'] == False:
-                        symbol_list[sym]['목표매수가_up'] = True
-                        symbol_list[sym]['목표매수가_down'] = False
-                        send_message(f"[{symbol_list[sym]['종목명']}] 목표매수가 보다 상향~")
 
                     if symbol_list[sym]['보유']: # 보유중이면
 
