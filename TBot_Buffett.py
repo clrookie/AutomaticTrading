@@ -662,13 +662,14 @@ try:
                             stock_dict = get_stock_balance() # 보유주식 정보 최신화
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
+                                    total_qty = qty
                                     qty = float(qty) * 0.34 # 분할 손절
                                     if qty < 1:
                                         qty = 1
                                     else:
                                         qty = int(qty)
                                     
-                                    send_message(f"[{symbol_list[sym]['종목명']}]: 1차 손절매 시도 ({qty}/{symbol_list[sym]['최대보유']}개)")
+                                    send_message(f"[{symbol_list[sym]['종목명']}]: 1차 손절매 시도 ({qty}/{total_qty}개)")
                                     current_price = get_current_price(symbol_list[sym]['마켓'],sym) # 가격 최신화
                                     if sell(symbol_list[sym]['마켓_sb'], sym, qty, current_price):
                                         symbol_list[sym]['손절_1차'] = True         
@@ -680,13 +681,14 @@ try:
                             stock_dict = get_stock_balance() # 보유주식 정보 최신화
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
+                                    total_qty = qty
                                     qty = float(qty) * 0.5 # 분할 손절
                                     if qty < 1:
                                         qty = 1
                                     else:
                                         qty = int(qty)
 
-                                    send_message(f"[{symbol_list[sym]['종목명']}]: 2차 손절매 시도 ({qty}/{symbol_list[sym]['최대보유']}개)")
+                                    send_message(f"[{symbol_list[sym]['종목명']}]: 2차 손절매 시도 ({qty}/{total_qty}개)")
                                     
                                     current_price = get_current_price(symbol_list[sym]['마켓'],sym)
                                     if sell(symbol_list[sym]['마켓_sb'], sym, qty, current_price):
@@ -700,7 +702,7 @@ try:
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp: # 전량 손절
                                     
-                                    send_message(f"[{symbol_list[sym]['종목명']}]: 3차 손절매 시도 ({qty}/{symbol_list[sym]['최대보유']}개)")
+                                    send_message(f"[{symbol_list[sym]['종목명']}]: 3차 전량 손절매 시도 ({qty}개)")
                                     
                                     current_price = get_current_price(symbol_list[sym]['마켓'],sym)
                                     if sell(symbol_list[sym]['마켓_sb'], sym, int(qty), current_price):
