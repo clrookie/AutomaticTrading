@@ -726,9 +726,11 @@ try:
                                 stock_dict= get_stock_balance()
                     
                     elif t_now < t_1330:    # 점심 이후로 추매 안함
-                        second_target = (((symbol_list[sym]['목표매수가']-symbol_list[sym]['시가'])/2)+symbol_list[sym]['시가'])
+                        middle_target   = (((symbol_list[sym]['목표매수가']-symbol_list[sym]['시가'])/1.136)+symbol_list[sym]['시가'])
+                        last_target     = (((symbol_list[sym]['목표매수가']-symbol_list[sym]['시가'])/1.333)+symbol_list[sym]['시가'])
+
                         # 2차 매수
-                        if (second_target >= current_price and
+                        if (middle_target >= current_price and
                             symbol_list[sym]['매수_1차'] == True and
                             symbol_list[sym]['매수_2차'] == False):
                             
@@ -763,7 +765,7 @@ try:
                                     stock_dict= get_stock_balance()
 
                         # 3차 매수
-                        elif (symbol_list[sym]['시가'] >= current_price and
+                        elif (last_target >= current_price and
                             symbol_list[sym]['매수_1차'] == True and
                             symbol_list[sym]['매수_2차'] == True and
                             symbol_list[sym]['매수_3차'] == False):
