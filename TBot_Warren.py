@@ -719,6 +719,7 @@ try:
 
                     if current_price < symbol_list[sym]['목표매수가']:
                         symbol_list[sym]['목표매수가_down'] = True
+                        send_message(f"[{symbol_list[sym]['종목명']}] 목표매수가 터치")
 
                     if symbol_list[sym]['보유']: # 보유중이면
 
