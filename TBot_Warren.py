@@ -128,44 +128,6 @@ def get_hotstart(code="005930"):
         return stck_clpr
     return False
 
-def get_target_price(code="005930"): #변동성 돌파 (안씀)
-    """변동성 돌파 전략으로 매수 목표가 조회"""
-    PATH = "uapi/domestic-stock/v1/quotations/inquire-daily-price"
-    URL = f"{URL_BASE}/{PATH}"
-    headers = {"Content-Type":"application/json", 
-        "authorization": f"Bearer {ACCESS_TOKEN}",
-        "appKey":APP_KEY,
-        "appSecret":APP_SECRET,
-        "tr_id":"FHKST01010400"}
-    params = {
-    "fid_cond_mrkt_div_code":"J",
-    "fid_input_iscd":code,
-    "fid_org_adj_prc":"1",
-    "fid_period_div_code":"D"
-    }
-    res = requests.get(URL, headers=headers, params=params)
-    stck_hgpr = int(res.json()['output'][1]['stck_hgpr']) #전일 고가
-    stck_lwpr = int(res.json()['output'][1]['stck_lwpr']) #전일 저가
-    stck_clpr = int(res.json()['output'][1]['stck_clpr']) #전일 종가
-    stck_oprc = int(res.json()['output'][0]['stck_oprc']) #오늘 시가
-
-    ## 심리를 이용한 1% 먹기 알고리즘 ##
-    # 매수가 = 시가 + (전일고가-전일저가) *0.5) + ((전일종가-시가)*0.5)
-    # 손절) 시가 이하
-    # 익절) 1.0% or 15:15 일괄매도
-    
-    target_price = 0
-    rate = 0.5
-    gab_rate = 0.25
-    stck_oprc_temp = ((stck_hgpr - stck_lwpr) * rate) + ((stck_clpr-stck_oprc) * gab_rate)
-
-    # 최소 타겟값 보정
-    if (stck_oprc * 0.01) > stck_oprc_temp :
-        target_price = stck_oprc * 1.01
-    else :    
-        target_price = stck_oprc + stck_oprc_temp
-
-    return target_price
 
 def get_target_price_new(code="005930"): # 음봉 윗꼬리 평균 + 보정
     PATH = "uapi/domestic-stock/v1/quotations/inquire-daily-price"
@@ -191,7 +153,6 @@ def get_target_price_new(code="005930"): # 음봉 윗꼬리 평균 + 보정
 
     for i in range(0,data_period):
         stck_hgpr = int(res.json()['output'][i]['stck_hgpr']) #고가
-        # stck_lwpr = int(res.json()['output'][i]['stck_lwpr']) #저가
         stck_clpr = int(res.json()['output'][i]['stck_clpr']) #종가
         stck_oprc = int(res.json()['output'][i]['stck_oprc']) #시가
 
@@ -474,7 +435,7 @@ try:
             t_now = datetime.datetime.now()
             
             t_ready = t_now.replace(hour=9, minute=0, second=15, microsecond=0)
-            t_start = t_now.replace(hour=9, minute=10, second=0, microsecond=0)
+            t_start = t_now.replace(hour=9, minute=11, second=0, microsecond=0)
             t_930 = t_now.replace(hour=9, minute=30, second=0, microsecond=0)
             t_1330 = t_now.replace(hour=13, minute=30, second=0, microsecond=0)
             t_1510 = t_now.replace(hour=15, minute=0, second=0,microsecond=0)

@@ -459,7 +459,7 @@ try:
             t_now = datetime.datetime.now(timezone('America/New_York')) # 뉴욕 기준 현재 시간
             
             t_ready = t_now.replace(hour=9, minute=31, second=0, microsecond=0)
-            t_start = t_now.replace(hour=9, minute=40, second=0, microsecond=0)
+            t_start = t_now.replace(hour=9, minute=41, second=0, microsecond=0)
             t_10 = t_now.replace(hour=10, minute=0, second=0, microsecond=0)
             t_1330 = t_now.replace(hour=13, minute=30, second=0, microsecond=0)
             t_1550 = t_now.replace(hour=15, minute=40, second=0, microsecond=0)
