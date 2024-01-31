@@ -308,8 +308,33 @@ def sell(code="005930", qty="1"):
     else:
         send_message(f"[매도 실패]{str(res.json())}")
         return False
-    
+
 def get_real_total():
+    PATH = "uapi/overseas-stock/v1/trading/inquire-balance"
+    URL = f"{URL_BASE}/{PATH}"
+    headers = {"Content-Type":"application/json", 
+        "authorization":f"Bearer {ACCESS_TOKEN}",
+        "appKey":APP_KEY,
+        "appSecret":APP_SECRET,
+        "tr_id":"TTTS3012R",
+    }
+    params = {
+        "CANO": CANO,
+        "ACNT_PRDT_CD": ACNT_PRDT_CD,
+        "OVRS_EXCG_CD": "NASD",
+        "TR_CRCY_CD": "USD",
+        "CTX_AREA_FK200": "",
+        "CTX_AREA_NK200": ""
+    }
+    res = requests.get(URL, headers=headers, params=params)
+
+    evaluation1 = float(res.json()['output2']['tot_evlu_pfls_amt'])
+    evaluation2 = float(res.json()['output2']['tot_pftrt'])
+
+    
+    return evaluation1, evaluation2
+
+def get_real_total111():
     PATH = "uapi/domestic-stock/v1/trading/inquire-balance-rlz-pl"
     URL = f"{URL_BASE}/{PATH}"
     headers = {"Content-Type":"application/json", 
@@ -398,7 +423,7 @@ try:
     # formatted_amount = "{:,.0f}$".format(c)
     # print(f"차익: {formatted_amount}")
 
-    print(get_total())
+    # print(get_total())
     # print(b)
     # print(c)
     # print(d)

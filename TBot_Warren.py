@@ -405,222 +405,60 @@ try:
     loss_cut2 = 0.991
     loss_cut3 = 0.986
 
+    # 공용 데이터
+    common_data ={
+    '배분예산':0,
+    '목표매수가':0,
+    '목표매수가_up': False,
+    '목표매수가_down': False,
+    '실매수가':0,
+    '시가':0,
+    '보유':False,
+    '예산_가중치':1.35,
+    '익절_가중치':0.65,
+        
+    '최대보유':0,
+    '매수_1차': False,
+    '매수_2차': False,
+    '매수_3차': False,
+    '손절_1차': False,
+    '손절_2차': False,
+    '손절_3차': False,
+        
+    'profit_rate07_up':True,
+    'profit_rate12_up':True,
+    'profit_rate17_up':True,
+    'profit_rate22_up':True,
+    'profit_rate07_down':False,
+    'profit_rate12_down':False,
+    'profit_rate17_down':False
+    }
+
+    #개별 종목 데이터
     symbol_list = {
-    '069500':{'종목명':'KOSPI_200', #1
-    '배분예산':0,
-    '목표매수가':0,
-    '목표매수가_up': False,
-    '목표매수가_down': False,
-    '실매수가':0,
-    '시가':0,
-    '보유':False,
-    '예산_가중치':1.35,
-    '익절_가중치':0.65,
-        
-    '최대보유':0,
-    '매수_1차': False,
-    '매수_2차': False,
-    '매수_3차': False,
-    '손절_1차': False,
-    '손절_2차': False,
-    '손절_3차': False,
-        
-    'profit_rate07_up':True,
-    'profit_rate12_up':True,
-    'profit_rate17_up':True,
-    'profit_rate22_up':True,
-    'profit_rate07_down':False,
-    'profit_rate12_down':False,
-    'profit_rate17_down':False},
+    '069500':{'종목명':'코스피_200', #1
+    **common_data},
 
-    '114800':{'종목명':'KOSPI_인버스', #2
-    '배분예산':0,
-    '목표매수가':0,
-    '목표매수가_up': False,
-    '목표매수가_down': False,
-    '실매수가':0,
-    '시가':0,
-    '보유':False,
-    '예산_가중치':1.35,
-    '익절_가중치':0.65,
-        
-    '최대보유':0,
-    '매수_1차': False,
-    '매수_2차': False,
-    '매수_3차': False,
-    '손절_1차': False,
-    '손절_2차': False,
-    '손절_3차': False,
+    '114800':{'종목명':'코스피_인버스', #2
+    **common_data},
 
-    'profit_rate07_up':True,
-    'profit_rate12_up':True,
-    'profit_rate17_up':True,
-    'profit_rate22_up':True,
-    'profit_rate07_down':False,
-    'profit_rate12_down':False,
-    'profit_rate17_down':False},
+    '122630':{'종목명':'코스피_레버리지', #3
+    **common_data},
 
-    '122630':{'종목명':'KOSPI_레버리지', #3
-    '배분예산':0,
-    '목표매수가':0,
-    '목표매수가_up': False,
-    '목표매수가_down': False,
-    '실매수가':0,
-    '시가':0,
-    '보유':False,
-    '예산_가중치':1.0,
-    '익절_가중치':1.3,
-
-    '최대보유':0,
-    '매수_1차': False,
-    '매수_2차': False,
-    '매수_3차': False,
-    '손절_1차': False,
-    '손절_2차': False,
-    '손절_3차': False,
-
-    'profit_rate07_up':True,
-    'profit_rate12_up':True,
-    'profit_rate17_up':True,
-    'profit_rate22_up':True,
-    'profit_rate07_down':False,
-    'profit_rate12_down':False,
-    'profit_rate17_down':False},
-
-    '252670':{'종목명':'KOSPI_인버스X2', #4
-    '배분예산':0,
-    '목표매수가':0,
-    '목표매수가_up': False,
-    '목표매수가_down': False,
-    '실매수가':0,
-    '시가':0,
-    '보유':False,
-    '예산_가중치':1.0,
-    '익절_가중치':1.0,
-
-    '최대보유':0,
-    '매수_1차': False,
-    '매수_2차': False,
-    '매수_3차': False,
-    '손절_1차': False,
-    '손절_2차': False,
-    '손절_3차': False,
-
-    'profit_rate07_up':True,
-    'profit_rate12_up':True,
-    'profit_rate17_up':True,
-    'profit_rate22_up':True,
-    'profit_rate07_down':False,
-    'profit_rate12_down':False,
-    'profit_rate17_down':False},
+    '252670':{'종목명':'코스피_인버스X2', #4
+    **common_data},
 
     '229200':{'종목명':'KOSDAQ_150', #5
-    '배분예산':0,
-    '목표매수가':0,
-    '목표매수가_up': False,
-    '목표매수가_down': False,
-    '실매수가':0,
-    '시가':0,
-    '보유':False,
-    '예산_가중치':1.0,
-    '익절_가중치':1.0,
-
-    '최대보유':0,
-    '매수_1차': False,
-    '매수_2차': False,
-    '매수_3차': False,
-    '손절_1차': False,
-    '손절_2차': False,
-    '손절_3차': False,
-
-    'profit_rate07_up':True,
-    'profit_rate12_up':True,
-    'profit_rate17_up':True,
-    'profit_rate22_up':True,
-    'profit_rate07_down':False,
-    'profit_rate12_down':False,
-    'profit_rate17_down':False},
+    **common_data},
 
     '233740':{'종목명':'KOSDAQ_레버리지', #6
-    '배분예산':0,
-    '목표매수가':0,
-    '목표매수가_up': False,
-    '목표매수가_down': False,
-    '실매수가':0,
-    '시가':0,
-    '보유':False,
-    '예산_가중치':1.0,
-    '익절_가중치':1.5,
-
-    '최대보유':0,
-    '매수_1차': False,
-    '매수_2차': False,
-    '매수_3차': False,
-    '손절_1차': False,
-    '손절_2차': False,
-    '손절_3차': False,
-
-    'profit_rate07_up':True,
-    'profit_rate12_up':True,
-    'profit_rate17_up':True,
-    'profit_rate22_up':True,
-    'profit_rate07_down':False,
-    'profit_rate12_down':False,
-    'profit_rate17_down':False},
+    **common_data},
 
     '251340':{'종목명':'KOSDAQ_인버스X2', #7
-    '배분예산':0,
-    '목표매수가':0,
-    '목표매수가_up': False,
-    '목표매수가_down': False,
-    '실매수가':0,
-    '시가':0,
-    '보유':False,
-    '예산_가중치':1.0,
-    '익절_가중치':1.3,
-
-    '최대보유':0,
-    '매수_1차': False,
-    '매수_2차': False,
-    '매수_3차': False,
-    '손절_1차': False,
-    '손절_2차': False,
-    '손절_3차': False,
-
-    'profit_rate07_up':True,
-    'profit_rate12_up':True,
-    'profit_rate17_up':True,
-    'profit_rate22_up':True,
-    'profit_rate07_down':False,
-    'profit_rate12_down':False,
-    'profit_rate17_down':False},
+    **common_data},
 
     '371460':{'종목명':'TIGER_차이나', #8
-    '배분예산':0,
-    '목표매수가':0,
-    '목표매수가_up': False,
-    '목표매수가_down': False,
-    '실매수가':0,
-    '시가':0,
-    '보유':False,
-    '예산_가중치':1.0,
-    '익절_가중치':1.5,
-
-    '최대보유':0,
-    '매수_1차': False,
-    '매수_2차': False,
-    '매수_3차': False,
-    '손절_1차': False,
-    '손절_2차': False,
-    '손절_3차': False,
-
-    'profit_rate07_up':True,
-    'profit_rate12_up':True,
-    'profit_rate17_up':True,
-    'profit_rate22_up':True,
-    'profit_rate07_down':False,
-    'profit_rate12_down':False,
-    'profit_rate17_down':False},            
+    **common_data},            
     }
 
     while True:
@@ -639,8 +477,8 @@ try:
             t_start = t_now.replace(hour=9, minute=10, second=0, microsecond=0)
             t_930 = t_now.replace(hour=9, minute=30, second=0, microsecond=0)
             t_1330 = t_now.replace(hour=13, minute=30, second=0, microsecond=0)
-            t_1510 = t_now.replace(hour=15, minute=10, second=30,microsecond=0)
-            t_exit = t_now.replace(hour=15, minute=19, second=30,microsecond=0)
+            t_1510 = t_now.replace(hour=15, minute=0, second=0,microsecond=0)
+            t_exit = t_now.replace(hour=15, minute=10, second=0,microsecond=0)
             
             if t_ready < t_now < t_exit and startoncebyday == False: # 매매 준비
             
@@ -683,15 +521,15 @@ try:
                 for sym in symbol_list: # 초기화
 
                     send_message(f"[{symbol_list[sym]['종목명']}]")
-                    symbol_list[sym]['배분예산'] = total_cash * (1/target_buy_count) * symbol_list[sym]['예산_가중치']
+                    symbol_list[sym]['배분예산'] = int(total_cash * (1/target_buy_count) * symbol_list[sym]['예산_가중치'])
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['배분예산'])
                     send_message(f" - 배분예산: {formatted_amount}")
 
-                    symbol_list[sym]['시가'] = get_stck_oprc(sym)
+                    symbol_list[sym]['시가'] = int(get_stck_oprc(sym))
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['시가'])
                     send_message(f" - 시가: {formatted_amount}")   
 
-                    symbol_list[sym]['목표매수가'] = get_target_price_new(sym)
+                    symbol_list[sym]['목표매수가'] = int(get_target_price_new(sym))
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['목표매수가'])
                     send_message(f" - 목표매수가: {formatted_amount}")   
 
@@ -705,6 +543,8 @@ try:
                     symbol_list[sym]['손절_1차'] = False
                     symbol_list[sym]['손절_2차'] = False
                     symbol_list[sym]['손절_3차'] = False
+                    symbol_list[sym]['목표매수가_down'] = False
+                    symbol_list[sym]['목표매수가_up'] = False
                     send_message("---------------------------------")
                     
                 
@@ -717,9 +557,15 @@ try:
                 for sym in symbol_list:
                     current_price = get_current_price(sym)
 
-                    if current_price < symbol_list[sym]['목표매수가']:
+                    # 반템포 늦은 장진입 시, 목표매수가 밑에서 매수하려고..
+                    if current_price < symbol_list[sym]['목표매수가'] and symbol_list[sym]['목표매수가_down'] == False:
                         symbol_list[sym]['목표매수가_down'] = True
-                        send_message(f"[{symbol_list[sym]['종목명']}] 목표매수가 터치")
+                        symbol_list[sym]['목표매수가_up'] = False
+                        send_message(f"[{symbol_list[sym]['종목명']}] 목표매수가 보다 하향~")
+                    elif current_price > symbol_list[sym]['목표매수가'] and symbol_list[sym]['목표매수가_up'] == False:
+                        symbol_list[sym]['목표매수가_up'] = True
+                        symbol_list[sym]['목표매수가_down'] = False
+                        send_message(f"[{symbol_list[sym]['종목명']}] 목표매수가 보다 상향~")
 
                     if symbol_list[sym]['보유']: # 보유중이면
 
@@ -798,8 +644,8 @@ try:
                                     sell_qty = int(float(symbol_list[sym]['최대보유']) * sell_rate)
 
                                     if qty > sell_qty: # 분할 익절
-                                        qty = sell_qty
                                         send_message(f"[{symbol_list[sym]['종목명']}]: 분할 익절 시도 ({sell_qty}/{qty}개)")
+                                        qty = sell_qty
                                     else:
                                         symbol_list[sym]['보유'] = False # 전량 익절
                                         send_message(f"[{symbol_list[sym]['종목명']}]: 전량 익절 시도 ({qty}개)")
@@ -1016,10 +862,10 @@ try:
                 a,b = get_real_total()
                 send_message("")
                 formatted_amount = "{:,.0f}원".format(a)
-                send_message(f"오늘의 차익: {formatted_amount}")
+                send_message(f"총자산증감액: {formatted_amount}")
 
                 formatted_amount = "{:,.3f}%".format(b)
-                send_message(f"수익율: {formatted_amount}")
+                send_message(f"총수익율: {formatted_amount}")
                 send_message("")
 
                 send_message("=== 국내증시 자동매매를 종료합니다 ===")

@@ -149,33 +149,26 @@ def get_target_price_new(market="NAS", code="AAPL"): # 음봉 윗꼬리 평균 +
     return target_price
 
 def get_real_total():
-    PATH = "uapi/domestic-stock/v1/trading/inquire-balance-rlz-pl"
+    PATH = "uapi/overseas-stock/v1/trading/inquire-balance"
     URL = f"{URL_BASE}/{PATH}"
     headers = {"Content-Type":"application/json", 
         "authorization":f"Bearer {ACCESS_TOKEN}",
         "appKey":APP_KEY,
         "appSecret":APP_SECRET,
-        "tr_id":"CTRP6504R",
-        "custtype":"P",
+        "tr_id":"TTTS3012R",
     }
     params = {
         "CANO": CANO,
         "ACNT_PRDT_CD": ACNT_PRDT_CD,
-        "AFHR_FLPR_YN": "N",
-        "OFL_YN": "",
-        "INQR_DVSN": "00",
-        "UNPR_DVSN": "01",
-        "FUND_STTL_ICLD_YN": "N",
-        "FNCG_AMT_AUTO_RDPT_YN": "N",
-        "PRCS_DVSN": "01",
-        "COST_ICLD_YN": "N",
-        "CTX_AREA_FK100": "",
-        "CTX_AREA_NK100": ""
+        "OVRS_EXCG_CD": "NASD",
+        "TR_CRCY_CD": "USD",
+        "CTX_AREA_FK200": "",
+        "CTX_AREA_NK200": ""
     }
     res = requests.get(URL, headers=headers, params=params)
 
-    evaluation1 = float(res.json()['output2'][0]['asst_icdc_amt'])
-    evaluation2 = float(res.json()['output2'][0]['asst_icdc_erng_rt'])
+    evaluation1 = float(res.json()['output2']['tot_evlu_pfls_amt'])
+    evaluation2 = float(res.json()['output2']['tot_pftrt'])
 
     
     return evaluation1, evaluation2
@@ -360,354 +353,96 @@ try:
     loss_cut2 = 0.991
     loss_cut3 = 0.986
 
+    # 공용 데이터
+    common_data ={
+    '배분예산':0,
+    '목표매수가':0,
+    '목표매수가_up': False,
+    '목표매수가_down': False,
+    '실매수가':0,
+    '시가':0,
+    '보유':False,
+    '예산_가중치':1.35,
+    '익절_가중치':0.65,
+        
+    '최대보유':0,
+    '매수_1차': False,
+    '매수_2차': False,
+    '매수_3차': False,
+    '손절_1차': False,
+    '손절_2차': False,
+    '손절_3차': False,
+        
+    'profit_rate07_up':True,
+    'profit_rate12_up':True,
+    'profit_rate17_up':True,
+    'profit_rate22_up':True,
+    'profit_rate07_down':False,
+    'profit_rate12_down':False,
+    'profit_rate17_down':False
+    }
+
+    #개별 종목 데이터
     symbol_list = {
     'DDM':{'종목명':'다우_레버리지X2', #1
     '마켓':'AMS',
     '마켓_sb':'AMEX',
-    '배분예산':0,
-    '목표매수가':0,
-    '목표매수가_up': False,
-    '목표매수가_down': False,
-    '실매수가':0,
-    '시가':0,
-    '보유':False,
-    '예산_가중치':1.35,
-    '익절_가중치':0.65,
-    
-    '최대보유':0,
-    '매수_1차': False,
-    '매수_2차': False,
-    '매수_3차': False,
-    '손절_1차': False,
-    '손절_2차': False,
-    '손절_3차': False,
-
-    'profit_rate07_up':True,
-    'profit_rate12_up':True,
-    'profit_rate17_up':True,
-    'profit_rate22_up':True,
-    'profit_rate07_down':False,
-    'profit_rate12_down':False,
-    'profit_rate17_down':False},
+    **common_data},
 
     'DXD':{'종목명':'다우_인버스X2', #2
     '마켓':'AMS',
     '마켓_sb':'AMEX',
-    '배분예산':0,
-    '목표매수가':0,
-    '목표매수가_up': False,
-    '목표매수가_down': False,
-    '실매수가':0,
-    '시가':0,
-    '보유':False,
-    '예산_가중치':1.35,
-    '익절_가중치':0.65,
-    
-    '최대보유':0,
-    '매수_1차': False,
-    '매수_2차': False,
-    '매수_3차': False,
-    '손절_1차': False,
-    '손절_2차': False,
-    '손절_3차': False,
-
-    'profit_rate07_up':True,
-    'profit_rate12_up':True,
-    'profit_rate17_up':True,
-    'profit_rate22_up':True,
-    'profit_rate07_down':False,
-    'profit_rate12_down':False,
-    'profit_rate17_down':False},
+    **common_data},
 
     'SSO':{'종목명':'S&P_레버리지X2', #3
     '마켓':'AMS',
     '마켓_sb':'AMEX',
-    '배분예산':0,
-    '목표매수가':0,
-    '목표매수가_up': False,
-    '목표매수가_down': False,
-    '실매수가':0,
-    '시가':0,
-    '보유':False,
-    '예산_가중치':1.35,
-    '익절_가중치':0.65,
-    
-    '최대보유':0,
-    '매수_1차': False,
-    '매수_2차': False,
-    '매수_3차': False,
-    '손절_1차': False,
-    '손절_2차': False,
-    '손절_3차': False,
-
-    'profit_rate07_up':True,
-    'profit_rate12_up':True,
-    'profit_rate17_up':True,
-    'profit_rate22_up':True,
-    'profit_rate07_down':False,
-    'profit_rate12_down':False,
-    'profit_rate17_down':False},
+    **common_data},
 
     'SDS':{'종목명':'S&P_인버스X2', #4
     '마켓':'AMS',
     '마켓_sb':'AMEX',
-    '배분예산':0,
-    '목표매수가':0,
-    '목표매수가_up': False,
-    '목표매수가_down': False,
-    '실매수가':0,
-    '시가':0,
-    '보유':False,
-    '예산_가중치':1.35,
-    '익절_가중치':0.65,
-    
-    '최대보유':0,
-    '매수_1차': False,
-    '매수_2차': False,
-    '매수_3차': False,
-    '손절_1차': False,
-    '손절_2차': False,
-    '손절_3차': False,
-
-    'profit_rate07_up':True,
-    'profit_rate12_up':True,
-    'profit_rate17_up':True,
-    'profit_rate22_up':True,
-    'profit_rate07_down':False,
-    'profit_rate12_down':False,
-    'profit_rate17_down':False},
+    **common_data},
 
     'QLD':{'종목명':'나스닥_레버리지X2', #5
     '마켓':'AMS',
     '마켓_sb':'AMEX',
-    '배분예산':0,
-    '목표매수가':0,
-    '목표매수가_up': False,
-    '목표매수가_down': False,
-    '실매수가':0,
-    '시가':0,
-    '보유':False,
-    '예산_가중치':1.35,
-    '익절_가중치':0.65,
-    
-    '최대보유':0,
-    '매수_1차': False,
-    '매수_2차': False,
-    '매수_3차': False,
-    '손절_1차': False,
-    '손절_2차': False,
-    '손절_3차': False,
-
-    'profit_rate07_up':True,
-    'profit_rate12_up':True,
-    'profit_rate17_up':True,
-    'profit_rate22_up':True,
-    'profit_rate07_down':False,
-    'profit_rate12_down':False,
-    'profit_rate17_down':False},
+    **common_data},
 
     'QID':{'종목명':'나스닥 인버스X2', #6
     '마켓':'AMS',
     '마켓_sb':'AMEX',
-    '배분예산':0,
-    '목표매수가':0,
-    '목표매수가_up': False,
-    '목표매수가_down': False,
-    '실매수가':0,
-    '시가':0,
-    '보유':False,
-    '예산_가중치':1.35,
-    '익절_가중치':0.65,
-    
-    '최대보유':0,
-    '매수_1차': False,
-    '매수_2차': False,
-    '매수_3차': False,
-    '손절_1차': False,
-    '손절_2차': False,
-    '손절_3차': False,
-
-    'profit_rate07_up':True,
-    'profit_rate12_up':True,
-    'profit_rate17_up':True,
-    'profit_rate22_up':True,
-    'profit_rate07_down':False,
-    'profit_rate12_down':False,
-    'profit_rate17_down':False},         
+    **common_data},         
     # ---------
     'UDOW':{'종목명':'다우_레버리지X3', #7
     '마켓':'AMS',
     '마켓_sb':'AMEX',
-    '배분예산':0,
-    '목표매수가':0,
-    '목표매수가_up': False,
-    '목표매수가_down': False,
-    '실매수가':0,
-    '시가':0,
-    '보유':False,
-    '예산_가중치':1.0,
-    '익절_가중치':1.3,
-    
-    '최대보유':0,
-    '매수_1차': False,
-    '매수_2차': False,
-    '매수_3차': False,
-    '손절_1차': False,
-    '손절_2차': False,
-    '손절_3차': False,
-
-    'profit_rate07_up':True,
-    'profit_rate12_up':True,
-    'profit_rate17_up':True,
-    'profit_rate22_up':True,
-    'profit_rate07_down':False,
-    'profit_rate12_down':False,
-    'profit_rate17_down':False},
+    **common_data},
 
     'SDOW':{'종목명':'다우_인버스X3',   #8
     '마켓':'AMS',
     '마켓_sb':'AMEX',
-    '배분예산':0,
-    '목표매수가':0,
-    '목표매수가_up': False,
-    '목표매수가_down': False,
-    '실매수가':0,
-    '시가':0,
-    '보유':False,
-    '예산_가중치':1.0,
-    '익절_가중치':1.3,
-    
-    '최대보유':0,
-    '매수_1차': False,
-    '매수_2차': False,
-    '매수_3차': False,
-    '손절_1차': False,
-    '손절_2차': False,
-    '손절_3차': False,
-
-    'profit_rate07_up':True,
-    'profit_rate12_up':True,
-    'profit_rate17_up':True,
-    'profit_rate22_up':True,
-    'profit_rate07_down':False,
-    'profit_rate12_down':False,
-    'profit_rate17_down':False},
+    **common_data},
 
     'UPRO':{'종목명':'S&P_레버리지X3',  #9
     '마켓':'AMS',
     '마켓_sb':'AMEX',
-    '배분예산':0,
-    '목표매수가':0,
-    '목표매수가_up': False,
-    '목표매수가_down': False,
-    '실매수가':0,
-    '시가':0,
-    '보유':False,
-    '예산_가중치':1.0,
-    '익절_가중치':1.3,
-    
-    '최대보유':0,
-    '매수_1차': False,
-    '매수_2차': False,
-    '매수_3차': False,
-    '손절_1차': False,
-    '손절_2차': False,
-    '손절_3차': False,
-
-    'profit_rate07_up':True,
-    'profit_rate12_up':True,
-    'profit_rate17_up':True,
-    'profit_rate22_up':True,
-    'profit_rate07_down':False,
-    'profit_rate12_down':False,
-    'profit_rate17_down':False},
+    **common_data},
 
     'SPXU':{'종목명':'S&P_인버스X3', #10
     '마켓':'AMS',
     '마켓_sb':'AMEX',
-    '배분예산':0,
-    '목표매수가':0,
-    '목표매수가_up': False,
-    '목표매수가_down': False,
-    '실매수가':0,
-    '시가':0,
-    '보유':False,
-    '예산_가중치':1.0,
-    '익절_가중치':1.3,
-    
-    '최대보유':0,
-    '매수_1차': False,
-    '매수_2차': False,
-    '매수_3차': False,
-    '손절_1차': False,
-    '손절_2차': False,
-    '손절_3차': False,
-
-    'profit_rate07_up':True,
-    'profit_rate12_up':True,
-    'profit_rate17_up':True,
-    'profit_rate22_up':True,
-    'profit_rate07_down':False,
-    'profit_rate12_down':False,
-    'profit_rate17_down':False},
+    **common_data},
 
     'TQQQ':{'종목명':'나스닥_레버리지X3',   #11
     '마켓':'NAS',
-    '마켓_sb':'NASD',
-    '배분예산':0,
-    '목표매수가':0,
-    '목표매수가_up': False,
-    '목표매수가_down': False,
-    '실매수가':0,
-    '시가':0,
-    '보유':False,
-    '예산_가중치':1.0,
-    '익절_가중치':1.3,
-    
-    '최대보유':0,
-    '매수_1차': False,
-    '매수_2차': False,
-    '매수_3차': False,
-    '손절_1차': False,
-    '손절_2차': False,
-    '손절_3차': False,
-
-    'profit_rate07_up':True,
-    'profit_rate12_up':True,
-    'profit_rate17_up':True,
-    'profit_rate22_up':True,
-    'profit_rate07_down':False,
-    'profit_rate12_down':False,
-    'profit_rate17_down':False},
+    '마켓_sb':'NASD'
+    **common_data},
 
     'SQQQ':{'종목명':'나스닥 인버스X3', #12
     '마켓':'NAS',
     '마켓_sb':'NASD',
-    '배분예산':0,
-    '목표매수가':0,
-    '목표매수가_up': False,
-    '목표매수가_down': False,
-    '실매수가':0,
-    '시가':0,
-    '보유':False,
-    '예산_가중치':1.0,
-    '익절_가중치':1.3,
-    
-    '최대보유':0,
-    '매수_1차': False,
-    '매수_2차': False,
-    '매수_3차': False,
-    '손절_1차': False,
-    '손절_2차': False,
-    '손절_3차': False,
-
-    'profit_rate07_up':True,
-    'profit_rate12_up':True,
-    'profit_rate17_up':True,
-    'profit_rate22_up':True,
-    'profit_rate07_down':False,
-    'profit_rate12_down':False,
-    'profit_rate17_down':False},            
+    **common_data},            
     }
 
     while True:
@@ -727,8 +462,8 @@ try:
             t_start = t_now.replace(hour=9, minute=40, second=0, microsecond=0)
             t_10 = t_now.replace(hour=10, minute=0, second=0, microsecond=0)
             t_1330 = t_now.replace(hour=13, minute=30, second=0, microsecond=0)
-            t_1550 = t_now.replace(hour=15, minute=50, second=0, microsecond=0)
-            t_exit = t_now.replace(hour=15, minute=58, second=0,microsecond=0)
+            t_1550 = t_now.replace(hour=15, minute=40, second=0, microsecond=0)
+            t_exit = t_now.replace(hour=15, minute=50, second=0,microsecond=0)
             
             if t_ready < t_now < t_exit and startoncebyday == False: # 매매 준비
             
@@ -793,6 +528,8 @@ try:
                     symbol_list[sym]['손절_1차'] = False
                     symbol_list[sym]['손절_2차'] = False
                     symbol_list[sym]['손절_3차'] = False
+                    symbol_list[sym]['목표매수가_down'] = False
+                    symbol_list[sym]['목표매수가_up'] = False
                     send_message("---------------------------------")
                     
 
@@ -805,9 +542,15 @@ try:
                 for sym in symbol_list:
                     current_price = get_current_price(symbol_list[sym]['마켓'],sym)
 
-                    if current_price < symbol_list[sym]['목표매수가']:
+                    # 반템포 늦은 장진입 시, 목표매수가 밑에서 매수하려고..
+                    if current_price < symbol_list[sym]['목표매수가'] and symbol_list[sym]['목표매수가_down'] == False:
                         symbol_list[sym]['목표매수가_down'] = True
-                        send_message(f"[{symbol_list[sym]['종목명']}] 목표매수가 터치")
+                        symbol_list[sym]['목표매수가_up'] = False
+                        send_message(f"[{symbol_list[sym]['종목명']}] 목표매수가 보다 하향~")
+                    elif current_price > symbol_list[sym]['목표매수가'] and symbol_list[sym]['목표매수가_up'] == False:
+                        symbol_list[sym]['목표매수가_up'] = True
+                        symbol_list[sym]['목표매수가_down'] = False
+                        send_message(f"[{symbol_list[sym]['종목명']}] 목표매수가 보다 상향~")
 
                     if symbol_list[sym]['보유']: # 보유중이면
 
@@ -885,8 +628,8 @@ try:
                                     sell_qty = int(float(symbol_list[sym]['최대보유']) * sell_rate)
 
                                     if qty > sell_qty: # 분할 익절
-                                        qty = sell_qty
                                         send_message(f"[{symbol_list[sym]['종목명']}]: 분할 익절 시도 ({sell_qty}/{qty}개)")
+                                        qty = sell_qty
                                     else:
                                         symbol_list[sym]['보유'] = False # 전량 익절
                                         send_message(f"[{symbol_list[sym]['종목명']}]: 전량 익절 시도 ({qty}개)")
@@ -1106,14 +849,14 @@ try:
                 # send_message(f" -end Sell: {end_sell_cnt}")
 
     
-                # a,b = get_real_total()
-                # send_message("")
-                # formatted_amount = "{:,.0f}원".format(a)
-                # send_message(f"오늘의 차익: {formatted_amount}")
+                a,b = get_real_total()
+                send_message("")
+                formatted_amount = "{:,.4f}$".format(a)
+                send_message(f"총평가손익금액: {formatted_amount}")
 
-                # formatted_amount = "{:,.3f}%".format(b)
-                # send_message(f"수익율: {formatted_amount}")
-                # send_message("")
+                formatted_amount = "{:,.4f}%".format(b)
+                send_message(f"총수익율: {formatted_amount}")
+                send_message("")
 
                 send_message("=== 뉴욕증시 자동매매를 종료합니다 ===")
                 continue
