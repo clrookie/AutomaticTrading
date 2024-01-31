@@ -642,6 +642,8 @@ try:
                                 if sym == symtemp:
                                     qty = int(qty)
                                     sell_qty = int(float(symbol_list[sym]['최대보유']) * sell_rate)
+                                    if sell_qty < 1:
+                                        sell_qty = 1
 
                                     if qty > sell_qty: # 분할 익절
                                         send_message(f"[{symbol_list[sym]['종목명']}]: 분할 익절 시도 ({sell_qty}/{qty}개)")
@@ -650,6 +652,7 @@ try:
                                         symbol_list[sym]['보유'] = False # 전량 익절
                                         send_message(f"[{symbol_list[sym]['종목명']}]: 전량 익절 시도 ({qty}개)")
 
+                                    current_price = get_current_price(symbol_list[sym]['마켓'],sym) # 가격 최신화
                                     if sell(symbol_list[sym]['마켓_sb'], sym, qty, current_price):
                                         send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 익절매 성공 ^^")                
                             
@@ -658,10 +661,14 @@ try:
                             stock_dict = get_stock_balance() # 보유주식 정보 최신화
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
-                                    qty = float(qty) * 0.33 # 분할 손절
-                                    qty = int(qty)
-    
+                                    qty = float(qty) * 0.34 # 분할 손절
+                                    if qty < 1:
+                                        qty = 1
+                                    else:
+                                        qty = int(qty)
+                                    
                                     send_message(f"[{symbol_list[sym]['종목명']}]: 1차 손절매 시도 ({qty}/{symbol_list[sym]['최대보유']}개)")
+                                    current_price = get_current_price(symbol_list[sym]['마켓'],sym) # 가격 최신화
                                     if sell(symbol_list[sym]['마켓_sb'], sym, qty, current_price):
                                         symbol_list[sym]['손절_1차'] = True         
                                         symbol_list[sym]['최대보유'] -= qty # 최대보유 감소
@@ -672,10 +679,14 @@ try:
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
                                     qty = float(qty) * 0.5 # 분할 손절
-                                    qty = int(qty)
+                                    if qty < 1:
+                                        qty = 1
+                                    else:
+                                        qty = int(qty)
 
                                     send_message(f"[{symbol_list[sym]['종목명']}]: 2차 손절매 시도 ({qty}/{symbol_list[sym]['최대보유']}개)")
                                     
+                                    current_price = get_current_price(symbol_list[sym]['마켓'],sym)
                                     if sell(symbol_list[sym]['마켓_sb'], sym, qty, current_price):
                                         symbol_list[sym]['손절_2차'] = True            
                                         symbol_list[sym]['최대보유'] -= qty # 최대보유 감소
@@ -687,6 +698,8 @@ try:
                                 if sym == symtemp: # 전량 손절
                                     
                                     send_message(f"[{symbol_list[sym]['종목명']}]: 3차 손절매 시도 ({qty}/{symbol_list[sym]['최대보유']}개)")
+                                    
+                                    current_price = get_current_price(symbol_list[sym]['마켓'],sym)
                                     if sell(symbol_list[sym]['마켓_sb'], sym, int(qty), current_price):
                                         symbol_list[sym]['손절_3차'] = True
                                         

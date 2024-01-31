@@ -611,6 +611,8 @@ try:
                                     qty = int(qty)
 
                                     sell_qty = int(float(symbol_list[sym]['최대보유']) * sell_rate)
+                                    if sell_qty < 1:
+                                        sell_qty = 1
 
                                     if qty > sell_qty: # 분할 익절
                                         send_message(f"[{symbol_list[sym]['종목명']}]: 분할 익절 시도 ({sell_qty}/{qty}개)")
@@ -628,8 +630,11 @@ try:
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
                                     qty = float(qty) * 0.33 # 분할 손절
+                                    if qty < 1:
+                                        qty = 1
+                                    else:
+                                        qty = int(qty)
 
-                                    qty = int(qty)
                                     send_message(f"[{symbol_list[sym]['종목명']}]: 1차 손절매 시도 ({qty}/{symbol_list[sym]['최대보유']}개)")
                                     if sell(sym, int(qty)):
                                         symbol_list[sym]['손절_1차'] = True     
@@ -640,9 +645,12 @@ try:
                             stock_dict = get_stock_balance() # 보유주식 정보 최신화
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
-                                    qty = float(qty) * 0.33 # 분할 손절
+                                    qty = float(qty) * 0.5 # 분할 손절
+                                    if qty < 1:
+                                        qty = 1
+                                    else:
+                                        qty = int(qty)
 
-                                    qty = int(qty)
                                     send_message(f"[{symbol_list[sym]['종목명']}]: 2차 손절매 시도 ({qty}/{symbol_list[sym]['최대보유']}개)")
                                     if sell(sym, qty):
                                         symbol_list[sym]['손절_2차'] = True            
