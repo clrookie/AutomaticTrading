@@ -409,6 +409,8 @@ try:
     '069500':{'종목명':'KOSPI_200', #1
     '배분예산':0,
     '목표매수가':0,
+    '목표매수가_up': False,
+    '목표매수가_down': False,
     '실매수가':0,
     '시가':0,
     '보유':False,
@@ -434,6 +436,8 @@ try:
     '114800':{'종목명':'KOSPI_인버스', #2
     '배분예산':0,
     '목표매수가':0,
+    '목표매수가_up': False,
+    '목표매수가_down': False,
     '실매수가':0,
     '시가':0,
     '보유':False,
@@ -459,6 +463,8 @@ try:
     '122630':{'종목명':'KOSPI_레버리지', #3
     '배분예산':0,
     '목표매수가':0,
+    '목표매수가_up': False,
+    '목표매수가_down': False,
     '실매수가':0,
     '시가':0,
     '보유':False,
@@ -484,6 +490,8 @@ try:
     '252670':{'종목명':'KOSPI_인버스X2', #4
     '배분예산':0,
     '목표매수가':0,
+    '목표매수가_up': False,
+    '목표매수가_down': False,
     '실매수가':0,
     '시가':0,
     '보유':False,
@@ -509,6 +517,8 @@ try:
     '229200':{'종목명':'KOSDAQ_150', #5
     '배분예산':0,
     '목표매수가':0,
+    '목표매수가_up': False,
+    '목표매수가_down': False,
     '실매수가':0,
     '시가':0,
     '보유':False,
@@ -534,6 +544,8 @@ try:
     '233740':{'종목명':'KOSDAQ_레버리지', #6
     '배분예산':0,
     '목표매수가':0,
+    '목표매수가_up': False,
+    '목표매수가_down': False,
     '실매수가':0,
     '시가':0,
     '보유':False,
@@ -559,6 +571,8 @@ try:
     '251340':{'종목명':'KOSDAQ_인버스X2', #7
     '배분예산':0,
     '목표매수가':0,
+    '목표매수가_up': False,
+    '목표매수가_down': False,
     '실매수가':0,
     '시가':0,
     '보유':False,
@@ -584,6 +598,8 @@ try:
     '371460':{'종목명':'TIGER_차이나', #8
     '배분예산':0,
     '목표매수가':0,
+    '목표매수가_up': False,
+    '목표매수가_down': False,
     '실매수가':0,
     '시가':0,
     '보유':False,
@@ -700,6 +716,9 @@ try:
 
                 for sym in symbol_list:
                     current_price = get_current_price(sym)
+
+                    if current_price < symbol_list[sym]['목표매수가']:
+                        symbol_list[sym]['목표매수가_down'] = True
 
                     if symbol_list[sym]['보유']: # 보유중이면
 
@@ -837,7 +856,7 @@ try:
 
                     # 보유하고 있던 아니던,,
                     # 목표가 1차 매수
-                    if symbol_list[sym]['목표매수가'] <= current_price and symbol_list[sym]['매수_1차'] == False:
+                    if symbol_list[sym]['목표매수가_down'] == True and symbol_list[sym]['목표매수가'] <= current_price and symbol_list[sym]['매수_1차'] == False:
 
 
                         qty = int((symbol_list[sym]['배분예산'] // current_price) * buy_rate) # 33% 분할 매수
