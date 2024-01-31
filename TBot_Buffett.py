@@ -687,7 +687,7 @@ try:
 
                     # 보유하고 있던 아니던,,
                     # 목표가 1차 매수
-                    if symbol_list[sym]['목표매수가_down'] == True and symbol_list[sym]['목표매수가'] <= current_price and symbol_list[sym]['매수_1차'] == False:
+                    if symbol_list[sym]['목표매수가_down'] == True and symbol_list[sym]['목표매수가'] < current_price and symbol_list[sym]['매수_1차'] == False:
 
                         qty = int((symbol_list[sym]['배분예산'] // current_price) * buy_rate) # 33% 분할 매수
                         send_message(f"[{symbol_list[sym]['종목명']}] 1차 매수 시도 ({qty}개)")
@@ -730,7 +730,7 @@ try:
                         last_target     = (((symbol_list[sym]['목표매수가']-symbol_list[sym]['시가'])/1.333)+symbol_list[sym]['시가'])
 
                         # 2차 매수
-                        if (middle_target >= current_price and
+                        if (middle_target > current_price and
                             symbol_list[sym]['매수_1차'] == True and
                             symbol_list[sym]['매수_2차'] == False):
                             
@@ -765,7 +765,7 @@ try:
                                     stock_dict= get_stock_balance()
 
                         # 3차 매수
-                        elif (last_target >= current_price and
+                        elif (last_target > current_price and
                             symbol_list[sym]['매수_1차'] == True and
                             symbol_list[sym]['매수_2차'] == True and
                             symbol_list[sym]['매수_3차'] == False):
