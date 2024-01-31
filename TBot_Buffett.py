@@ -366,6 +366,8 @@ try:
     '마켓_sb':'AMEX',
     '배분예산':0,
     '목표매수가':0,
+    '목표매수가_up': False,
+    '목표매수가_down': False,
     '실매수가':0,
     '시가':0,
     '보유':False,
@@ -393,6 +395,8 @@ try:
     '마켓_sb':'AMEX',
     '배분예산':0,
     '목표매수가':0,
+    '목표매수가_up': False,
+    '목표매수가_down': False,
     '실매수가':0,
     '시가':0,
     '보유':False,
@@ -420,6 +424,8 @@ try:
     '마켓_sb':'AMEX',
     '배분예산':0,
     '목표매수가':0,
+    '목표매수가_up': False,
+    '목표매수가_down': False,
     '실매수가':0,
     '시가':0,
     '보유':False,
@@ -447,6 +453,8 @@ try:
     '마켓_sb':'AMEX',
     '배분예산':0,
     '목표매수가':0,
+    '목표매수가_up': False,
+    '목표매수가_down': False,
     '실매수가':0,
     '시가':0,
     '보유':False,
@@ -474,6 +482,8 @@ try:
     '마켓_sb':'AMEX',
     '배분예산':0,
     '목표매수가':0,
+    '목표매수가_up': False,
+    '목표매수가_down': False,
     '실매수가':0,
     '시가':0,
     '보유':False,
@@ -501,6 +511,8 @@ try:
     '마켓_sb':'AMEX',
     '배분예산':0,
     '목표매수가':0,
+    '목표매수가_up': False,
+    '목표매수가_down': False,
     '실매수가':0,
     '시가':0,
     '보유':False,
@@ -528,6 +540,8 @@ try:
     '마켓_sb':'AMEX',
     '배분예산':0,
     '목표매수가':0,
+    '목표매수가_up': False,
+    '목표매수가_down': False,
     '실매수가':0,
     '시가':0,
     '보유':False,
@@ -555,6 +569,8 @@ try:
     '마켓_sb':'AMEX',
     '배분예산':0,
     '목표매수가':0,
+    '목표매수가_up': False,
+    '목표매수가_down': False,
     '실매수가':0,
     '시가':0,
     '보유':False,
@@ -582,6 +598,8 @@ try:
     '마켓_sb':'AMEX',
     '배분예산':0,
     '목표매수가':0,
+    '목표매수가_up': False,
+    '목표매수가_down': False,
     '실매수가':0,
     '시가':0,
     '보유':False,
@@ -609,6 +627,8 @@ try:
     '마켓_sb':'AMEX',
     '배분예산':0,
     '목표매수가':0,
+    '목표매수가_up': False,
+    '목표매수가_down': False,
     '실매수가':0,
     '시가':0,
     '보유':False,
@@ -636,6 +656,8 @@ try:
     '마켓_sb':'NASD',
     '배분예산':0,
     '목표매수가':0,
+    '목표매수가_up': False,
+    '목표매수가_down': False,
     '실매수가':0,
     '시가':0,
     '보유':False,
@@ -663,6 +685,8 @@ try:
     '마켓_sb':'NASD',
     '배분예산':0,
     '목표매수가':0,
+    '목표매수가_up': False,
+    '목표매수가_down': False,
     '실매수가':0,
     '시가':0,
     '보유':False,
@@ -781,6 +805,9 @@ try:
                 for sym in symbol_list:
                     current_price = get_current_price(symbol_list[sym]['마켓'],sym)
 
+                    if current_price < symbol_list[sym]['목표매수가']:
+                        symbol_list[sym]['목표매수가_down'] = True
+
                     if symbol_list[sym]['보유']: # 보유중이면
 
                         sell_fix = False
@@ -854,7 +881,7 @@ try:
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
                                     qty = int(qty)
-                                    sell_qty = int(symbol_list[sym]['최대보유'] * sell_rate)
+                                    sell_qty = int(float(symbol_list[sym]['최대보유']) * sell_rate)
 
                                     if qty > sell_qty: # 분할 익절
                                         qty = sell_qty
@@ -871,7 +898,7 @@ try:
                             stock_dict = get_stock_balance() # 보유주식 정보 최신화
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
-                                    qty *= 0.33 # 분할 손절
+                                    qty = float(qty) * 0.33 # 분할 손절
                                     qty = int(qty)
     
                                     send_message(f"[{symbol_list[sym]['종목명']}]: 1차 손절매 시도 ({qty}/{symbol_list[sym]['최대보유']}개)")
@@ -884,7 +911,7 @@ try:
                             stock_dict = get_stock_balance() # 보유주식 정보 최신화
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
-                                    qty *= 0.5 # 분할 손절
+                                    qty = float(qty) * 0.5 # 분할 손절
                                     qty = int(qty)
 
                                     send_message(f"[{symbol_list[sym]['종목명']}]: 2차 손절매 시도 ({qty}/{symbol_list[sym]['최대보유']}개)")
@@ -916,7 +943,7 @@ try:
 
                     # 보유하고 있던 아니던,,
                     # 목표가 1차 매수
-                    if symbol_list[sym]['목표매수가'] <= current_price and symbol_list[sym]['매수_1차'] == False:
+                    if symbol_list[sym]['목표매수가_down'] == True and symbol_list[sym]['목표매수가'] <= current_price and symbol_list[sym]['매수_1차'] == False:
 
                         qty = int((symbol_list[sym]['배분예산'] // current_price) * buy_rate) # 33% 분할 매수
                         send_message(f"[{symbol_list[sym]['종목명']}] 1차 매수 시도 ({qty}개)")

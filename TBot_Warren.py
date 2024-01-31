@@ -775,7 +775,7 @@ try:
                                 if sym == symtemp:
                                     qty = int(qty)
 
-                                    sell_qty = int(symbol_list[sym]['최대보유'] * sell_rate)
+                                    sell_qty = int(float(symbol_list[sym]['최대보유']) * sell_rate)
 
                                     if qty > sell_qty: # 분할 익절
                                         qty = sell_qty
@@ -792,7 +792,7 @@ try:
                             stock_dict = get_stock_balance() # 보유주식 정보 최신화
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
-                                    qty *= 0.33 # 분할 손절
+                                    qty = float(qty) * 0.33 # 분할 손절
 
                                     qty = int(qty)
                                     send_message(f"[{symbol_list[sym]['종목명']}]: 1차 손절매 시도 ({qty}/{symbol_list[sym]['최대보유']}개)")
@@ -805,7 +805,7 @@ try:
                             stock_dict = get_stock_balance() # 보유주식 정보 최신화
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
-                                    qty *= 0.5  # 분할 손절
+                                    qty = float(qty) * 0.33 # 분할 손절
 
                                     qty = int(qty)
                                     send_message(f"[{symbol_list[sym]['종목명']}]: 2차 손절매 시도 ({qty}/{symbol_list[sym]['최대보유']}개)")
