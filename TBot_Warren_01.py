@@ -451,7 +451,7 @@ try:
     **common_data},
 
     '233740':{'종목명':'KOSDAQ_레버리지', #6
-    '예산_가중치':0.8,
+    '예산_가중치':1,
     '익절_가중치':1.5,
     **common_data},
 
@@ -461,7 +461,7 @@ try:
     **common_data},
 
     '371460':{'종목명':'TIGER_차이나', #8
-    '예산_가중치':0.8,
+    '예산_가중치':1,
     '익절_가중치':1.5,
     **common_data},            
     }
@@ -486,7 +486,7 @@ try:
             if t_start < t_now < t_exit and startoncebyday == False: # 매매 준비
             
                 send_message("")
-                send_message("=== 국내증시 자동매매를 준비합니다 ===")
+                send_message("=== 자동매매를 준비합니다 ===")
                 send_message("")
 
                 
@@ -501,7 +501,6 @@ try:
                 
                 total_cash = get_balance() # 보유 현금 조회
 
-                # 일단 200만원으로 테스팅 ===============================================================================
                 # total_cash /= 5 
 
                 stock_dict = get_stock_balance() # 보유 주식 조회
@@ -544,10 +543,10 @@ try:
                     
                 
                 send_message("")
-                send_message("9시 10분부터 매매를 시작합니다~~")
+                send_message("매매를 시작합니다~~")
                 send_message("")
 
-            if t_start < t_now < t_exit and startoncebyday == True:  # AM 09:10 ~ PM 03:19 : 매수
+            if t_start < t_now < t_exit and startoncebyday == True:  # AM 09:00 ~ PM 03:19 : 매수
 
                 for sym in symbol_list:
                     current_price = get_current_price(sym)
@@ -778,16 +777,16 @@ try:
             if t_exit < t_now and startoncebyday == True:  # PM 03:19 ~ : 데일리 프로그램 종료
                 startoncebyday = False
 
-                send_message(f"=데일리 일괄매도=")
+                send_message(f"**** 데일리 일괄매도 ****")
                 stock_dict = get_stock_balance()
                 for sym, qty in stock_dict.items(): # 있으면 일괄 매도
                     if sell(sym, int(qty)):
-                        send_message(f">>> [{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(sym)} / 매수가 {symbol_list[sym]['목표매수가']}")
-                        send_message(f">>> [{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/symbol_list[sym]['목표매수가'],4)}% 매도합니다")
+                        send_message(f">>> [{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(sym)} / 평단가 {get_avg_balance(sym)}")
+                        send_message(f">>> [{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/get_avg_balance(sym),4)}% 매도합니다")
                     else:
                         sell(sym, int(qty))
-                        send_message(f">>> retry [{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(sym)} / 매수가 {symbol_list[sym]['목표매수가']}")
-                        send_message(f">>> retry [{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/symbol_list[sym]['목표매수가'],4)}% 매도합니다")
+                        send_message(f">>> retry [{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(sym)} / 평단가 {get_avg_balance(sym)}")
+                        send_message(f">>> retry [{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/get_avg_balance(sym),4)}% 매도합니다")
                 send_message(f"---")
 
 
@@ -800,7 +799,7 @@ try:
                 send_message(f"총수익율: {formatted_amount}")
                 send_message("")
 
-                send_message("=== 국내증시 자동매매를 종료합니다 ===")
+                send_message("=== 자동매매를 종료합니다 ===")
                 continue
 except Exception as e:
     send_message(f"[오류 발생]{e}")
