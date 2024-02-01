@@ -377,16 +377,16 @@ try:
     t_0 = True
     t_30 = True
 
-    buy_cnt = 0
-    good_sell_cnt = 0
-    bad_sell_cnt = 0
-    end_sell_cnt = 0
-
     # 분할익절 기준선
     profit_rate07 = 1.016
     profit_rate12 = 1.021
     profit_rate17 = 1.026
     profit_rate22 = 1.031
+    
+    # 시가 분할손절 기준선
+    loss_cut1 = 0.985
+    loss_cut2 = 0.980
+    loss_cut3 = 0.975
 
     # 익절비율
     sell_rate = 0.2
@@ -398,10 +398,6 @@ try:
 
     previous_time = datetime.datetime.now()
     
-    # 시가 분할손절 기준선
-    loss_cut1 = 0.990
-    loss_cut2 = 0.985
-    loss_cut3 = 0.980
 
     # 공용 데이터
     common_data ={
@@ -441,7 +437,7 @@ try:
 
     '122630':{'종목명':'코스피_레버리지', #3
     '예산_가중치':1,
-    '익절_가중치':1,
+    '익절_가중치':1.25,
     **common_data},
 
     '252670':{'종목명':'코스피_인버스X2', #4
@@ -451,7 +447,7 @@ try:
 
     '229200':{'종목명':'KOSDAQ_150', #5
     '예산_가중치':1,
-    '익절_가중치':1,
+    '익절_가중치':1.25,
     **common_data},
 
     '233740':{'종목명':'KOSDAQ_레버리지', #6
@@ -542,6 +538,7 @@ try:
                     symbol_list[sym]['손절_2차'] = False
                     symbol_list[sym]['손절_3차'] = False
                     symbol_list[sym]['매수카운트'] = 0
+                    previous_time = datetime.datetime.now()
 
                     send_message("---------------------------------")
                     
@@ -663,8 +660,7 @@ try:
                                     send_message(f"[{symbol_list[sym]['종목명']}]: 1차 손절매 시도 ({qty}/{total_qty}개)")
                                     if sell(sym, int(qty)):
                                         symbol_list[sym]['손절_1차'] = True
-                                        symbol_list[sym]['매수카운트'] -= 1
-                                        send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/avg_price,4)}% 1차 손절매 ({symbol_list[sym]['매수카운트']}/3)")
+                                        send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/avg_price,4)}% 1차 손절매")
                                         send_message(f"[{symbol_list[sym]['종목명']}]: 손절가({current_price}) 평단가({avg_price})")     
                         # 2차 손절
                         elif(avg_price*loss_cut2 > current_price and symbol_list[sym]['손절_2차'] == False):
@@ -680,9 +676,8 @@ try:
 
                                     send_message(f"[{symbol_list[sym]['종목명']}]: 2차 손절매 시도 ({qty}/{total_qty}개)")
                                     if sell(sym, qty):
-                                        symbol_list[sym]['손절_2차'] = True
-                                        symbol_list[sym]['매수카운트'] -= 1            
-                                        send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/avg_price,4)}% 2차 손절매 ({symbol_list[sym]['매수카운트']}/3)")
+                                        symbol_list[sym]['손절_2차'] = True   
+                                        send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/avg_price,4)}% 2차 손절매")
                                         send_message(f"[{symbol_list[sym]['종목명']}]: 손절가({current_price}) 평단가({avg_price})")     
                         # 3차 손절
                         elif(avg_price*loss_cut3 > current_price and symbol_list[sym]['손절_3차'] == False):
@@ -694,7 +689,7 @@ try:
                                     send_message(f"[{symbol_list[sym]['종목명']}]: 3차 전량 손절매 시도 ({qty}개)")
                                     if sell(sym, qty):
                                         symbol_list[sym]['손절_3차'] = True
-                                        send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/avg_price,4)}% 3차 손절매 ({symbol_list[sym]['매수카운트']}/3)")
+                                        send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/avg_price,4)}% 3차 손절매")
                                         send_message(f"[{symbol_list[sym]['종목명']}]: 손절가({current_price}) 평단가({avg_price})")     
 
                                         # 매수 unlock... ;;
@@ -716,7 +711,7 @@ try:
                         # 현재 시간을 이전 시간으로 업데이트
                         previous_time = t_now
 
-                        if symbol_list[sym]['목표매수가'] < current_price and symbol_list[sym]['매수카운트'] < buy_max_cnt: # 시간과 횟수만 체크 (시가, 목표가 다 고려하지 않는다.)
+                        if symbol_list[sym]['목표매수가'] < current_price and symbol_list[sym]['매수카운트'] < buy_max_cnt: # 목표매수가와 횟수 체크
                             
                             symbol_list[sym]['매수카운트'] += 1
 
