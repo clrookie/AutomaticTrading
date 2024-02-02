@@ -232,7 +232,7 @@ def get_avg_balance(code="005930"):
         if int(stock['hldg_qty']) > 0 and stock['pdno'] == code:
             return int(stock['pchs_avg_pric'])
     
-    return False
+    return 9
 
 def get_stock_balance():
     """주식 잔고조회"""
@@ -555,8 +555,7 @@ try:
 
                         sell_fix = False
                         avg_price = get_avg_balance(sym)
-                        if avg_price == False:
-                            
+                        if avg_price == 9:
                             send_message(f"[{symbol_list[sym]['종목명']}] : !!!! 평단가 리턴 실패 !!!!")
                             continue
                         
@@ -734,7 +733,12 @@ try:
                                     send_message(f" - 목표매수가: {formatted_amount}")   
                                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['실매수가'])
                                     send_message(f" - **실매수가**: {formatted_amount}")
-                                    formatted_amount = "{:,.0f}원".format(get_avg_balance(sym))
+                                    
+                                    avg_price = get_avg_balance(sym)
+                                    if avg_price == 9:
+                                        send_message(f"[{symbol_list[sym]['종목명']}] : !!!! 평단가 리턴 실패 !!!!")
+                                       
+                                    formatted_amount = "{:,.0f}원".format(avg_price)
                                     send_message(f" - *평단가*: {formatted_amount}")
 
                                     #분할매도 조건 초기화
@@ -780,13 +784,17 @@ try:
                 send_message(f"**** 데일리 일괄매도 ****")
                 stock_dict = get_stock_balance()
                 for sym, qty in stock_dict.items(): # 있으면 일괄 매도
+                    avg_price = get_avg_balance(sym)
+                    if avg_price == 9:
+                        send_message(f"[{symbol_list[sym]['종목명']}] : !!!! 평단가 리턴 실패 !!!!")
+                        
                     if sell(sym, int(qty)):
-                        send_message(f">>> [{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(sym)} / 평단가 {get_avg_balance(sym)}")
-                        send_message(f">>> [{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/get_avg_balance(sym),4)}% 매도합니다")
+                        send_message(f">>> [{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(sym)} / 평단가 {avg_price}")
+                        send_message(f">>> [{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/avg_price,4)}% 매도합니다")
                     else:
                         sell(sym, int(qty))
-                        send_message(f">>> retry [{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(sym)} / 평단가 {get_avg_balance(sym)}")
-                        send_message(f">>> retry [{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/get_avg_balance(sym),4)}% 매도합니다")
+                        send_message(f">>> retry [{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(sym)} / 평단가 {avg_price}")
+                        send_message(f">>> retry [{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/avg_price,4)}% 매도합니다")
                 send_message(f"---")
 
 
