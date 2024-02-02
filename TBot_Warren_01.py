@@ -784,10 +784,16 @@ try:
                 send_message(f"**** 데일리 일괄매도 ****")
                 stock_dict = get_stock_balance()
                 for sym, qty in stock_dict.items(): # 있으면 일괄 매도
+                                       
                     avg_price = get_avg_balance(sym)
                     if avg_price == 9:
                         send_message(f"[{symbol_list[sym]['종목명']}] : !!!! 평단가 리턴 실패 !!!!")
-                        
+
+                    if (symbol_list[sym]['profit_rate17_down'] == True): # 시세좋은 종목은 다음날 시가 매도
+                        send_message(f"[{symbol_list[sym]['종목명']}]: 일괄 매도 롤오버~")
+                        send_message(f"[{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(sym)} / 평단가 {avg_price}")
+                        continue
+
                     if sell(sym, int(qty)):
                         send_message(f">>> [{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(sym)} / 평단가 {avg_price}")
                         send_message(f">>> [{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/avg_price,4)}% 매도합니다")
