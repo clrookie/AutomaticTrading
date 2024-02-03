@@ -1,5 +1,6 @@
 import time
 import pyupbit
+from datetime import datetime, timedelta
 import datetime
 import requests
 import math
@@ -48,12 +49,6 @@ def get_start_time(ticker):
     start_time = df.index[0]
     return start_time
 
-def get_ma15(ticker):
-    """15일 이동 평균선 조회"""
-    df = pyupbit.get_ohlcv(ticker, interval="day", count=15)
-    ma15 = df['close'].rolling(15).mean().iloc[-1]
-    return ma15
-
 def get_balance(ticker):
     """잔고 조회"""
     balances = upbit.get_balances()
@@ -89,84 +84,68 @@ try:
     t_0 = True
     t_30 = True
 
-    buy_cnt = 0
-    good_sell_cnt = 0
-    bad_sell_cnt = 0
-    end_sell_cnt = 0
+    # 익절 기준선
+    profit_rate07 = 1.016
+    profit_rate12 = 1.021
+    profit_rate17 = 1.026
+    profit_rate22 = 1.031
+    
+    # 손절 기준선
+    loss_cut1 = 0.985
+    loss_cut2 = 0.980
+    loss_cut3 = 0.975
 
-    total_cash = 0
-
- # 분할매도 기준선
-    profit_rate07 = 1.007
-    profit_rate12 = 1.012
-    profit_rate17 = 1.017
-    profit_rate22 = 1.022
+    # 익절비율
     sell_rate = 0.2
+    
+    # 매수
+    buy_rate = 0.2
+    buy_max_cnt = 5
+    buy_interval = 15
+    
+    previous_time = datetime.datetime.now()
 
-    symbol_list = { # 거래대금 top5 등록
-    'KRW-BTC':{'종목명':'비트코인',
+    # 공용 데이터
+    common_data ={
     '배분예산':0,
     '목표매수가':0,
     '실매수가':0,
     '시가':0,
-    '보유':False,
-    '예산_가중치':1.0,
-    '익절_가중치':1.0,
-    'profit_rate07_up':True,
-    'profit_rate12_up':True,
-    'profit_rate17_up':True,
-    'profit_rate22_up':True,
-    'profit_rate07_down':False,
-    'profit_rate12_down':False,
-    'profit_rate17_down':False},
+    '평단가':0,
+    '보유': False,
+    '매수최대량':0,
+        
+    '매매유무': False,
+    '매수카운트':0,
+    '손절_1차': False,
+    '손절_2차': False,
+    '손절_3차': False,
+        
+    'profit_rate07_up': True,
+    'profit_rate12_up': True,
+    'profit_rate17_up': True,
+    'profit_rate22_up': True,
+    'profit_rate07_down': False,
+    'profit_rate12_down': False,
+    'profit_rate17_down': False
+    }
 
-    'KRW-ZRX':{'종목명':'제로엑스',
-    '배분예산':0,
-    '목표매수가':0,
-    '실매수가':0,
-    '시가':0,
-    '보유':False,
+    #개별 종목 데이터
+    symbol_list = { 
+    'KRW-BTC':{'종목명':'비트코인', #1
     '예산_가중치':1.0,
     '익절_가중치':1.0,
-    'profit_rate07_up':True,
-    'profit_rate12_up':True,
-    'profit_rate17_up':True,
-    'profit_rate22_up':True,
-    'profit_rate07_down':False,
-    'profit_rate12_down':False,
-    'profit_rate17_down':False},
+    **common_data},
 
-    'KRW-ETC':{'종목명':'이더리움클래식',
-    '배분예산':0,
-    '목표매수가':0,
-    '실매수가':0,
-    '시가':0,
-    '보유':False,
+    'KRW-ETC':{'종목명':'이더리움클래식', #2
     '예산_가중치':1.0,
     '익절_가중치':1.0,
-    'profit_rate07_up':True,
-    'profit_rate12_up':True,
-    'profit_rate17_up':True,
-    'profit_rate22_up':True,
-    'profit_rate07_down':False,
-    'profit_rate12_down':False,
-    'profit_rate17_down':False},
+    **common_data},
 
-    'KRW-XRP':{'종목명':'리플',
-    '배분예산':0,
-    '목표매수가':0,
-    '실매수가':0,
-    '시가':0,
-    '보유':False,
+    'KRW-XRP':{'종목명':'리플', #3 
     '예산_가중치':1.0,
     '익절_가중치':1.0,
-    'profit_rate07_up':True,
-    'profit_rate12_up':True,
-    'profit_rate17_up':True,
-    'profit_rate22_up':True,
-    'profit_rate07_down':False,
-    'profit_rate12_down':False,
-    'profit_rate17_down':False},
+    **common_data},
     }
 
 
@@ -184,17 +163,6 @@ try:
             t_0 = True
             t_30 = True
 
-            send_message("[last240 매매 카운트]")
-            send_message(f" -buy: {buy_cnt}")
-            send_message(f" -good Sell: {good_sell_cnt}")
-            send_message(f" -bad Sell: {bad_sell_cnt}")
-            send_message(f" -end Sell: {end_sell_cnt}")
-            
-            buy_cnt = 0
-            good_sell_cnt = 0
-            bad_sell_cnt = 0
-            end_sell_cnt = 0
-
             total_cash = get_balance("KRW") # 현금잔고 조회
         
             formatted_amount = "{:,.0f}원".format(total_cash)
@@ -209,25 +177,34 @@ try:
                 coin = get_balance(sym)  # 보유량
                 if coin > 0 : # 5000원 이상일 때
                     sell_result = upbit.sell_market_order(sym, coin)
-                    send_message(f">>> [{symbol_list[sym]['종목명']}] {coin} 수량을 시가({sell_result})에 매도했습니다~")
+                    send_message(f">>> [{symbol_list[sym]['종목명']}] {coin} 수량을 ({sell_result})에 매도했습니다~")
 
             for sym in symbol_list: # 초기화
                 send_message(f"[{symbol_list[sym]['종목명']}]")
-                symbol_list[sym]['배분예산'] = total_cash * (1/target_buy_count) * symbol_list[sym]['예산_가중치']
+                symbol_list[sym]['배분예산'] = int(total_cash * (1/target_buy_count) * symbol_list[sym]['예산_가중치'])
                 formatted_amount = "{:,.0f}원".format(symbol_list[sym]['배분예산'])
                 send_message(f" - 배분예산: {formatted_amount}")
 
-                symbol_list[sym]['시가'] = get_stck_oprc(sym)
+                symbol_list[sym]['시가'] = round(get_stck_oprc(sym),1)
                 formatted_amount = "{:,.0f}원".format(symbol_list[sym]['시가'])
                 send_message(f" - 시가: {formatted_amount}")   
 
-                symbol_list[sym]['목표매수가'] = get_target_price(sym)
+                symbol_list[sym]['목표매수가'] = round(get_target_price(sym),1)
                 formatted_amount = "{:,.0f}원".format(symbol_list[sym]['목표매수가'])
                 send_message(f" - 목표매수가: {formatted_amount}")   
 
                 send_message(f" - 타겟%: {round((symbol_list[sym]['목표매수가'])/symbol_list[sym]['시가'],4)}")
 
+                
                 symbol_list[sym]['보유'] = False
+                symbol_list[sym]['손절_1차'] = False
+                symbol_list[sym]['손절_2차'] = False
+                symbol_list[sym]['손절_3차'] = False
+                symbol_list[sym]['매매유무'] = False
+                symbol_list[sym]['매수카운트'] = 0
+                symbol_list[sym]['매수최대량'] = 0
+
+                previous_time = datetime.datetime.now()
                 send_message("---------------------------------")
             
             send_message("")
@@ -241,9 +218,10 @@ try:
                 if symbol_list[sym]['보유']: # 보유중이면
 
                     sell_fix = False
+                    avg_price = float(sym['avg_buy_price'])
                     
                     #상향 익절
-                    if current_price > symbol_list[sym]['목표매수가']*(((profit_rate22-1)*symbol_list[sym]['익절_가중치'])+1) and symbol_list[sym]['profit_rate22_up']:
+                    if current_price > avg_price*(((profit_rate22-1)*symbol_list[sym]['익절_가중치'])+1) and symbol_list[sym]['profit_rate22_up']:
                         symbol_list[sym]['profit_rate22_up'] = False
                         symbol_list[sym]['profit_rate17_up'] = False
                         symbol_list[sym]['profit_rate12_up'] = False
@@ -255,7 +233,7 @@ try:
 
                         sell_fix = True
 
-                    elif current_price > symbol_list[sym]['목표매수가']*(((profit_rate17-1)*symbol_list[sym]['익절_가중치'])+1) and symbol_list[sym]['profit_rate17_up']:
+                    elif current_price > avg_price*(((profit_rate17-1)*symbol_list[sym]['익절_가중치'])+1) and symbol_list[sym]['profit_rate17_up']:
                         symbol_list[sym]['profit_rate17_up'] = False
                         symbol_list[sym]['profit_rate12_up'] = False
                         symbol_list[sym]['profit_rate07_up'] = False
@@ -265,7 +243,7 @@ try:
 
                         sell_fix = True
 
-                    elif current_price > symbol_list[sym]['목표매수가']*(((profit_rate12-1)*symbol_list[sym]['익절_가중치'])+1) and symbol_list[sym]['profit_rate12_up']:
+                    elif current_price > avg_price*(((profit_rate12-1)*symbol_list[sym]['익절_가중치'])+1) and symbol_list[sym]['profit_rate12_up']:
                         symbol_list[sym]['profit_rate12_up'] = False
                         symbol_list[sym]['profit_rate07_up'] = False
 
@@ -273,20 +251,20 @@ try:
 
                         sell_fix = True
 
-                    elif current_price > symbol_list[sym]['목표매수가']*(((profit_rate07-1)*symbol_list[sym]['익절_가중치'])+1) and symbol_list[sym]['profit_rate07_up']:
+                    elif current_price > avg_price*(((profit_rate07-1)*symbol_list[sym]['익절_가중치'])+1) and symbol_list[sym]['profit_rate07_up']:
                         symbol_list[sym]['profit_rate07_up'] = False
 
                         sell_fix = True
 
                     # 하향 익절
-                    elif current_price <= symbol_list[sym]['목표매수가']*(((profit_rate17-1)*symbol_list[sym]['익절_가중치'])+1) and symbol_list[sym]['profit_rate17_down']:
+                    elif current_price <= avg_price*(((profit_rate17-1)*symbol_list[sym]['익절_가중치'])+1) and symbol_list[sym]['profit_rate17_down']:
                         symbol_list[sym]['profit_rate17_down'] = False
 
                         symbol_list[sym]['profit_rate22_up'] = True
 
                         sell_fix = True
 
-                    elif current_price <= symbol_list[sym]['목표매수가']*(((profit_rate12-1)*symbol_list[sym]['익절_가중치'])+1) and symbol_list[sym]['profit_rate12_down']:
+                    elif current_price <= avg_price*(((profit_rate12-1)*symbol_list[sym]['익절_가중치'])+1) and symbol_list[sym]['profit_rate12_down']:
                         symbol_list[sym]['profit_rate12_down'] = False
 
                         symbol_list[sym]['profit_rate22_up'] = True
@@ -295,7 +273,7 @@ try:
                         sell_fix = True
 
 
-                    elif current_price <= symbol_list[sym]['목표매수가']*(((profit_rate07-1)*symbol_list[sym]['익절_가중치'])+1) and symbol_list[sym]['profit_rate07_down']:
+                    elif current_price <= avg_price*(((profit_rate07-1)*symbol_list[sym]['익절_가중치'])+1) and symbol_list[sym]['profit_rate07_down']:
                         symbol_list[sym]['profit_rate07_down'] = False
 
                         symbol_list[sym]['profit_rate22_up'] = True
@@ -304,69 +282,152 @@ try:
 
                         sell_fix = True
 
-                    #익절
+                    # 익절하거나 손절하거나 if절
                     if sell_fix:
                         qty = get_balance(sym) # 보유주식 정보 최신화 
 
                         if qty > 0:
-                            sell_qty = math.floor(symbol_list[sym]['배분예산']/current_price*1000)/1000  # 소수점 3자리 반내림
-                            sell_qty *= sell_rate
+                            
+                            sell_qty = math.floor(symbol_list[sym]['매수최대량'] * sell_rate * 1000)/1000 # 소수점 3자리 반내림
 
-                            if qty > sell_qty: # sell_rate 분할매도
+                            if qty > sell_qty: # 분할 익절
+                                send_message(f"[{symbol_list[sym]['종목명']}]: 분할 익절 시도 ({sell_qty}/{qty}개)")
                                 qty = sell_qty
+                            else:
+                                symbol_list[sym]['보유'] = False # 전량 익절
+                                send_message(f"[{symbol_list[sym]['종목명']}]: 전량 익절 시도 ({qty}개)")
 
+                            
                             sell_result = upbit.sell_market_order(sym, qty)
-                            
-                            good_sell_cnt += 1
-                            send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 익절매합니다 ^^")
-                            
-                            continue
+
+                            send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/avg_price,4)}% 익절매합니다 ^^ ({qty}개)")
+                            send_message(f"[{symbol_list[sym]['종목명']}]: 익절가({current_price}) 평단가({avg_price})")
+                            send_message(f"sell log ({sell_result})")    
                         
 
-                    #시가 손절 : 99.5% 보정
-                    elif(symbol_list[sym]['시가']*0.995 > current_price): # 오늘 시가 보다 떨어지면 
+                    # 1차 손절하거나
+                    elif(avg_price*loss_cut1 > current_price and symbol_list[sym]['손절_1차'] == False): # 오늘 시가 보다 떨어지면 
                                      
                         qty = get_balance(sym) # 보유주식 정보 최신화
                         
                         if qty > 0:
-                            sell_result = upbit.sell_market_order(sym, qty)
                             
-                            symbol_list[sym]['보유'] = False      
-                            bad_sell_cnt += 1
-                            send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/symbol_list[sym]['실매수가'],4)}% 시가 손절매합니다 ㅠ")
-                            continue
-
-                    
-                    continue # 보유 주식 있으면 매수하지 않는다.
-
-                # 목표가 매수
-                elif symbol_list[sym]['목표매수가'] <= current_price and symbol_list[sym]['보유'] == False:
-                    
-                    qty = math.floor(symbol_list[sym]['배분예산']/current_price*1000)/1000  # 소수점 3자리 반내림
-                    if qty > 0:
-                        sell_result = upbit.buy_market_order(sym, qty)
-                        send_message(sell_result)
-                        buy_cnt += 1
-                        symbol_list[sym]['실매수가'] = current_price
-                        symbol_list[sym]['보유'] = True
-
-                        send_message(f"[{symbol_list[sym]['종목명']}] -+-+-매수 성공-+-+-")
-                        
-                        formatted_amount = "{:,.0f}원".format(symbol_list[sym]['목표매수가'])
-                        send_message(f" - 목표매수가: {formatted_amount}")   
-
-                        formatted_amount = "{:,.0f}원".format(symbol_list[sym]['실매수가'])
+                            total_qty = qty
+                            qty = float(qty) * 0.33 # 분할 손절
+                            sell_qty = math.floor(qty * 1000)/1000 # 소수점 3자리 반내림
+                            
+                            
+                            send_message(f"[{symbol_list[sym]['종목명']}]: 1차 손절매 시도 ({sell_qty}/{total_qty}개)")
+                            
+                            sell_result = upbit.sell_market_order(sym, sell_qty)
+                               
+                            symbol_list[sym]['손절_1차'] = True
+                            symbol_list[sym]['매수최대량'] -= sell_qty     
+                            send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/avg_price,4)}% 1차 손절매")
+                            send_message(f"[{symbol_list[sym]['종목명']}]: 손절가({current_price}) 평단가({avg_price})") 
+                            send_message(f"sell log ({sell_result})")    
+                            
+                    # 2차 손절하거나
+                    elif(avg_price*loss_cut2 > current_price and symbol_list[sym]['손절_2차'] == False): # 오늘 시가 보다 떨어지면 
+                                     
                         qty = get_balance(sym) # 보유주식 정보 최신화
-                        send_message(f" - 실매수가: {formatted_amount} / 수량({qty})")
+                        
+                        if qty > 0:
+                            
+                            total_qty = qty
+                            qty = float(qty) * 0.5 # 분할 손절
+                            sell_qty = math.floor(qty * 1000)/1000 # 소수점 3자리 반내림
+                            
+                            
+                            send_message(f"[{symbol_list[sym]['종목명']}]: 2차 손절매 시도 ({sell_qty}/{total_qty}개)")
+                            
+                            sell_result = upbit.sell_market_order(sym, sell_qty)
+                               
+                            symbol_list[sym]['손절_2차'] = True
+                            symbol_list[sym]['매수최대량'] -= sell_qty     
+                            send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/avg_price,4)}% 2차 손절매")
+                            send_message(f"[{symbol_list[sym]['종목명']}]: 손절가({current_price}) 평단가({avg_price})") 
+                            send_message(f"sell log ({sell_result})")
 
-                        #분할매도 조건 초기화
-                        symbol_list[sym]['profit_rate07_up'] = True
-                        symbol_list[sym]['profit_rate12_up'] = True
-                        symbol_list[sym]['profit_rate17_up'] = True
-                        symbol_list[sym]['profit_rate22_up'] = True
-                        symbol_list[sym]['profit_rate07_down'] = False
-                        symbol_list[sym]['profit_rate12_down'] = False
-                        symbol_list[sym]['profit_rate17_down'] = False
+                    # 3차 손절
+                    elif(avg_price*loss_cut3 > current_price and symbol_list[sym]['손절_3차'] == False):
+                        
+                        qty = get_balance(sym) # 보유주식 정보 최신화
+                        
+                        if qty > 0:
+                            
+                            total_qty = qty
+                            sell_qty = math.floor(qty * 1000)/1000 # 소수점 3자리 반내림
+                            
+                            send_message(f"[{symbol_list[sym]['종목명']}]: 3차 손절매 시도 ({sell_qty}/{total_qty}개)")
+                            
+                            sell_result = upbit.sell_market_order(sym, sell_qty)
+                               
+                            symbol_list[sym]['손절_3차'] = True
+                            symbol_list[sym]['매수카운트'] = 0
+                            symbol_list[sym]['매수최대량'] = 0      
+                            send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/avg_price,4)}% 3차 손절매")
+                            send_message(f"[{symbol_list[sym]['종목명']}]: 손절가({current_price}) 평단가({avg_price})") 
+                            send_message(f"sell log ({sell_result})")
+ 
+
+#---------------------- 여기까지 보유중 루프 -----------------------------------------------------------------------------
+                            
+                # 보유하고 있던 아니던,, 분할 매수
+                    
+                # 시간 간격 계산
+                time_difference = t_now - previous_time
+                
+                # n시간이 지났는지 확인
+                if time_difference >= timedelta(seconds=buy_interval):
+                    
+                    # 현재 시간을 이전 시간으로 업데이트
+                    previous_time = t_now
+
+                    if symbol_list[sym]['목표매수가'] < current_price and symbol_list[sym]['매수카운트'] < buy_max_cnt: # 목표매수가와 횟수 체크
+                        
+                        symbol_list[sym]['매수카운트'] += 1
+
+                        qty = math.floor(symbol_list[sym]['배분예산']/current_price* buy_rate * 1000 )/1000  # 소수점 3자리 반내림 # 분할 매수
+                        send_message(f"[{symbol_list[sym]['종목명']}] 매수 시도 ({qty}개)")
+                        if qty > 0:
+                            buy_result = upbit.buy_market_order(sym, qty)
+                            symbol_list[sym]['실매수가'] = current_price
+                            symbol_list[sym]['보유'] = True
+                            symbol_list[sym]['매매유무'] = True
+                            
+                            symbol_list[sym]['매수최대량'] += qty
+
+                            # 손절 1차 unlock... ;;
+                            symbol_list[sym]['손절_1차'] = False
+                            symbol_list[sym]['손절_2차'] = False
+                            symbol_list[sym]['손절_3차'] = False     
+
+                            send_message(f"[{symbol_list[sym]['종목명']}] {symbol_list[sym]['매수카운트']}차 매수 성공")
+                            
+                            formatted_amount = "{:,.1f}원".format(symbol_list[sym]['시가'])
+                            send_message(f" - 시가: {formatted_amount}")
+                            formatted_amount = "{:,.1f}원".format(symbol_list[sym]['목표매수가'])
+                            send_message(f" - 목표매수가: {formatted_amount}")   
+                            formatted_amount = "{:,.1f}원".format(symbol_list[sym]['실매수가'])
+                            send_message(f" - **실매수가**: {formatted_amount}")
+                            
+                            avg_price = float(sym['avg_buy_price'])
+                            formatted_amount = "{:,.1f}원".format(avg_price)
+                            send_message(f" - *평단가*: {formatted_amount}")
+                            send_message(f"buy log ({buy_result})")
+
+                            #분할매도 조건 초기화
+                            symbol_list[sym]['profit_rate07_up'] = True
+                            symbol_list[sym]['profit_rate12_up'] = True
+                            symbol_list[sym]['profit_rate17_up'] = True
+                            symbol_list[sym]['profit_rate22_up'] = True
+                            symbol_list[sym]['profit_rate07_down'] = False
+                            symbol_list[sym]['profit_rate12_down'] = False
+                            symbol_list[sym]['profit_rate17_down'] = False
+                                
+
+#---------------------- 분할 매수 루프 -----------------------------------------------------------------------------
 
         # for문 끝 라인..
 

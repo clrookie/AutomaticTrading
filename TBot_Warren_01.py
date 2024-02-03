@@ -130,7 +130,7 @@ def get_hotstart(code="005930"):
     return False
 
 
-def get_target_price_new(code="005930"): # 음봉 윗꼬리 평균 + 보정
+def get_target_price(code="005930"): # 음봉 윗꼬리 평균 + 보정
     PATH = "uapi/domestic-stock/v1/quotations/inquire-daily-price"
     URL = f"{URL_BASE}/{PATH}"
     headers = {"Content-Type":"application/json", 
@@ -377,13 +377,13 @@ try:
     t_0 = True
     t_30 = True
 
-    # 분할익절 기준선
+    # 익절 기준선
     profit_rate07 = 1.016
     profit_rate12 = 1.021
     profit_rate17 = 1.026
     profit_rate22 = 1.031
     
-    # 시가 분할손절 기준선
+    # 손절 기준선
     loss_cut1 = 0.985
     loss_cut2 = 0.980
     loss_cut3 = 0.975
@@ -403,11 +403,11 @@ try:
     common_data ={
     '배분예산':0,
     '목표매수가':0,
-    '분할매수cnt':0,
     '실매수가':0,
     '시가':0,
     '평단가':0,
     '보유':False,
+    '매수최대량':0,
         
     '매매유무': False,
     '매수카운트':0,
@@ -548,7 +548,7 @@ try:
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['시가'])
                     send_message(f" - 시가: {formatted_amount}")   
 
-                    symbol_list[sym]['목표매수가'] = int(get_target_price_new(sym))
+                    symbol_list[sym]['목표매수가'] = int(get_target_price(sym))
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['목표매수가'])
                     send_message(f" - 목표매수가: {formatted_amount}")   
 
@@ -560,6 +560,7 @@ try:
                     symbol_list[sym]['손절_3차'] = False
                     symbol_list[sym]['매매유무'] = False
                     symbol_list[sym]['매수카운트'] = 0
+                    symbol_list[sym]['매수최대량'] = 0
                     previous_time = datetime.datetime.now()
 
                     send_message("---------------------------------")
@@ -645,13 +646,13 @@ try:
                             sell_fix = True
 
 
-                        # 익절 하거나,,
+                        # 익절하거나 손절하거나 if절
                         if sell_fix:
                             stock_dict = get_stock_balance() # 보유주식 최신화
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
                                     qty = int(qty)
-                                    sell_qty = int(sell_qty * sell_rate)
+                                    sell_qty = int(symbol_list[sym]['매수최대량'] * sell_rate)
                                     
                                     if sell_qty < 1: sell_qty = 1
 
@@ -659,7 +660,7 @@ try:
                                         send_message(f"[{symbol_list[sym]['종목명']}]: 분할 익절 시도 ({sell_qty}/{qty}개)")
                                         qty = sell_qty
                                     else:
-                                        symbol_list[sym]['보유'] = False # 전량 익절
+                                        symbol_list[sym]['보유'] = False # 전량 익절 -> 일간 매매 종료
                                         send_message(f"[{symbol_list[sym]['종목명']}]: 전량 익절 시도 ({qty}개)")
 
                                     if sell(sym, qty):
@@ -681,8 +682,10 @@ try:
                                     send_message(f"[{symbol_list[sym]['종목명']}]: 1차 손절매 시도 ({qty}/{total_qty}개)")
                                     if sell(sym, int(qty)):
                                         symbol_list[sym]['손절_1차'] = True
+                                        symbol_list[sym]['매수최대량'] -= qty     
                                         send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/avg_price,4)}% 1차 손절매")
                                         send_message(f"[{symbol_list[sym]['종목명']}]: 손절가({current_price}) 평단가({avg_price})")     
+                                        
                         # 2차 손절
                         elif(avg_price*loss_cut2 > current_price and symbol_list[sym]['손절_2차'] == False):
                             stock_dict = get_stock_balance() # 보유주식 정보 최신화
@@ -698,8 +701,10 @@ try:
                                     send_message(f"[{symbol_list[sym]['종목명']}]: 2차 손절매 시도 ({qty}/{total_qty}개)")
                                     if sell(sym, qty):
                                         symbol_list[sym]['손절_2차'] = True   
+                                        symbol_list[sym]['매수최대량'] -= qty     
                                         send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/avg_price,4)}% 2차 손절매")
-                                        send_message(f"[{symbol_list[sym]['종목명']}]: 손절가({current_price}) 평단가({avg_price})")     
+                                        send_message(f"[{symbol_list[sym]['종목명']}]: 손절가({current_price}) 평단가({avg_price})")
+                                        
                         # 3차 손절
                         elif(avg_price*loss_cut3 > current_price and symbol_list[sym]['손절_3차'] == False):
 
@@ -716,12 +721,11 @@ try:
                                         # 매수 unlock... ;;
                                         symbol_list[sym]['보유'] = False
                                         symbol_list[sym]['매수카운트'] = 0
+                                        symbol_list[sym]['매수최대량'] = 0   
 
-#---------------------- 보유중 루프 -----------------------------------------------------------------------------
+#---------------------- 여기까지 보유중 루프 -----------------------------------------------------------------------------
 
-
-                    # 보유하고 있던 아니던,,
-                    # 목표가 1차 매수
+                    # 보유하고 있던 아니던,, 분할 매수
                     
                     # 시간 간격 계산
                     time_difference = t_now - previous_time
@@ -736,13 +740,15 @@ try:
                             
                             symbol_list[sym]['매수카운트'] += 1
 
-                            qty = int((symbol_list[sym]['배분예산'] // current_price) * buy_rate) # 33% 분할 매수
+                            qty = int((symbol_list[sym]['배분예산'] // current_price) * buy_rate) # 분할 매수
                             send_message(f"[{symbol_list[sym]['종목명']}] 매수 시도 ({qty}개)")
                             if qty > 0:
                                 if buy(sym, qty):
                                     symbol_list[sym]['실매수가'] = current_price
                                     symbol_list[sym]['보유'] = True
                                     symbol_list[sym]['매매유무'] = True
+                                    
+                                    symbol_list[sym]['매수최대량'] += qty
 
                                     # 손절 1차 unlock... ;;
                                     symbol_list[sym]['손절_1차'] = False
