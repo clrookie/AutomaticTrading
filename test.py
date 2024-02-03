@@ -57,22 +57,22 @@ previous_time = datetime.now()
 
 formatted_amount = "{:,.0f}원".format(aaa())
 print(formatted_amount)
-# while True:
-#     # 현재 시간 가져오기
-#     current_time = datetime.now()
+while True:
+    # 현재 시간 가져오기
+    current_time = datetime.now()
 
-#     # 시간 간격 계산
-#     time_difference = current_time - previous_time
+    # 시간 간격 계산
+    time_difference = current_time - previous_time
 
-#     # 1분이 지났는지 확인
-#     if time_difference >= timedelta(seconds=10):
-#         print("1분이 지났습니다.")
+    # 1분이 지났는지 확인
+    if time_difference >= timedelta(seconds=10):
+        print("1분이 지났습니다.")
 
-#         # 현재 시간을 이전 시간으로 업데이트
-#         previous_time = current_time
+        # 현재 시간을 이전 시간으로 업데이트
+        previous_time = current_time
 
-#     # 결과 출력
-#     print("현재 시간:", current_time)
+    # 결과 출력
+    print("현재 시간:", current_time)
     
 
 # # 로그인
