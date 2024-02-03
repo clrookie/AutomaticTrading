@@ -151,13 +151,7 @@ try:
 
     while True:
         
-        df = pyupbit.get_ohlcv("KRW-BTC", interval="minute240", count=1)
-
-        
-        send_message("---")
-        time.sleep(2)
-        
-        continue
+        df = pyupbit.get_ohlcv("KRW-BTC", interval="minute240", count=1)    
 
         if df.index[0].hour != last240_hour:    # 240분 캔들 갱신
             last240_hour = df.index[0].hour
