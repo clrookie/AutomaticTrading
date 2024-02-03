@@ -409,6 +409,7 @@ try:
     '평단가':0,
     '보유':False,
         
+    '매매유무': False,
     '매수카운트':0,
     '손절_1차': False,
     '손절_2차': False,
@@ -557,6 +558,7 @@ try:
                     symbol_list[sym]['손절_1차'] = False
                     symbol_list[sym]['손절_2차'] = False
                     symbol_list[sym]['손절_3차'] = False
+                    symbol_list[sym]['매매유무'] = False
                     symbol_list[sym]['매수카운트'] = 0
                     previous_time = datetime.datetime.now()
 
@@ -740,6 +742,7 @@ try:
                                 if buy(sym, qty):
                                     symbol_list[sym]['실매수가'] = current_price
                                     symbol_list[sym]['보유'] = True
+                                    symbol_list[sym]['매매유무'] = True
 
                                     # 손절 1차 unlock... ;;
                                     symbol_list[sym]['손절_1차'] = False
@@ -805,7 +808,7 @@ try:
                 send_message(f"**** 데일리 일괄매도 ****")
                 stock_dict = get_stock_balance()
                 for sym, qty in stock_dict.items(): # 있으면 일괄 매도
-                                       
+                    
                     avg_price = get_avg_balance(sym)
                     if avg_price == 9:
                         send_message(f"[{symbol_list[sym]['종목명']}] : !!!! 평단가 리턴 실패 !!!!")
@@ -822,14 +825,24 @@ try:
                         sell(sym, int(qty))
                         send_message(f">>> retry [{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(sym)} / 평단가 {avg_price}")
                         send_message(f">>> retry [{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/avg_price,4)}% 매도합니다")
+                    
                 send_message(f"---")
 
+                
+                #매매한 종목수 카운트
+                Total_sym = 0
+                trade_cnt = 0
+                for sym in symbol_list: # 초기화
+                    Total_sym += 1
+                    if symbol_list[sym]['매매유무'] == True:
+                        trade_cnt += 1
 
                 a,b = get_real_total()
                 send_message("")
-                formatted_amount = "{:,.0f}원".format(a)
-                send_message(f"총자산증감액: {formatted_amount}")
 
+                send_message(f"매매종목수: {trade_cnt}/{Total_sym}")
+                formatted_amount = "{:,.0f}원".format(a)
+                send_message(f"자산증감액: {formatted_amount}")
                 formatted_amount = "{:,.3f}%".format(b)
                 send_message(f"총수익율: {formatted_amount}")
                 send_message("")
