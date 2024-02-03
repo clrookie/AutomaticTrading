@@ -153,13 +153,19 @@ try:
         
         df = pyupbit.get_ohlcv("KRW-BTC", interval="minute240", count=1)
 
+        
+        send_message("---")
+        time.sleep(2)
+        
+        continue
+
         if df.index[0].hour != last240_hour:    # 240분 캔들 갱신
             last240_hour = df.index[0].hour
             
             send_message("")
             send_message(f"=== 코인거래 240분봉 갱신합니다 === ({last240_hour}시)")
             send_message("")
-    
+
             t_0 = True
             t_30 = True
 
