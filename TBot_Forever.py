@@ -236,7 +236,9 @@ try:
                         symbol_list[sym]['매수카운트'] += 1
 
                         qty = math.floor(symbol_list[sym]['배분예산']/current_price* buy_rate * 1000 )/1000  # 소수점 3자리 반내림 # 분할 매수
-                        send_message(f"[{symbol_list[sym]['종목명']}] 매수 시도 ({qty}개)")
+
+                        message_list = ""
+                        message_list += f"[{symbol_list[sym]['종목명']}] 매수 시도 ({qty}개)\n"
                         if qty > 0:
                             buy_result = upbit.buy_market_order(sym, qty)
                             symbol_list[sym]['실매수가'] = current_price
@@ -250,19 +252,19 @@ try:
                             symbol_list[sym]['손절_2차'] = False
                             symbol_list[sym]['손절_3차'] = False     
 
-                            send_message(f"[{symbol_list[sym]['종목명']}] {symbol_list[sym]['매수카운트']}차 매수 성공")
+                            message_list += f"[{symbol_list[sym]['종목명']}] {symbol_list[sym]['매수카운트']}차 매수 성공\n"
                             
                             formatted_amount = "{:,.1f}원".format(symbol_list[sym]['시가'])
-                            send_message(f" - 시가: {formatted_amount}")
+                            message_list += f" - 시가: {formatted_amount}\n"
                             formatted_amount = "{:,.1f}원".format(symbol_list[sym]['목표매수가'])
-                            send_message(f" - 목표매수가: {formatted_amount}")   
+                            message_list += f" - 목표매수가: {formatted_amount}\n"   
                             formatted_amount = "{:,.1f}원".format(symbol_list[sym]['실매수가'])
-                            send_message(f" - **실매수가**: {formatted_amount}")
+                            message_list += f" - **실매수가**: {formatted_amount}\n"
                             
                             avg_price = float(sym['avg_buy_price'])
                             formatted_amount = "{:,.1f}원".format(avg_price)
-                            send_message(f" - *평단가*: {formatted_amount}")
-                            send_message(f"buy log ({buy_result})")
+                            message_list += f" - *평단가*: {formatted_amount}\n"
+                            message_list += f"buy log ({buy_result})\n"
 
                             #분할매도 조건 초기화
                             symbol_list[sym]['profit_rate07_up'] = True
@@ -272,6 +274,8 @@ try:
                             symbol_list[sym]['profit_rate07_down'] = False
                             symbol_list[sym]['profit_rate12_down'] = False
                             symbol_list[sym]['profit_rate17_down'] = False
+                        send_message(message_list)
+                        message_list = ""
 
 # -------------- 분할 매수 -------------------------------------------------------
 
@@ -451,32 +455,39 @@ try:
         if t_now.minute == 30 and t_30: 
             t_30 = False
             t_0 = True
-            send_message("")
-            send_message("===30분===30분===30분===30분===")
-            send_message("")
+            message_list = ""
+            message_list += "\n"
+            message_list += "===30분===30분===30분===30분===\n"
+            message_list += "\n"
             total_cash = get_balance("KRW") # 현금잔고 조회
             formatted_amount = "{:,.0f}원".format(total_cash)
-            send_message(f"현금 잔고: {formatted_amount}")
+            message_list += f"현금 잔고: {formatted_amount}\n"
 
             for sym in symbol_list:
                 qty = get_balance(sym)
                 if qty > 0:
-                    send_message(f"{symbol_list[sym]['종목명']}: {qty}개 보유중")
+                    message_list += f"{symbol_list[sym]['종목명']}: {qty}개 보유중\n"
+            
+            send_message(message_list)
+
         
         if t_now.minute == 0 and t_0:
             t_0 = False
             t_30 = True
-            send_message("")
-            send_message("===0분===0분===0분===0분===")
-            send_message("")
+            message_list = ""
+            message_list += "\n"
+            message_list += "===0분===0분===0분===0분===\n"
+            message_list += "\n"
             total_cash = get_balance("KRW") # 현금잔고 조회
             formatted_amount = "{:,.0f}원".format(total_cash)
-            send_message(f"현금 잔고: {formatted_amount}")
+            message_list += f"현금 잔고: {formatted_amount}\n"
 
             for sym in symbol_list:
                 qty = get_balance(sym)
                 if qty > 0:
-                    send_message(f"{symbol_list[sym]['종목명']}: {qty}개 보유중")
+                    message_list += f"{symbol_list[sym]['종목명']}: {qty}개 보유중\n"
+            
+            send_message(message_list)
 
 
 except Exception as e:

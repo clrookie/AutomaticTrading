@@ -263,23 +263,26 @@ def get_stock_balance():
     evaluation = res.json()['output2']
     stock_dict = {}
     
-    send_message("")
-    send_message("====주식 보유잔고====")
+    message_list = ""
+    message_list += "\n"
+    message_list += "====주식 보유잔고====\n"
     for stock in stock_list:
         if int(stock['hldg_qty']) > 0:
             stock_dict[stock['pdno']] = stock['hldg_qty']
-            send_message(f"{stock['prdt_name']}({stock['pdno']}): {stock['hldg_qty']}주")
+            message_list += f"{stock['prdt_name']}({stock['pdno']}): {stock['hldg_qty']}주\n"
     
     formatted_amount = "{:,.0f}원".format(int(evaluation[0]['scts_evlu_amt']))
-    send_message(f"주식 평가 금액: {formatted_amount}")
+    message_list += f"주식 평가 금액: {formatted_amount}\n"
 
     formatted_amount = "{:,.0f}원".format(int(evaluation[0]['evlu_pfls_smtl_amt']))
-    send_message(f"평가 손익 합계: {formatted_amount}")
+    message_list += f"평가 손익 합계: {formatted_amount}\n"
 
     formatted_amount = "{:,.0f}원".format(int(evaluation[0]['tot_evlu_amt']))
-    send_message(f"총 평가 금액: {formatted_amount}")
-    send_message("=================")
-    send_message("")
+    message_list += f"총 평가 금액: {formatted_amount}\n"
+    message_list += "=================\n"
+    message_list += "\n"
+    send_message(message_list)
+
     return stock_dict
 
 def get_balance():
@@ -304,9 +307,13 @@ def get_balance():
     }
     res = requests.get(URL, headers=headers, params=params)
     cash = res.json()['output']['ord_psbl_cash']
-    send_message("===============================")
+    
+    message_list = ""
+    message_list += "===============================\n"
     formatted_amount = "{:,.0f}원".format(int(cash))
-    send_message(f"현금 잔고: {formatted_amount}")
+    message_list += f"현금 잔고: {formatted_amount}\n"
+    send_message(message_list)
+
     return int(cash)
 
 def buy(code="005930", qty="1"):
@@ -368,9 +375,12 @@ def sell(code="005930", qty="1"):
 
 # 자동 매매 코드
 try:        
-    send_message("")
-    send_message("=== 국내증시 초기화합니다 ===")
-    send_message("")
+    message_list = ""
+    message_list += "\n"
+    message_list += "<<=== 국내증시 초기화합니다 ===>>\n"
+    message_list += "\n"
+    send_message(message_list)
+    message_list = ""
     
     holiday = False
     startoncebyday = False
@@ -531,6 +541,7 @@ try:
                 stock_dict = get_stock_balance() # 보유 주식 조회
                 target_buy_count = int(len(symbol_list)) # 매수종목 수량
 
+                
                 for sym, qty in stock_dict.items(): # 있으면 일괄 매도
                     
                     current_price = get_current_price(sym)
@@ -593,9 +604,10 @@ try:
                         if symbol_list[sym]['목표매수가'] < current_price and symbol_list[sym]['매수카운트'] < buy_max_cnt: # 목표매수가와 횟수 체크
                                 
                                 symbol_list[sym]['매수카운트'] += 1
+                                message_list =""
 
                                 qty = int((symbol_list[sym]['배분예산'] // current_price) * buy_rate) # 분할 매수
-                                send_message(f"[{symbol_list[sym]['종목명']}] 매수 시도 ({qty}개)")
+                                message_list += f"[{symbol_list[sym]['종목명']}] 매수 시도 ({qty}개)\n"
                                 if qty > 0:
                                     if buy(sym, qty):
                                         symbol_list[sym]['실매수가'] = current_price
@@ -609,21 +621,21 @@ try:
                                         symbol_list[sym]['손절_2차'] = False
                                         symbol_list[sym]['손절_3차'] = False     
 
-                                        send_message(f"[{symbol_list[sym]['종목명']}] {symbol_list[sym]['매수카운트']}차 매수 성공")
+                                        message_list += f"[{symbol_list[sym]['종목명']}] {symbol_list[sym]['매수카운트']}차 매수 성공\n"
                                         
                                         formatted_amount = "{:,.0f}원".format(symbol_list[sym]['시가'])
-                                        send_message(f" - 시가: {formatted_amount}")
+                                        message_list += f" - 시가: {formatted_amount}\n"
                                         formatted_amount = "{:,.0f}원".format(symbol_list[sym]['목표매수가'])
-                                        send_message(f" - 목표매수가: {formatted_amount}")   
+                                        message_list += f" - 목표매수가: {formatted_amount}\n"   
                                         formatted_amount = "{:,.0f}원".format(symbol_list[sym]['실매수가'])
-                                        send_message(f" - **실매수가**: {formatted_amount}")
+                                        message_list += f" - **실매수가**: {formatted_amount}\n"
                                         
                                         avg_price = get_avg_balance(sym)
                                         if avg_price == 9:
-                                            send_message(f"[{symbol_list[sym]['종목명']}] : !!!! 평단가 리턴 실패 !!!!")
+                                            message_list += f"[{symbol_list[sym]['종목명']}] : !!!! 평단가 리턴 실패 !!!!\n"
                                         
                                         formatted_amount = "{:,.0f}원".format(avg_price)
-                                        send_message(f" - *평단가*: {formatted_amount}")
+                                        message_list += f" - *평단가*: {formatted_amount}\n"
 
                                         #분할매도 조건 초기화
                                         symbol_list[sym]['profit_rate07_up'] = True
@@ -635,6 +647,7 @@ try:
                                         symbol_list[sym]['profit_rate17_down'] = False
                                         
                                         stock_dict= get_stock_balance()
+                                send_message(message_list)
 # -------------- 분할 매수 -------------------------------------------------------
 
 
@@ -797,16 +810,22 @@ try:
                 if t_now.minute == 30 and t_30: 
                     t_30 = False
                     t_0 = True
-                    send_message("")
-                    send_message("===30분===30분===30분===30분===")
-                    send_message("")
+
+                    message_list =""
+                    message_list += "\n"
+                    message_list += "===30분===30분===30분===30분===\n"
+                    message_list += "\n"
+                    send_message(message_list)
                     get_stock_balance()
                 if t_now.minute == 0 and t_0:
                     t_0 = False
                     t_30 = True
-                    send_message("")
-                    send_message("===0분===0분===0분===0분===")
-                    send_message("")
+                    
+                    message_list =""
+                    message_list += "\n"
+                    message_list += "===0분===0분===0분===0분===\n"
+                    message_list += "\n"
+                    send_message(message_list)
                     get_stock_balance()
                 
                 # 서비스 정책상 (1초 20건 한계)
@@ -853,16 +872,21 @@ try:
                         trade_cnt += 1
 
                 a,b = get_real_total()
-                send_message("")
+                
+                message_list = ""
 
-                send_message(f"매매종목수: {trade_cnt}/{Total_sym}")
+                message_list += "\n"
+                message_list += f"매매종목수: {trade_cnt}/{Total_sym}\n"
                 formatted_amount = "{:,.0f}원".format(a)
-                send_message(f"자산증감액: {formatted_amount}")
+                message_list += f"자산증감액: {formatted_amount}\n"
                 formatted_amount = "{:,.3f}%".format(b)
-                send_message(f"총수익율: {formatted_amount}")
-                send_message("")
+                message_list += f"총수익율: {formatted_amount}\n"
+                message_list += "\n"
 
-                send_message("=== 자동매매를 종료합니다 ===")
+                message_list += "<<=== 자동매매를 종료합니다 ===>>\n"
+                send_message(message_list)
+                message_list =""
+
                 continue
 except Exception as e:
     send_message(f"[오류 발생]{e}")
