@@ -8,7 +8,7 @@ import math
 def send_message(msg):
     """디스코드 메세지 전송"""
     now = datetime.datetime.now()
-    message = {"content": f"[{now.strftime('%m-%d %H:%M:%S')}] {msg}"}
+    message = {"content": f"[{now.strftime('%m-%d %H:%M:%S')}] {str(msg)}"}
     requests.post('https://discord.com/api/webhooks/1200644595919360010/IGX1ctpFUQLHuMchUET2N7qfIkV4VedBfzg3JRppv3SyHAm3v6pV1tGrz-UvLXdnpmBj', data=message)
     print(message)
 
@@ -154,22 +154,18 @@ try:
             last240_hour = df.index[0].hour
             
             message_list = ""
-            message_list += "11"
-            message_list += "22\n"
-            message_list += "33"
-            # message_list += f"=== 코인거래 240분봉 갱신합니다 === ({last240_hour}시)"
-            # # send_message(message_list)
-            # # message_list = ""
+            message_list1 = f"=== 코인거래 240분봉 갱신합니다 === ({last240_hour}시)\n"
+            message_list += message_list1
 
             t_0 = True
             t_30 = True
 
             total_cash = get_balance("KRW") # 현금잔고 조회
         
-            # formatted_amount = "{:,.0f}원".format(total_cash)
-            # message_list += f"현금 잔고: {formatted_amount}"
-    
-            # message_list += f"=== 1111 코인거래 240분봉 갱신합니다 === ({last240_hour}시)"
+            formatted_amount = "{:,.0f}원".format(total_cash)
+            message_list1 = f"현금 잔고: {formatted_amount}\n"
+
+            message_list += message_list1
             send_message(message_list)
 
             # 일단 테스팅 ===============================================================================
