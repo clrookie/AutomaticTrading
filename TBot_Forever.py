@@ -5,9 +5,6 @@ import datetime
 import requests
 import math
 
-access = "your-access"
-secret = "your-secret"
-
 def send_message(msg):
     """디스코드 메세지 전송"""
     now = datetime.datetime.now()
@@ -75,8 +72,8 @@ def get_stck_oprc(ticker):
 try:
     
     # 로그인
-    access = ""
-    secret = ""
+    access = "fFdkQXI2fA7AYy63eoDM5wVl4Cw34S8pleq7zBwb"
+    secret = "FnByjcxojmilXjdHtXNF2rVVoYvDF1OG1WDXL0Pn"
     upbit = pyupbit.Upbit(access, secret)
     send_message("=== 코인거래 초기화 합니다 ===")
 
@@ -159,7 +156,6 @@ try:
             message_list = ""
             message_list += f"=== 코인거래 240분봉 갱신합니다 === ({last240_hour}시)\n"
             message_list +="\n"
-            message_list = ""
 
             t_0 = True
             t_30 = True
@@ -171,7 +167,7 @@ try:
             message_list +="\n"
 
             # 일단 테스팅 ===============================================================================
-            total_cash /= 10
+            # total_cash /= 10
 
             target_buy_count = int(len(symbol_list)) # 매수종목 수량
 
@@ -184,18 +180,18 @@ try:
             for sym in symbol_list: # 초기화
                 message_list += f"[{symbol_list[sym]['종목명']}]\n"
                 symbol_list[sym]['배분예산'] = int(total_cash * (1/target_buy_count) * symbol_list[sym]['예산_가중치'])
-                formatted_amount = "{:,.0f}원".format(symbol_list[sym]['배분예산'])
-                message_list += f" - 배분예산: {formatted_amount}\n"
+                formatted_amount = "{:,.1f}원".format(symbol_list[sym]['배분예산'])
+                message_list += f"- 배분예산: {formatted_amount}\n"
 
                 symbol_list[sym]['시가'] = round(get_stck_oprc(sym),1)
-                formatted_amount = "{:,.0f}원".format(symbol_list[sym]['시가'])
-                message_list += f" - 시가: {formatted_amount}\n"   
+                formatted_amount = "{:,.1f}원".format(symbol_list[sym]['시가'])
+                message_list += f"- 시가: {formatted_amount}\n"   
 
                 symbol_list[sym]['목표매수가'] = round(get_target_price(sym),1)
-                formatted_amount = "{:,.0f}원".format(symbol_list[sym]['목표매수가'])
-                message_list += f" - 목표매수가: {formatted_amount}\n"   
+                formatted_amount = "{:,.1f}원".format(symbol_list[sym]['목표매수가'])
+                message_list += f"- 목표매수가: {formatted_amount}\n"   
 
-                message_list += f" - 타겟%: {round((symbol_list[sym]['목표매수가'])/symbol_list[sym]['시가'],4)}\n"
+                message_list += f"- 타겟%: {round((symbol_list[sym]['목표매수가'])/symbol_list[sym]['시가'],4)}\n"
 
                 
                 symbol_list[sym]['보유'] = False
@@ -211,7 +207,7 @@ try:
             
             previous_time = datetime.datetime.now()
             message_list += "\n"
-            message_list += "코인 매매를 시작합니다~\n"
+            message_list += "코인 매매를 시작합니다~~\n"
             message_list += "\n"
 
             send_message(message_list)
