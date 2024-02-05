@@ -154,8 +154,7 @@ try:
             last240_hour = df.index[0].hour
             
             message_list = ""
-            message_list1 = f"=== 코인거래 240분봉 갱신합니다 === ({last240_hour}시)\n"
-            message_list += message_list1
+            message_list += str(f"=== 코인거래 240분봉 갱신합니다 === ({last240_hour}시)")
 
             t_0 = True
             t_30 = True
@@ -163,9 +162,7 @@ try:
             total_cash = get_balance("KRW") # 현금잔고 조회
         
             formatted_amount = "{:,.0f}원".format(total_cash)
-            message_list1 = f"현금 잔고: {formatted_amount}\n"
-
-            message_list += message_list1
+            message_list += str(f"현금 잔고: {formatted_amount}")
             send_message(message_list)
 
             # 일단 테스팅 ===============================================================================
