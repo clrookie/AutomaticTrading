@@ -153,9 +153,11 @@ try:
         if df.index[0].hour != last240_hour:    # 240분 캔들 갱신
             last240_hour = df.index[0].hour
             
-            message_list = ''
+            message_list = ""
             message_list += f"=== 코인거래 240분봉 갱신합니다 === ({last240_hour}시)\n"
             message_list +="\n"
+            send_message(message_list)
+            message_list = ""
 
             t_0 = True
             t_30 = True
