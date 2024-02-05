@@ -245,7 +245,9 @@ try:
                             send_message("04")
                             buy_result = upbit.buy_market_order(sym, qty)
                             send_message("05")
-                            symbol_list[sym]['실매수가'] = current_price
+                            
+                            send_message(current_price)
+                            symbol_list[sym]['실매수가'] = float(current_price)
                             symbol_list[sym]['보유'] = True
                             symbol_list[sym]['매매유무'] = True
                             
