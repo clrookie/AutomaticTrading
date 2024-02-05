@@ -162,12 +162,12 @@ try:
             t_30 = True
 
             total_cash = get_balance("KRW") # 현금잔고 조회
-
-            message_list1 = ""
-            formatted_amount = "{:,.0f}원".format(total_cash)
-            message_list1 += f"현금 잔고: {formatted_amount}"
+        
+            # formatted_amount = "{:,.0f}원".format(total_cash)
+            # message_list += f"현금 잔고: {formatted_amount}"
     
-            send_message(message_list1)
+            message_list += f"=== 1111 코인거래 240분봉 갱신합니다 === ({last240_hour}시)"
+            send_message(message_list)
 
             # 일단 테스팅 ===============================================================================
             # total_cash /= 10
