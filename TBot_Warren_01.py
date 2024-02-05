@@ -547,7 +547,7 @@ try:
                     if sell(sym, int(qty)):
                         send_message(f">>> [{symbol_list[sym]['종목명']}] 일괄 매도 성공 !!")
 
-                message_list = "" # 초기화
+                message_list = "\n" # 초기화
                 for sym in symbol_list: # 초기화
 
                     message_list += f"[{symbol_list[sym]['종목명']}]\n"
