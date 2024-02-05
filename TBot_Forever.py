@@ -155,6 +155,8 @@ try:
             
             message_list = ""
             message_list += f"=== 코인거래 240분봉 갱신합니다 === ({last240_hour}시)"
+            send_message(message_list)
+            message_list = ""
 
             t_0 = True
             t_30 = True
