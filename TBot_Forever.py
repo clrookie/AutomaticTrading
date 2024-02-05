@@ -162,7 +162,8 @@ try:
             t_30 = True
 
             total_cash = get_balance("KRW") # 현금잔고 조회
-        
+
+            message_list1 = ""
             formatted_amount = "{:,.0f}원".format(total_cash)
             message_list1 += f"현금 잔고: {formatted_amount}"
     
