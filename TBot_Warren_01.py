@@ -561,10 +561,11 @@ try:
                     symbol_list[sym]['매매유무'] = False
                     symbol_list[sym]['매수카운트'] = 0
                     symbol_list[sym]['매수최대량'] = 0
-                    previous_time = datetime.datetime.now()
 
                     send_message("---------------------------------")
                     
+                
+                previous_time = datetime.datetime.now()
                 
                 send_message("")
                 send_message("매매를 시작합니다~~")
@@ -572,8 +573,67 @@ try:
 
             if t_start < t_now < t_exit and startoncebyday == True:  # AM 09:00 ~ PM 03:19 : 매수
 
+                # 시간 간격 분할 매수
+                time_difference = t_now - previous_time
+                # n시간이 지났는지 확인
+                if time_difference >= timedelta(seconds=buy_interval):                    
+                    # 현재 시간을 이전 시간으로 업데이트
+                    previous_time = t_now
+
+                    for sym in symbol_list:
+                        
+                        current_price = get_current_price(sym)
+                        
+                        if symbol_list[sym]['목표매수가'] < current_price and symbol_list[sym]['매수카운트'] < buy_max_cnt: # 목표매수가와 횟수 체크
+                                
+                                symbol_list[sym]['매수카운트'] += 1
+
+                                qty = int((symbol_list[sym]['배분예산'] // current_price) * buy_rate) # 분할 매수
+                                send_message(f"[{symbol_list[sym]['종목명']}] 매수 시도 ({qty}개)")
+                                if qty > 0:
+                                    if buy(sym, qty):
+                                        symbol_list[sym]['실매수가'] = current_price
+                                        symbol_list[sym]['보유'] = True
+                                        symbol_list[sym]['매매유무'] = True
+                                        
+                                        symbol_list[sym]['매수최대량'] += qty
+
+                                        # 손절 1차 unlock... ;;
+                                        symbol_list[sym]['손절_1차'] = False
+                                        symbol_list[sym]['손절_2차'] = False
+                                        symbol_list[sym]['손절_3차'] = False     
+
+                                        send_message(f"[{symbol_list[sym]['종목명']}] {symbol_list[sym]['매수카운트']}차 매수 성공")
+                                        
+                                        formatted_amount = "{:,.0f}원".format(symbol_list[sym]['시가'])
+                                        send_message(f" - 시가: {formatted_amount}")
+                                        formatted_amount = "{:,.0f}원".format(symbol_list[sym]['목표매수가'])
+                                        send_message(f" - 목표매수가: {formatted_amount}")   
+                                        formatted_amount = "{:,.0f}원".format(symbol_list[sym]['실매수가'])
+                                        send_message(f" - **실매수가**: {formatted_amount}")
+                                        
+                                        avg_price = get_avg_balance(sym)
+                                        if avg_price == 9:
+                                            send_message(f"[{symbol_list[sym]['종목명']}] : !!!! 평단가 리턴 실패 !!!!")
+                                        
+                                        formatted_amount = "{:,.0f}원".format(avg_price)
+                                        send_message(f" - *평단가*: {formatted_amount}")
+
+                                        #분할매도 조건 초기화
+                                        symbol_list[sym]['profit_rate07_up'] = True
+                                        symbol_list[sym]['profit_rate12_up'] = True
+                                        symbol_list[sym]['profit_rate17_up'] = True
+                                        symbol_list[sym]['profit_rate22_up'] = True
+                                        symbol_list[sym]['profit_rate07_down'] = False
+                                        symbol_list[sym]['profit_rate12_down'] = False
+                                        symbol_list[sym]['profit_rate17_down'] = False
+                                        
+                                        stock_dict= get_stock_balance()
+# -------------- 분할 매수 -------------------------------------------------------
+
+
+# -------------- 보유중 -------------------------------------------------------
                 for sym in symbol_list:
-                    current_price = get_current_price(sym)
 
                     if symbol_list[sym]['보유']: # 보유중이면
 
@@ -583,6 +643,8 @@ try:
                             send_message(f"[{symbol_list[sym]['종목명']}] : !!!! 평단가 리턴 실패 !!!!")
                             continue
                         
+                        current_price = get_current_price(sym)
+
                         #상향 익절
                         if current_price > avg_price*(((profit_rate22-1)*symbol_list[sym]['익절_가중치'])+1) and symbol_list[sym]['profit_rate22_up']:
                             symbol_list[sym]['profit_rate22_up'] = False
@@ -725,65 +787,6 @@ try:
 
 #---------------------- 여기까지 보유중 루프 -----------------------------------------------------------------------------
 
-                    # 보유하고 있던 아니던,, 분할 매수
-                    
-                    # 시간 간격 계산
-                    time_difference = t_now - previous_time
-                    
-                    # n시간이 지났는지 확인
-                    if time_difference >= timedelta(seconds=buy_interval):
-                        
-                        # 현재 시간을 이전 시간으로 업데이트
-                        previous_time = t_now
-
-                        if symbol_list[sym]['목표매수가'] < current_price and symbol_list[sym]['매수카운트'] < buy_max_cnt: # 목표매수가와 횟수 체크
-                            
-                            symbol_list[sym]['매수카운트'] += 1
-
-                            qty = int((symbol_list[sym]['배분예산'] // current_price) * buy_rate) # 분할 매수
-                            send_message(f"[{symbol_list[sym]['종목명']}] 매수 시도 ({qty}개)")
-                            if qty > 0:
-                                if buy(sym, qty):
-                                    symbol_list[sym]['실매수가'] = current_price
-                                    symbol_list[sym]['보유'] = True
-                                    symbol_list[sym]['매매유무'] = True
-                                    
-                                    symbol_list[sym]['매수최대량'] += qty
-
-                                    # 손절 1차 unlock... ;;
-                                    symbol_list[sym]['손절_1차'] = False
-                                    symbol_list[sym]['손절_2차'] = False
-                                    symbol_list[sym]['손절_3차'] = False     
-
-                                    send_message(f"[{symbol_list[sym]['종목명']}] {symbol_list[sym]['매수카운트']}차 매수 성공")
-                                    
-                                    formatted_amount = "{:,.0f}원".format(symbol_list[sym]['시가'])
-                                    send_message(f" - 시가: {formatted_amount}")
-                                    formatted_amount = "{:,.0f}원".format(symbol_list[sym]['목표매수가'])
-                                    send_message(f" - 목표매수가: {formatted_amount}")   
-                                    formatted_amount = "{:,.0f}원".format(symbol_list[sym]['실매수가'])
-                                    send_message(f" - **실매수가**: {formatted_amount}")
-                                    
-                                    avg_price = get_avg_balance(sym)
-                                    if avg_price == 9:
-                                        send_message(f"[{symbol_list[sym]['종목명']}] : !!!! 평단가 리턴 실패 !!!!")
-                                       
-                                    formatted_amount = "{:,.0f}원".format(avg_price)
-                                    send_message(f" - *평단가*: {formatted_amount}")
-
-                                    #분할매도 조건 초기화
-                                    symbol_list[sym]['profit_rate07_up'] = True
-                                    symbol_list[sym]['profit_rate12_up'] = True
-                                    symbol_list[sym]['profit_rate17_up'] = True
-                                    symbol_list[sym]['profit_rate22_up'] = True
-                                    symbol_list[sym]['profit_rate07_down'] = False
-                                    symbol_list[sym]['profit_rate12_down'] = False
-                                    symbol_list[sym]['profit_rate17_down'] = False
-                                    
-                                    time.sleep(3)
-                                    stock_dict= get_stock_balance()
-
-#---------------------- 분할 매수 루프 -----------------------------------------------------------------------------
 
                 if t_now.minute == 30 and t_30: 
                     t_30 = False
