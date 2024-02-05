@@ -154,22 +154,18 @@ try:
             last240_hour = df.index[0].hour
             
             message_list = ""
-            message_list += f"=== 코인거래 240분봉 갱신합니다 === ({last240_hour}시)"
+            message_list += f"=== 코인거래 240분봉 갱신합니다 === ({last240_hour}시)\n"
+            message_list += "\n"
 
             t_0 = True
             t_30 = True
 
             
-            send_message(message_list)
-            
-            send_message("오류0")
             total_cash = get_balance("KRW") # 현금잔고 조회
-            
-            send_message("오류1")
         
             formatted_amount = "{:,.0f}원".format(total_cash)
-            message_list += f"현금 잔고: {formatted_amount}"
-            send_message(message_list)
+            message_list += f"현금 잔고: {formatted_amount}\n"
+            message_list += "\n"
             
             send_message("오류2")
             # 일단 테스팅 ===============================================================================
@@ -212,7 +208,6 @@ try:
             
             
             previous_time = datetime.datetime.now()
-            send_message(message_list)
             message_list += "\n"
             message_list += "코인 매매를 시작합니다~~\n"
             message_list += "\n"
@@ -229,18 +224,26 @@ try:
                 
                 for sym in symbol_list:
 
+                    send_message("01")
+
                     current_price = get_current_price(sym)
+                    send_message("02")
 
                     if symbol_list[sym]['목표매수가'] < current_price and symbol_list[sym]['매수카운트'] < buy_max_cnt: # 목표매수가와 횟수 체크
                         
                         symbol_list[sym]['매수카운트'] += 1
 
+                        
+                        send_message("03")
                         qty = math.floor(symbol_list[sym]['배분예산']/current_price* buy_rate * 1000 )/1000  # 소수점 3자리 반내림 # 분할 매수
 
                         message_list = ""
                         message_list += f"[{symbol_list[sym]['종목명']}] 매수 시도 ({qty}개)\n"
                         if qty > 0:
+                            
+                            send_message("04")
                             buy_result = upbit.buy_market_order(sym, qty)
+                            send_message("05")
                             symbol_list[sym]['실매수가'] = current_price
                             symbol_list[sym]['보유'] = True
                             symbol_list[sym]['매매유무'] = True
