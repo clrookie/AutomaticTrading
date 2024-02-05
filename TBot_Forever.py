@@ -153,9 +153,9 @@ try:
         if df.index[0].hour != last240_hour:    # 240분 캔들 갱신
             last240_hour = df.index[0].hour
             
-            message_list = ""
-            message_list += f"=== 코인거래 240분봉 갱신합니다 === ({last240_hour}시)"
-            message_list += ""
+            message_list = ''
+            message_list += f'=== 코인거래 240분봉 갱신합니다 === ({last240_hour}시)'
+            message_list += ''
 
             t_0 = True
             t_30 = True
@@ -163,8 +163,8 @@ try:
             total_cash = get_balance("KRW") # 현금잔고 조회
         
             formatted_amount = "{:,.0f}원".format(total_cash)
-            message_list += f"현금 잔고: {formatted_amount}"
-            message_list += ""
+            message_list += f'현금 잔고: {formatted_amount}'
+            message_list += ''
             send_message(message_list)
 
             # 일단 테스팅 ===============================================================================
