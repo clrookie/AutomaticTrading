@@ -179,15 +179,15 @@ try:
 
             for sym in symbol_list: # 초기화
                 message_list += f"[{symbol_list[sym]['종목명']}]\n"
-                symbol_list[sym]['배분예산'] = int(total_cash * (1/target_buy_count) * symbol_list[sym]['예산_가중치'])
+                symbol_list[sym]['배분예산'] = round((total_cash * (1/target_buy_count) * symbol_list[sym]['예산_가중치']),2)
                 formatted_amount = "{:,.1f}원".format(symbol_list[sym]['배분예산'])
                 message_list += f"- 배분예산: {formatted_amount}\n"
 
-                symbol_list[sym]['시가'] = round(get_stck_oprc(sym),1)
+                symbol_list[sym]['시가'] = round(get_stck_oprc(sym),2)
                 formatted_amount = "{:,.1f}원".format(symbol_list[sym]['시가'])
                 message_list += f"- 시가: {formatted_amount}\n"   
 
-                symbol_list[sym]['목표매수가'] = round(get_target_price(sym),1)
+                symbol_list[sym]['목표매수가'] = round(get_target_price(sym),2)
                 formatted_amount = "{:,.1f}원".format(symbol_list[sym]['목표매수가'])
                 message_list += f"- 목표매수가: {formatted_amount}\n"   
 
