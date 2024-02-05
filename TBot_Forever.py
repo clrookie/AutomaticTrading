@@ -167,7 +167,6 @@ try:
             message_list += f"현금 잔고: {formatted_amount}\n"
             message_list += "\n"
             
-            send_message("오류2")
             # 일단 테스팅 ===============================================================================
             # total_cash /= 10
 
@@ -224,6 +223,8 @@ try:
                 
                 for sym in symbol_list:
 
+                    
+                    send_message(sym)
                     send_message("01")
 
                     current_price = get_current_price(sym)
@@ -255,6 +256,8 @@ try:
                             symbol_list[sym]['손절_2차'] = False
                             symbol_list[sym]['손절_3차'] = False     
 
+                            
+                            send_message("06")
                             message_list += f"[{symbol_list[sym]['종목명']}] {symbol_list[sym]['매수카운트']}차 매수 성공\n"
                             
                             formatted_amount = "{:,.1f}원".format(symbol_list[sym]['시가'])
@@ -268,6 +271,8 @@ try:
                             formatted_amount = "{:,.1f}원".format(avg_price)
                             message_list += f" - *평단가*: {formatted_amount}\n"
                             message_list += f"buy log ({buy_result})\n"
+                            
+                            send_message("07")
 
                             #분할매도 조건 초기화
                             symbol_list[sym]['profit_rate07_up'] = True
@@ -277,8 +282,10 @@ try:
                             symbol_list[sym]['profit_rate07_down'] = False
                             symbol_list[sym]['profit_rate12_down'] = False
                             symbol_list[sym]['profit_rate17_down'] = False
+                        
+                        send_message("08")
                         send_message(message_list)
-                        message_list = ""
+                        send_message("09")
 
 # -------------- 분할 매수 -------------------------------------------------------
 
