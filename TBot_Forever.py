@@ -8,7 +8,7 @@ import math
 def send_message(msg):
     """디스코드 메세지 전송"""
     now = datetime.datetime.now()
-    message = {"content": f"[{now.strftime('%m-%d %H:%M:%S')}] {str(msg)}"}
+    message = {"content": f"[{now.strftime('%m-%d %H:%M:%S')}] {msg}"}
     requests.post('https://discord.com/api/webhooks/1200644595919360010/IGX1ctpFUQLHuMchUET2N7qfIkV4VedBfzg3JRppv3SyHAm3v6pV1tGrz-UvLXdnpmBj', data=message)
     print(message)
 
@@ -170,7 +170,7 @@ try:
             # message_list += f"현금 잔고: {formatted_amount}"
     
             # message_list += f"=== 1111 코인거래 240분봉 갱신합니다 === ({last240_hour}시)"
-            send_message(str(message_list))
+            send_message(message_list)
 
             # 일단 테스팅 ===============================================================================
             # total_cash /= 10
