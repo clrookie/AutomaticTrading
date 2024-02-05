@@ -170,7 +170,7 @@ try:
             # message_list += f"현금 잔고: {formatted_amount}"
     
             # message_list += f"=== 1111 코인거래 240분봉 갱신합니다 === ({last240_hour}시)"
-            send_message(message_list)
+            send_message(str(message_list))
 
             # 일단 테스팅 ===============================================================================
             # total_cash /= 10
