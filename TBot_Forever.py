@@ -156,9 +156,12 @@ try:
         if df.index[0].hour != last240_hour:    # 240분 캔들 갱신
             last240_hour = df.index[0].hour
             
-            send_message("")
-            send_message(f"=== 코인거래 240분봉 갱신합니다 === ({last240_hour}시)")
-            send_message("")
+            message_list = ""
+            message_list +="\n"
+            message_list += f"=== 코인거래 240분봉 갱신합니다 === ({last240_hour}시)\n"
+            message_list +="\n"
+            send_message(message_list)
+            message_list = ""
 
             t_0 = True
             t_30 = True
@@ -179,21 +182,22 @@ try:
                     sell_result = upbit.sell_market_order(sym, coin)
                     send_message(f">>> [{symbol_list[sym]['종목명']}] {coin} 수량을 ({sell_result})에 매도했습니다~")
 
+            message_list = ""
             for sym in symbol_list: # 초기화
-                send_message(f"[{symbol_list[sym]['종목명']}]")
+                message_list += f"[{symbol_list[sym]['종목명']}]\n"
                 symbol_list[sym]['배분예산'] = int(total_cash * (1/target_buy_count) * symbol_list[sym]['예산_가중치'])
                 formatted_amount = "{:,.0f}원".format(symbol_list[sym]['배분예산'])
-                send_message(f" - 배분예산: {formatted_amount}")
+                message_list += f" - 배분예산: {formatted_amount}\n"
 
                 symbol_list[sym]['시가'] = round(get_stck_oprc(sym),1)
                 formatted_amount = "{:,.0f}원".format(symbol_list[sym]['시가'])
-                send_message(f" - 시가: {formatted_amount}")   
+                message_list += f" - 시가: {formatted_amount}\n"   
 
                 symbol_list[sym]['목표매수가'] = round(get_target_price(sym),1)
                 formatted_amount = "{:,.0f}원".format(symbol_list[sym]['목표매수가'])
-                send_message(f" - 목표매수가: {formatted_amount}")   
+                message_list += f" - 목표매수가: {formatted_amount}\n"   
 
-                send_message(f" - 타겟%: {round((symbol_list[sym]['목표매수가'])/symbol_list[sym]['시가'],4)}")
+                message_list += f" - 타겟%: {round((symbol_list[sym]['목표매수가'])/symbol_list[sym]['시가'],4)}\n"
 
                 
                 symbol_list[sym]['보유'] = False
@@ -204,16 +208,18 @@ try:
                 symbol_list[sym]['매수카운트'] = 0
                 symbol_list[sym]['매수최대량'] = 0
 
-                send_message("---------------------------------")
+                message_list += "---------------------------------\n"
             
             
             previous_time = datetime.datetime.now()
-            send_message("")
-            send_message("코인 매매를 시작합니다~")
-            send_message("")
+            message_list += "\n"
+            message_list += "코인 매매를 시작합니다~\n"
+            message_list += "\n"
 
-        else:   # 거래 루프
-                                
+            send_message(message_list)
+            message_list = ""
+
+        else:   # 거래 루프        
             # 시간 간격 분할 매수
             time_difference = t_now - previous_time
             # n시간이 지났는지 확인

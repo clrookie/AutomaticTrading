@@ -507,9 +507,12 @@ try:
             
             if t_start < t_now < t_exit and startoncebyday == False: # 매매 준비
             
-                send_message("")
-                send_message("=== 자동매매를 준비합니다 ===")
-                send_message("")
+                message_list = ""
+                message_list += "\n"
+                message_list += "=== 자동매매를 준비합니다 ===\n"
+                message_list += "\n"
+                send_message(message_list)
+                message_list = ""
 
                 
                 # 토큰 세팅
@@ -536,23 +539,23 @@ try:
                     if sell(sym, int(qty)):
                         send_message(f">>> [{symbol_list[sym]['종목명']}] 일괄 매도 성공 !!")
 
-
+                message_list = "" # 초기화
                 for sym in symbol_list: # 초기화
 
-                    send_message(f"[{symbol_list[sym]['종목명']}]")
+                    message_list += f"[{symbol_list[sym]['종목명']}]\n"
                     symbol_list[sym]['배분예산'] = int(total_cash * (1/target_buy_count) * symbol_list[sym]['예산_가중치'])
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['배분예산'])
-                    send_message(f" - 배분예산: {formatted_amount}")
+                    message_list += f" - 배분예산: {formatted_amount}\n"
 
                     symbol_list[sym]['시가'] = int(get_stck_oprc(sym))
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['시가'])
-                    send_message(f" - 시가: {formatted_amount}")   
+                    message_list += f" - 시가: {formatted_amount}\n"   
 
                     symbol_list[sym]['목표매수가'] = int(get_target_price(sym))
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['목표매수가'])
-                    send_message(f" - 목표매수가: {formatted_amount}")   
+                    message_list += f" - 목표매수가: {formatted_amount}\n"   
 
-                    send_message(f" - 타겟%: {round((symbol_list[sym]['목표매수가'])/symbol_list[sym]['시가'],4)}")
+                    message_list += f" - 타겟%: {round((symbol_list[sym]['목표매수가'])/symbol_list[sym]['시가'],4)}\n"
 
                     symbol_list[sym]['보유'] = False
                     symbol_list[sym]['손절_1차'] = False
@@ -562,14 +565,17 @@ try:
                     symbol_list[sym]['매수카운트'] = 0
                     symbol_list[sym]['매수최대량'] = 0
 
-                    send_message("---------------------------------")
+                    message_list += "---------------------------------\n"
                     
                 
                 previous_time = datetime.datetime.now()
                 
-                send_message("")
-                send_message("매매를 시작합니다~~")
-                send_message("")
+                message_list +="\n"
+                message_list +="매매를 시작합니다~~\n"
+                message_list +="\n"
+
+                send_message(message_list)
+                message_list =""
 
             if t_start < t_now < t_exit and startoncebyday == True:  # AM 09:00 ~ PM 03:19 : 매수
 
