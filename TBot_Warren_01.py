@@ -264,7 +264,6 @@ def get_stock_balance():
     stock_dict = {}
     
     message_list = ""
-    message_list += "\n"
     message_list += "====주식 보유잔고====\n"
     for stock in stock_list:
         if int(stock['hldg_qty']) > 0:
@@ -376,8 +375,7 @@ def sell(code="005930", qty="1"):
 # 자동 매매 코드
 try:        
     message_list = ""
-    message_list += "\n"
-    message_list += "<<=== 국내증시 초기화합니다 ===>>\n"
+    message_list += "=== 국내증시 초기화합니다 ===\n"
     message_list += "\n"
     send_message(message_list)
     message_list = ""
@@ -518,7 +516,6 @@ try:
             if t_start < t_now < t_exit and startoncebyday == False: # 매매 준비
             
                 message_list = ""
-                message_list += "\n"
                 message_list += "=== 자동매매를 준비합니다 ===\n"
                 message_list += "\n"
                 send_message(message_list)
@@ -812,7 +809,6 @@ try:
                     t_0 = True
 
                     message_list =""
-                    message_list += "\n"
                     message_list += "===30분===30분===30분===30분===\n"
                     message_list += "\n"
                     send_message(message_list)
@@ -822,7 +818,6 @@ try:
                     t_30 = True
                     
                     message_list =""
-                    message_list += "\n"
                     message_list += "===0분===0분===0분===0분===\n"
                     message_list += "\n"
                     send_message(message_list)
@@ -883,7 +878,7 @@ try:
                 message_list += f"총수익율: {formatted_amount}\n"
                 message_list += "\n"
 
-                message_list += "<<=== 자동매매를 종료합니다 ===>>\n"
+                message_list += "=== 자동매매를 종료합니다 ===\n"
                 send_message(message_list)
                 message_list =""
 

@@ -157,10 +157,8 @@ try:
             last240_hour = df.index[0].hour
             
             message_list = ""
-            message_list +="\n"
             message_list += f"=== 코인거래 240분봉 갱신합니다 === ({last240_hour}시)\n"
             message_list +="\n"
-            send_message(message_list)
             message_list = ""
 
             t_0 = True
@@ -169,7 +167,8 @@ try:
             total_cash = get_balance("KRW") # 현금잔고 조회
         
             formatted_amount = "{:,.0f}원".format(total_cash)
-            send_message(f"현금 잔고: {formatted_amount}")
+            message_list += f"현금 잔고: {formatted_amount}\n"
+            message_list +="\n"
 
             # 일단 테스팅 ===============================================================================
             total_cash /= 10
@@ -182,7 +181,6 @@ try:
                     sell_result = upbit.sell_market_order(sym, coin)
                     send_message(f">>> [{symbol_list[sym]['종목명']}] {coin} 수량을 ({sell_result})에 매도했습니다~")
 
-            message_list = ""
             for sym in symbol_list: # 초기화
                 message_list += f"[{symbol_list[sym]['종목명']}]\n"
                 symbol_list[sym]['배분예산'] = int(total_cash * (1/target_buy_count) * symbol_list[sym]['예산_가중치'])
@@ -456,7 +454,6 @@ try:
             t_30 = False
             t_0 = True
             message_list = ""
-            message_list += "\n"
             message_list += "===30분===30분===30분===30분===\n"
             message_list += "\n"
             total_cash = get_balance("KRW") # 현금잔고 조회
@@ -475,7 +472,6 @@ try:
             t_0 = False
             t_30 = True
             message_list = ""
-            message_list += "\n"
             message_list += "===0분===0분===0분===0분===\n"
             message_list += "\n"
             total_cash = get_balance("KRW") # 현금잔고 조회
