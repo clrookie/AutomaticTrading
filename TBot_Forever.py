@@ -246,8 +246,7 @@ try:
                             buy_result = upbit.buy_market_order(sym, qty)
                             send_message("05")
                             
-                            send_message(current_price)
-                            symbol_list[sym]['실매수가'] = float(current_price)
+                            symbol_list[sym]['실매수가'] = current_price
                             symbol_list[sym]['보유'] = True
                             symbol_list[sym]['매매유무'] = True
                             
@@ -259,7 +258,6 @@ try:
                             symbol_list[sym]['손절_3차'] = False     
 
                             
-                            send_message("06")
                             message_list += f"[{symbol_list[sym]['종목명']}] {symbol_list[sym]['매수카운트']}차 매수 성공\n"
                             
                             formatted_amount = "{:,.1f}원".format(symbol_list[sym]['시가'])
@@ -269,12 +267,14 @@ try:
                             formatted_amount = "{:,.1f}원".format(symbol_list[sym]['실매수가'])
                             message_list += f" - **실매수가**: {formatted_amount}\n"
                             
+                            send_message("06")
+                            send_message(sym['avg_buy_price'])
                             avg_price = float(sym['avg_buy_price'])
+                            send_message("07")
                             formatted_amount = "{:,.1f}원".format(avg_price)
                             message_list += f" - *평단가*: {formatted_amount}\n"
                             message_list += f"buy log ({buy_result})\n"
                             
-                            send_message("07")
 
                             #분할매도 조건 초기화
                             symbol_list[sym]['profit_rate07_up'] = True
