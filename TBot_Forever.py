@@ -157,7 +157,6 @@ try:
             message_list += f"=== 코인거래 240분봉 갱신합니다 === ({last240_hour}시)\n"
             message_list +="\n"
             send_message(message_list)
-            message_list = ""
 
             t_0 = True
             t_30 = True
@@ -168,7 +167,6 @@ try:
             message_list += f"현금 잔고: {formatted_amount}\n"
             message_list +="\n"
             send_message(message_list)
-            message_list = ""
 
             # 일단 테스팅 ===============================================================================
             # total_cash /= 10
@@ -211,13 +209,11 @@ try:
             
             previous_time = datetime.datetime.now()
             send_message(message_list)
-            message_list = ""
             message_list += "\n"
             message_list += "코인 매매를 시작합니다~~\n"
             message_list += "\n"
 
             send_message(message_list)
-            message_list = ""
 
         else:   # 거래 루프        
             # 시간 간격 분할 매수
