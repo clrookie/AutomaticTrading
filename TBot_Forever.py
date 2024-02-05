@@ -72,8 +72,8 @@ def get_stck_oprc(ticker):
 try:
     
     # 로그인
-    access = "fFdkQXI2fA7AYy63eoDM5wVl4Cw34S8pleq7zBwb"
-    secret = "FnByjcxojmilXjdHtXNF2rVVoYvDF1OG1WDXL0Pn"
+    access = "QBgTbRF0Z3f13iAbzxusZkFu21N7j6M3xfuSsPe3"
+    secret = "Kh9Weug6GDkBiT4kLzLdu9jfH7hMntHHs9AZCGVV"
     upbit = pyupbit.Upbit(access, secret)
     send_message("=== 코인거래 초기화 합니다 ===")
 
