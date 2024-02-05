@@ -167,6 +167,8 @@ try:
             formatted_amount = "{:,.0f}원".format(total_cash)
             message_list += f"현금 잔고: {formatted_amount}\n"
             message_list +="\n"
+            send_message(message_list)
+            message_list = ""
 
             # 일단 테스팅 ===============================================================================
             # total_cash /= 10
@@ -208,6 +210,8 @@ try:
             
             
             previous_time = datetime.datetime.now()
+            send_message(message_list)
+            message_list = ""
             message_list += "\n"
             message_list += "코인 매매를 시작합니다~~\n"
             message_list += "\n"
