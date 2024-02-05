@@ -165,7 +165,7 @@ try:
 
             # message_list.append(f"현금 잔고: {formatted_amount}")
             message_list.append("현금 잔고: ")
-            send_message(message_list)
+            send_message(str(message_list))
 
             # 일단 테스팅 ===============================================================================
             # total_cash /= 10
