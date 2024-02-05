@@ -488,13 +488,18 @@ try:
     **common_data},                        
     }
 
-    message_list = ""
-    message_list += "\n"
-    message_list += "=== 자동매매를 준비합니다 ===\n"
-    message_list += "\n"
-    send_message(message_list)
+    
     message_list = ""
     
+    for sym in symbol_list:
+        message_list += "\n"
+        message_list += f"[{symbol_list[sym]['종목명']}]\n"
+        message_list += "=== 자동매매를 준비합니다 ===\n"
+        message_list += "\n"
+        message_list += "---------------------------------\n"
+    send_message(message_list)
+    message_list = ""
+
     while True:
         today = datetime.datetime.today().weekday()
         today_date = datetime.datetime.today().strftime("%Y%m%d")
