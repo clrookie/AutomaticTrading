@@ -153,16 +153,25 @@ try:
         if df.index[0].hour != last240_hour:    # 240분 캔들 갱신
             last240_hour = df.index[0].hour
             
-            send_message(f"=== 코인거래 240분봉 갱신합니다 === ({last240_hour}시)")
+            message_list = ""
+            message_list += f"=== 코인거래 240분봉 갱신합니다 === ({last240_hour}시)"
 
             t_0 = True
             t_30 = True
 
+            
+            send_message(message_list)
+            
+            send_message("오류0")
             total_cash = get_balance("KRW") # 현금잔고 조회
+            
+            send_message("오류1")
+        
             formatted_amount = "{:,.0f}원".format(total_cash)
-
-            send_message(f"현금 잔고: {formatted_amount}")
-
+            message_list += f"현금 잔고: {formatted_amount}"
+            send_message(message_list)
+            
+            send_message("오류2")
             # 일단 테스팅 ===============================================================================
             # total_cash /= 10
 
@@ -175,20 +184,20 @@ try:
                     send_message(f">>> [{symbol_list[sym]['종목명']}] {coin} 수량을 ({sell_result})에 매도했습니다~")
 
             for sym in symbol_list: # 초기화
-                send_message(f"[{symbol_list[sym]['종목명']}]")
+                message_list += f"[{symbol_list[sym]['종목명']}]\n"
                 symbol_list[sym]['배분예산'] = round((total_cash * (1/target_buy_count) * symbol_list[sym]['예산_가중치']),2)
                 formatted_amount = "{:,.1f}원".format(symbol_list[sym]['배분예산'])
-                send_message(f"- 배분예산: {formatted_amount}")
+                message_list += f"- 배분예산: {formatted_amount}\n"
 
                 symbol_list[sym]['시가'] = round(get_stck_oprc(sym),2)
                 formatted_amount = "{:,.1f}원".format(symbol_list[sym]['시가'])
-                send_message(f"- 시가: {formatted_amount}")  
+                message_list += f"- 시가: {formatted_amount}\n"   
 
                 symbol_list[sym]['목표매수가'] = round(get_target_price(sym),2)
                 formatted_amount = "{:,.1f}원".format(symbol_list[sym]['목표매수가'])
-                send_message(f"- 목표매수가: {formatted_amount}") 
+                message_list += f"- 목표매수가: {formatted_amount}\n"   
 
-                send_message(f"- 타겟%: {round((symbol_list[sym]['목표매수가'])/symbol_list[sym]['시가'],4)}")
+                message_list += f"- 타겟%: {round((symbol_list[sym]['목표매수가'])/symbol_list[sym]['시가'],4)}\n"
 
                 
                 symbol_list[sym]['보유'] = False
@@ -199,12 +208,16 @@ try:
                 symbol_list[sym]['매수카운트'] = 0
                 symbol_list[sym]['매수최대량'] = 0
 
-                send_message("---------------------------------")
+                message_list += "---------------------------------\n"
             
             
             previous_time = datetime.datetime.now()
-            send_message("")
-            send_message("코인 매매를 시작합니다~~")
+            send_message(message_list)
+            message_list += "\n"
+            message_list += "코인 매매를 시작합니다~~\n"
+            message_list += "\n"
+
+            send_message(message_list)
 
         else:   # 거래 루프        
             # 시간 간격 분할 매수
