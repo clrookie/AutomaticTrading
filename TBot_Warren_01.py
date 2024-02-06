@@ -511,7 +511,7 @@ try:
             t_start = t_now.replace(hour=9, minute=0, second=15, microsecond=0)
             t_930 = t_now.replace(hour=9, minute=30, second=0, microsecond=0)
             t_1510 = t_now.replace(hour=15, minute=10, second=0,microsecond=0)
-            t_exit = t_now.replace(hour=15, minute=19, second=0,microsecond=0)
+            t_exit = t_now.replace(hour=15, minute=18, second=0,microsecond=0)
             
             if t_start < t_now < t_exit and startoncebyday == False: # 매매 준비
             
@@ -547,23 +547,23 @@ try:
                     if sell(sym, int(qty)):
                         send_message(f">>> [{symbol_list[sym]['종목명']}] 일괄 매도 성공 !!")
 
-                message_list = "\n" # 초기화
+                message_list = "" # 초기화
                 for sym in symbol_list: # 초기화
 
                     message_list += f"[{symbol_list[sym]['종목명']}]\n"
                     symbol_list[sym]['배분예산'] = int(total_cash * (1/target_buy_count) * symbol_list[sym]['예산_가중치'])
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['배분예산'])
-                    message_list += f" - 배분예산: {formatted_amount}\n"
+                    message_list += f"- 배분예산: {formatted_amount}\n"
 
                     symbol_list[sym]['시가'] = int(get_stck_oprc(sym))
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['시가'])
-                    message_list += f" - 시가: {formatted_amount}\n"   
+                    message_list += f"- 시가: {formatted_amount}\n"   
 
                     symbol_list[sym]['목표매수가'] = int(get_target_price(sym))
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['목표매수가'])
-                    message_list += f" - 목표매수가: {formatted_amount}\n"   
+                    message_list += f"- 목표매수가: {formatted_amount}\n"   
 
-                    message_list += f" - 타겟%: {round((symbol_list[sym]['목표매수가'])/symbol_list[sym]['시가'],4)}\n"
+                    message_list += f"- 타겟%: {round((symbol_list[sym]['목표매수가'])/symbol_list[sym]['시가'],4)}\n"
 
                     symbol_list[sym]['보유'] = False
                     symbol_list[sym]['손절_1차'] = False
@@ -622,11 +622,11 @@ try:
                                         message_list += f"[{symbol_list[sym]['종목명']}] {symbol_list[sym]['매수카운트']}차 매수 성공\n"
                                         
                                         formatted_amount = "{:,.0f}원".format(symbol_list[sym]['시가'])
-                                        message_list += f" - 시가: {formatted_amount}\n"
+                                        message_list += f"- 시가: {formatted_amount}\n"
                                         formatted_amount = "{:,.0f}원".format(symbol_list[sym]['목표매수가'])
-                                        message_list += f" - 목표매수가: {formatted_amount}\n"   
+                                        message_list += f"- 목표매수가: {formatted_amount}\n"   
                                         formatted_amount = "{:,.0f}원".format(symbol_list[sym]['실매수가'])
-                                        message_list += f" - **실매수가**: {formatted_amount}\n"
+                                        message_list += f"- 실매수가: {formatted_amount}\n"
                                         
                                         
                                         avg_price = get_avg_balance(sym)
@@ -637,7 +637,7 @@ try:
                                         
                                         formatted_amount = "{:,.0f}원".format(avg_price)
                                         
-                                        message_list += f" - *평단가*: {formatted_amount}\n"
+                                        message_list += f"- *평단가*: {formatted_amount}\n"
 
                                         #분할매도 조건 초기화
                                         symbol_list[sym]['profit_rate07_up'] = True
@@ -648,7 +648,6 @@ try:
                                         symbol_list[sym]['profit_rate12_down'] = False
                                         symbol_list[sym]['profit_rate17_down'] = False
                                         
-                                        stock_dict= get_stock_balance()
                                 send_message(message_list)
 # -------------- 분할 매수 -------------------------------------------------------
 
@@ -855,8 +854,8 @@ try:
                         continue
 
                     if sell(sym, int(qty)):
-                        send_message(f">>> [{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(sym)} / 평단가 {avg_price}")
-                        send_message(f">>> [{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/avg_price,4)}% 매도합니다")
+                        send_message(f"[{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(sym)} / 평단가 {avg_price}")
+                        send_message(f"[{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/avg_price,4)}% 매도합니다")
                     else:
                         sell(sym, int(qty))
                         send_message(f">>> retry [{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(sym)} / 평단가 {avg_price}")
@@ -873,9 +872,13 @@ try:
                     if symbol_list[sym]['매매유무'] == True:
                         trade_cnt += 1
 
+                time.sleep(15)
+
+                get_stock_balance()
+
                 a,b = get_real_total()
                 
-                message_list = ""
+                message_list = "[일간 손익]"
 
                 message_list += "\n"
                 message_list += f"매매종목수: {trade_cnt}/{Total_sym}\n"
@@ -884,10 +887,10 @@ try:
                 formatted_amount = "{:,.3f}%".format(b)
                 message_list += f"총수익율: {formatted_amount}\n"
                 message_list += "\n"
-
-                message_list += "=== 자동매매를 종료합니다 ===\n"
+                message_list += "=== 자동매매를 종료합니다 ==="
                 send_message(message_list)
-                message_list =""
+
+    
 
                 continue
 except Exception as e:
