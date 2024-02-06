@@ -603,7 +603,7 @@ try:
                                 symbol_list[sym]['매수카운트'] += 1
                                 message_list =""
 
-                                qty = float((symbol_list[sym]['배분예산'] // current_price) * buy_rate) # 분할 매수
+                                qty = int((symbol_list[sym]['배분예산'] // current_price) * buy_rate) # 분할 매수
                                 message_list += f"[{symbol_list[sym]['종목명']}] 매수 시도 ({qty}개)\n"
                                 if qty > 0:
                                     if buy(sym, qty):
@@ -631,8 +631,8 @@ try:
                                         if avg_price == 9:
                                             message_list += f"[{symbol_list[sym]['종목명']}] : !!!! 평단가 리턴 실패 !!!!\n"
                                         
-                                        formatted_amount = "{:,.0f}원".format(avg_price)
-                                        message_list += f" - *평단가*: {formatted_amount}\n"
+                                        # formatted_amount = "{:,.0f}원".format(avg_price)
+                                        # message_list += f" - *평단가*: {formatted_amount}\n"
 
                                         #분할매도 조건 초기화
                                         symbol_list[sym]['profit_rate07_up'] = True
