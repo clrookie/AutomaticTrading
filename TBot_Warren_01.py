@@ -631,7 +631,7 @@ try:
                                         
                                         
                                         send_message("01")
-                                        avg_price = get_avg_balance(sym)
+                                        avg_price = float(get_avg_balance(sym))
                                         
                                         send_message("02")
                                         if avg_price == 9:
