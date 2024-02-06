@@ -174,7 +174,7 @@ try:
 
             for sym in symbol_list: # 있으면 일괄 매도
                 coin = get_balance(sym)  # 보유량
-                if coin > 0 : # 5000원 이상일 때
+                if coin >= 0.001 : # 최소 거래량
                     sell_result = upbit.sell_market_order(sym, coin)
                     send_message(f">>> [{symbol_list[sym]['종목명']}] {coin} 수량을 ({sell_result})에 매도했습니다~")
 
@@ -231,13 +231,16 @@ try:
 
                         qty = math.floor(symbol_list[sym]['배분예산']/current_price* buy_rate * 1000 )/1000  # 소수점 3자리 반내림 # 분할 매수
                         qty = round(qty,4)
+                        if qty <= 0: qty = 0.001
+
+                        price = symbol_list[sym]['배분예산'] * buy_rate # 소수점 3자리 반내림 # 분할 매수
+                        if price < 5000: price = 5000 # 최소 주문량
 
                         message_list = ""
                         message_list += f"[{symbol_list[sym]['종목명']}] 매수 시도 ({qty}개)\n"
-                        if qty > 0:
-                            
-                            buy_result = upbit.buy_market_order(sym, qty)
-                            
+                        
+                        buy_result = upbit.buy_market_order(sym, price) # 현금
+                        if buy_result is not None:                            
                             symbol_list[sym]['실매수가'] = current_price
                             symbol_list[sym]['보유'] = True
                             symbol_list[sym]['매매유무'] = True
@@ -253,19 +256,16 @@ try:
                             message_list += f"[{symbol_list[sym]['종목명']}] {symbol_list[sym]['매수카운트']}차 매수 성공\n"
                             
                             formatted_amount = "{:,.1f}원".format(symbol_list[sym]['시가'])
-                            message_list += f" - 시가: {formatted_amount}\n"
+                            message_list += f"- 시가: {formatted_amount}\n"
                             formatted_amount = "{:,.1f}원".format(symbol_list[sym]['목표매수가'])
-                            message_list += f" - 목표매수가: {formatted_amount}\n"   
+                            message_list += f"- 목표매수가: {formatted_amount}\n"   
                             formatted_amount = "{:,.1f}원".format(symbol_list[sym]['실매수가'])
-                            message_list += f" - **실매수가**: {formatted_amount}\n"
+                            message_list += f"- 실매수가: {formatted_amount}\n"
                             
                             
                             avg_price = upbit.get_avg_buy_price(sym)
                             formatted_amount = "{:,.1f}원".format(avg_price)
-                            message_list += f" - *평단가*: {formatted_amount}\n"
-
-                            message_list += f"buy log ({buy_result})\n"
-                            
+                            message_list += f"- 평단가: {formatted_amount}\n"                            
 
                             #분할매도 조건 초기화
                             symbol_list[sym]['profit_rate07_up'] = True
@@ -275,6 +275,8 @@ try:
                             symbol_list[sym]['profit_rate07_down'] = False
                             symbol_list[sym]['profit_rate12_down'] = False
                             symbol_list[sym]['profit_rate17_down'] = False
+                        else:
+                            message_list += f"+매수 실패+ ({buy_result})\n"
                         
                         send_message(message_list)
 
@@ -374,10 +376,13 @@ try:
 
                             
                             sell_result = upbit.sell_market_order(sym, qty)
+                            if sell_result is not None:
+                                send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/avg_price,4)}% 익절매합니다 ^^ ({qty}개)")
+                                send_message(f"[{symbol_list[sym]['종목명']}]: 익절가({current_price}) 평단가({avg_price})")
+                            else:
+                                send_message(f"매도 실패 ({sell_result})")
 
-                            send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/avg_price,4)}% 익절매합니다 ^^ ({qty}개)")
-                            send_message(f"[{symbol_list[sym]['종목명']}]: 익절가({current_price}) 평단가({avg_price})")
-                            send_message(f"sell log ({sell_result})")    
+    
                         
 
                     # 1차 손절하거나
@@ -400,12 +405,13 @@ try:
                             send_message(f"[{symbol_list[sym]['종목명']}]: 1차 손절매 시도 ({sell_qty}/{total_qty}개)")
                             
                             sell_result = upbit.sell_market_order(sym, sell_qty)
-                               
-                            symbol_list[sym]['손절_1차'] = True
-                            symbol_list[sym]['매수최대량'] -= sell_qty     
-                            send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/avg_price,4)}% 1차 손절매")
-                            send_message(f"[{symbol_list[sym]['종목명']}]: 손절가({current_price}) 평단가({avg_price})") 
-                            send_message(f"sell log ({sell_result})")    
+                            if sell_result is not None:
+                                symbol_list[sym]['손절_1차'] = True
+                                symbol_list[sym]['매수최대량'] -= sell_qty     
+                                send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/avg_price,4)}% 1차 손절매")
+                                send_message(f"[{symbol_list[sym]['종목명']}]: 손절가({current_price}) 평단가({avg_price})") 
+                            else:
+                                send_message(f"매도 실패 ({sell_result})")  
                             
                     # 2차 손절하거나
                     elif(avg_price*loss_cut2 > current_price and symbol_list[sym]['손절_2차'] == False): # 오늘 시가 보다 떨어지면 
@@ -423,13 +429,16 @@ try:
                             
                             send_message(f"[{symbol_list[sym]['종목명']}]: 2차 손절매 시도 ({sell_qty}/{total_qty}개)")
                             
+
                             sell_result = upbit.sell_market_order(sym, sell_qty)
-                               
-                            symbol_list[sym]['손절_2차'] = True
-                            symbol_list[sym]['매수최대량'] -= sell_qty     
-                            send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/avg_price,4)}% 2차 손절매")
-                            send_message(f"[{symbol_list[sym]['종목명']}]: 손절가({current_price}) 평단가({avg_price})") 
-                            send_message(f"sell log ({sell_result})")
+                            if sell_result is not None:
+                                symbol_list[sym]['손절_2차'] = True
+                                symbol_list[sym]['매수최대량'] -= sell_qty     
+                                send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/avg_price,4)}% 2차 손절매")
+                                send_message(f"[{symbol_list[sym]['종목명']}]: 손절가({current_price}) 평단가({avg_price})") 
+                                send_message(f"sell log ({sell_result})")
+                            else:
+                                send_message(f"매도 실패 ({sell_result})")  
 
                     # 3차 손절
                     elif(avg_price*loss_cut3 > current_price and symbol_list[sym]['손절_3차'] == False):
@@ -446,14 +455,15 @@ try:
                             send_message(f"[{symbol_list[sym]['종목명']}]: 3차 손절매 시도 ({sell_qty}/{total_qty}개)")
                             
                             sell_result = upbit.sell_market_order(sym, sell_qty)
-                               
-                            symbol_list[sym]['손절_3차'] = True
-                            symbol_list[sym]['매수카운트'] = 0
-                            symbol_list[sym]['매수최대량'] = 0      
-                            send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/avg_price,4)}% 3차 손절매")
-                            send_message(f"[{symbol_list[sym]['종목명']}]: 손절가({current_price}) 평단가({avg_price})") 
-                            send_message(f"sell log ({sell_result})")
- 
+                            if sell_result is not None:
+                                symbol_list[sym]['손절_3차'] = True
+                                symbol_list[sym]['매수카운트'] = 0
+                                symbol_list[sym]['매수최대량'] = 0      
+                                send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/avg_price,4)}% 3차 손절매")
+                                send_message(f"[{symbol_list[sym]['종목명']}]: 손절가({current_price}) 평단가({avg_price})") 
+                                send_message(f"sell log ({sell_result})")
+                            else:
+                                send_message(f"매도 실패 ({sell_result})")  
 
 #---------------------- 여기까지 보유중 루프 -----------------------------------------------------------------------------
                             
