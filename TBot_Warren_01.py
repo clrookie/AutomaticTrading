@@ -604,7 +604,6 @@ try:
                                 message_list =""
 
                                 qty = float((symbol_list[sym]['배분예산'] // current_price) * buy_rate) # 분할 매수
-                                qty = int(qty)
                                 message_list += f"[{symbol_list[sym]['종목명']}] 매수 시도 ({qty}개)\n"
                                 if qty > 0:
                                     if buy(sym, qty):
