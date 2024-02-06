@@ -179,7 +179,10 @@ try:
                 coin = get_balance(symbol_list[sym]['매도티커'])  # 보유량
                 if coin >= 0.001 : # 최소 거래량
                     sell_result = upbit.sell_market_order(sym, coin)
-                    send_message(f">>> [{symbol_list[sym]['종목명']}] {coin} 수량을 ({sell_result})에 매도했습니다~")
+                    if sell_result is not None:
+                        send_message(f">>> [{symbol_list[sym]['종목명']}] {coin} 전량 매도했습니다~")
+                    else:
+                        send_message(f"[{symbol_list[sym]['매도티커']}] 매도실패 ({sell_result})")
 
             for sym in symbol_list: # 초기화
                 message_list += f"[{symbol_list[sym]['종목명']}]\n"
@@ -279,7 +282,7 @@ try:
                             symbol_list[sym]['profit_rate12_down'] = False
                             symbol_list[sym]['profit_rate17_down'] = False
                         else:
-                            message_list += f"+매수 실패+ ({buy_result})\n"
+                            message_list += f"매수 실패 ({buy_result})\n"
                         
                         send_message(message_list)
 
@@ -436,7 +439,6 @@ try:
                                 symbol_list[sym]['매수최대량'] -= sell_qty     
                                 send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/avg_price,4)}% 2차 손절매")
                                 send_message(f"[{symbol_list[sym]['종목명']}]: 손절가({current_price}) 평단가({avg_price})") 
-                                send_message(f"sell log ({sell_result})")
                             else:
                                 send_message(f"매도 실패 ({sell_result})")  
 
@@ -461,7 +463,6 @@ try:
                                 symbol_list[sym]['매수최대량'] = 0      
                                 send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/avg_price,4)}% 3차 손절매")
                                 send_message(f"[{symbol_list[sym]['종목명']}]: 손절가({current_price}) 평단가({avg_price})") 
-                                send_message(f"sell log ({sell_result})")
                             else:
                                 send_message(f"매도 실패 ({sell_result})")  
 
