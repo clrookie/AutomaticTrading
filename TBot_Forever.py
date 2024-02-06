@@ -223,28 +223,21 @@ try:
                 
                 for sym in symbol_list:
 
-                    
-                    send_message(sym)
-                    send_message("01")
-
                     current_price = get_current_price(sym)
-                    send_message("02")
 
                     if symbol_list[sym]['목표매수가'] < current_price and symbol_list[sym]['매수카운트'] < buy_max_cnt: # 목표매수가와 횟수 체크
                         
                         symbol_list[sym]['매수카운트'] += 1
 
-                        
-                        send_message("03")
                         qty = math.floor(symbol_list[sym]['배분예산']/current_price* buy_rate * 1000 )/1000  # 소수점 3자리 반내림 # 분할 매수
+                        if(qty < 0.001): qty = 0.001
+                        qty = round(qty,4)
 
                         message_list = ""
                         message_list += f"[{symbol_list[sym]['종목명']}] 매수 시도 ({qty}개)\n"
                         if qty > 0:
                             
-                            send_message("04")
                             buy_result = upbit.buy_market_order(sym, qty)
-                            send_message("05")
                             
                             symbol_list[sym]['실매수가'] = current_price
                             symbol_list[sym]['보유'] = True
@@ -267,12 +260,11 @@ try:
                             formatted_amount = "{:,.1f}원".format(symbol_list[sym]['실매수가'])
                             message_list += f" - **실매수가**: {formatted_amount}\n"
                             
-                            send_message("06")
-                            send_message(sym['avg_buy_price'])
-                            avg_price = float(sym['avg_buy_price'])
-                            send_message("07")
+                            
+                            avg_price = upbit.get_avg_buy_price(sym)
                             formatted_amount = "{:,.1f}원".format(avg_price)
                             message_list += f" - *평단가*: {formatted_amount}\n"
+
                             message_list += f"buy log ({buy_result})\n"
                             
 
@@ -285,9 +277,7 @@ try:
                             symbol_list[sym]['profit_rate12_down'] = False
                             symbol_list[sym]['profit_rate17_down'] = False
                         
-                        send_message("08")
                         send_message(message_list)
-                        send_message("09")
 
 # -------------- 분할 매수 -------------------------------------------------------
 
@@ -300,9 +290,8 @@ try:
                 if symbol_list[sym]['보유']: # 보유중이면
 
                     sell_fix = False
-                    avg_price = float(sym['avg_buy_price'])
                     
-                    
+                    avg_price = upbit.get_avg_buy_price(sym)
                     current_price = get_current_price(sym)
 
                     #상향 익절
@@ -374,6 +363,8 @@ try:
                         if qty > 0:
                             
                             sell_qty = math.floor(symbol_list[sym]['매수최대량'] * sell_rate * 1000)/1000 # 소수점 3자리 반내림
+                            if(sell_qty < 0.001): sell_qty = 0.001
+                            sell_qty = round(qty,4)
 
                             if qty > sell_qty: # 분할 익절
                                 send_message(f"[{symbol_list[sym]['종목명']}]: 분할 익절 시도 ({sell_qty}/{qty}개)")
@@ -399,8 +390,13 @@ try:
                             
                             total_qty = qty
                             qty = float(qty) * 0.33 # 분할 손절
+
                             sell_qty = math.floor(qty * 1000)/1000 # 소수점 3자리 반내림
+                            if(sell_qty < 0.001): sell_qty = 0.001
+                            sell_qty = round(qty,4)
                             
+                            if(sell_qty < 0.001): sell_qty = 0.001
+                            sell_qty = round(qty,4)
                             
                             send_message(f"[{symbol_list[sym]['종목명']}]: 1차 손절매 시도 ({sell_qty}/{total_qty}개)")
                             
@@ -421,8 +417,10 @@ try:
                             
                             total_qty = qty
                             qty = float(qty) * 0.5 # 분할 손절
+
                             sell_qty = math.floor(qty * 1000)/1000 # 소수점 3자리 반내림
-                            
+                            if(sell_qty < 0.001): sell_qty = 0.001
+                            sell_qty = round(qty,4)
                             
                             send_message(f"[{symbol_list[sym]['종목명']}]: 2차 손절매 시도 ({sell_qty}/{total_qty}개)")
                             
@@ -443,6 +441,8 @@ try:
                             
                             total_qty = qty
                             sell_qty = math.floor(qty * 1000)/1000 # 소수점 3자리 반내림
+                            if(sell_qty < 0.001): sell_qty = 0.001
+                            sell_qty = round(qty,4)
                             
                             send_message(f"[{symbol_list[sym]['종목명']}]: 3차 손절매 시도 ({sell_qty}/{total_qty}개)")
                             

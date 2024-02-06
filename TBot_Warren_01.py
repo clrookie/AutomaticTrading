@@ -603,7 +603,8 @@ try:
                                 symbol_list[sym]['매수카운트'] += 1
                                 message_list =""
 
-                                qty = int((symbol_list[sym]['배분예산'] // current_price) * buy_rate) # 분할 매수
+                                qty = float((symbol_list[sym]['배분예산'] // current_price) * buy_rate) # 분할 매수
+                                qty = int(qty)
                                 message_list += f"[{symbol_list[sym]['종목명']}] 매수 시도 ({qty}개)\n"
                                 if qty > 0:
                                     if buy(sym, qty):
@@ -729,8 +730,8 @@ try:
                             stock_dict = get_stock_balance() # 보유주식 최신화
                             for symtemp, qty in stock_dict.items():
                                 if sym == symtemp:
-                                    qty = int(qty)
-                                    sell_qty = int(symbol_list[sym]['매수최대량'] * sell_rate)
+                                    qty = float(qty)
+                                    sell_qty = float(symbol_list[sym]['매수최대량'] * sell_rate)
                                     
                                     if sell_qty < 1: sell_qty = 1
 
