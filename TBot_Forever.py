@@ -130,16 +130,19 @@ try:
     #개별 종목 데이터
     symbol_list = { 
     'KRW-BTC':{'종목명':'비트코인 #1', #1
+    '매도티커':'BTC',
     '예산_가중치':1.0,
     '익절_가중치':1.0,
     **common_data},
 
     'KRW-ETC':{'종목명':'이더리움클래식 #2', #2
+    '매도티커':'ETC',
     '예산_가중치':1.0,
     '익절_가중치':1.0,
     **common_data},
 
     'KRW-XRP':{'종목명':'리플 #3', #3 
+    '매도티커':'XRP',
     '예산_가중치':1.0,
     '익절_가중치':1.0,
     **common_data},
@@ -173,7 +176,7 @@ try:
             target_buy_count = int(len(symbol_list)) # 매수종목 수량
 
             for sym in symbol_list: # 있으면 일괄 매도
-                coin = get_balance(sym)  # 보유량
+                coin = get_balance(symbol_list[sym]['매도티커'])  # 보유량
                 if coin >= 0.001 : # 최소 거래량
                     sell_result = upbit.sell_market_order(sym, coin)
                     send_message(f">>> [{symbol_list[sym]['종목명']}] {coin} 수량을 ({sell_result})에 매도했습니다~")
@@ -359,7 +362,7 @@ try:
 
                     # 익절하거나 손절하거나 if절
                     if sell_fix:
-                        qty = get_balance(sym) # 보유주식 정보 최신화 
+                        qty = get_balance(symbol_list[sym]['매도티커']) # 보유주식 정보 최신화 
 
                         if qty > 0:
                             
@@ -388,7 +391,7 @@ try:
                     # 1차 손절하거나
                     elif(avg_price*loss_cut1 > current_price and symbol_list[sym]['손절_1차'] == False): # 오늘 시가 보다 떨어지면 
                                      
-                        qty = get_balance(sym) # 보유주식 정보 최신화
+                        qty = get_balance(symbol_list[sym]['매도티커']) # 보유주식 정보 최신화
                         
                         if qty > 0:
                             
@@ -413,7 +416,7 @@ try:
                     # 2차 손절하거나
                     elif(avg_price*loss_cut2 > current_price and symbol_list[sym]['손절_2차'] == False): # 오늘 시가 보다 떨어지면 
                                      
-                        qty = get_balance(sym) # 보유주식 정보 최신화
+                        qty = get_balance(symbol_list[sym]['매도티커']) # 보유주식 정보 최신화
                         
                         if qty > 0:
                             
@@ -440,7 +443,7 @@ try:
                     # 3차 손절
                     elif(avg_price*loss_cut3 > current_price and symbol_list[sym]['손절_3차'] == False):
                         
-                        qty = get_balance(sym) # 보유주식 정보 최신화
+                        qty = get_balance(symbol_list[sym]['매도티커']) # 보유주식 정보 최신화
                         
                         if qty > 0:
                             
@@ -481,7 +484,7 @@ try:
             message_list += f"현금 잔고: {formatted_amount}\n"
 
             for sym in symbol_list:
-                qty = get_balance(sym)
+                qty = get_balance(symbol_list[sym]['매도티커'])
                 if qty > 0:
                     message_list += f"{symbol_list[sym]['종목명']}: {qty}개 보유중\n"
             
@@ -499,7 +502,7 @@ try:
             message_list += f"현금 잔고: {formatted_amount}\n"
 
             for sym in symbol_list:
-                qty = get_balance(sym)
+                qty = get_balance(symbol_list[sym]['매도티커'])
                 if qty > 0:
                     message_list += f"{symbol_list[sym]['종목명']}: {qty}개 보유중\n"
             
