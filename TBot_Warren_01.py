@@ -630,7 +630,6 @@ try:
                                         message_list += f" - **실매수가**: {formatted_amount}\n"
                                         
                                         
-                                        send_message("01")
                                         avg_price = get_avg_balance(sym)
                                         avg_price = float(avg_price)
                                         
@@ -667,6 +666,7 @@ try:
 
                         sell_fix = False
                         avg_price = get_avg_balance(sym)
+                        avg_price = float(avg_price)
                         if avg_price == 9:
                             send_message(f"[{symbol_list[sym]['종목명']}] : !!!! 평단가 리턴 실패 !!!!")
                             continue
@@ -851,6 +851,7 @@ try:
                 for sym, qty in stock_dict.items(): # 있으면 일괄 매도
                     
                     avg_price = get_avg_balance(sym)
+                    avg_price = float(avg_price)
                     if avg_price == 9:
                         send_message(f"[{symbol_list[sym]['종목명']}] : !!!! 평단가 리턴 실패 !!!!")
 
