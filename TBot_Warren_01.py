@@ -631,11 +631,11 @@ try:
                                         
                                         
                                         send_message("01")
-                                        avg_price = get_avg_balance(sym)
+                                        avg_price = int(get_avg_balance(sym))
                                         if avg_price == 9:
                                             message_list += f"[{symbol_list[sym]['종목명']}] : !!!! 평단가 리턴 실패 !!!!\n"
                                         
-                                        formatted_amount = "{:,.0f}원".format(float(avg_price))
+                                        formatted_amount = "{:,.0f}원".format(avg_price)
                                         message_list += f" - *평단가*: {formatted_amount}\n"
 
                                         
