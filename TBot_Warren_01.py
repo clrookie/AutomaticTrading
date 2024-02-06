@@ -229,7 +229,7 @@ def get_avg_balance(code="005930"):
     stock_list = res.json()['output1']
 
     for stock in stock_list:
-        if stock['hldg_qty'] > 0 and stock['pdno'] == code:
+        if int(stock['hldg_qty']) > 0 and stock['pdno'] == code:
             return stock['pchs_avg_pric']
     
     return 9
