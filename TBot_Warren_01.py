@@ -608,7 +608,6 @@ try:
                                 if qty > 0:
                                     if buy(sym, qty):
                                         
-                                        send_message("00")
                                         symbol_list[sym]['실매수가'] = current_price
                                         symbol_list[sym]['보유'] = True
                                         symbol_list[sym]['매매유무'] = True
@@ -633,17 +632,12 @@ try:
                                         avg_price = get_avg_balance(sym)
                                         avg_price = float(avg_price)
                                         
-                                        send_message("02")
                                         if avg_price == 9:
                                             message_list += f"[{symbol_list[sym]['종목명']}] : !!!! 평단가 리턴 실패 !!!!\n"
                                         
                                         formatted_amount = "{:,.0f}원".format(avg_price)
                                         
-                                        send_message("03")
                                         message_list += f" - *평단가*: {formatted_amount}\n"
-
-                                        
-                                        send_message("04")
 
                                         #분할매도 조건 초기화
                                         symbol_list[sym]['profit_rate07_up'] = True
