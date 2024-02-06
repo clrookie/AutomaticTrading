@@ -164,14 +164,6 @@ try:
             t_30 = True
 
             
-            total_cash = get_balance("KRW") # 현금잔고 조회
-        
-            formatted_amount = "{:,.0f}원".format(total_cash)
-            message_list += f"현금 잔고: {formatted_amount}\n"
-            message_list += "\n"
-            
-            # 일단 테스팅 ===============================================================================
-            # total_cash /= 10
 
             target_buy_count = int(len(symbol_list)) # 매수종목 수량
 
@@ -180,9 +172,18 @@ try:
                 if coin >= 0.001 : # 최소 거래량
                     sell_result = upbit.sell_market_order(sym, coin)
                     if sell_result is not None:
-                        send_message(f">>> [{symbol_list[sym]['종목명']}] {coin} 전량 매도했습니다~")
+                        send_message(f"[{symbol_list[sym]['종목명']}] {coin} 전량 매도했습니다~")
                     else:
                         send_message(f"[{symbol_list[sym]['매도티커']}] 매도실패 ({sell_result})")
+            
+            
+            time.sleep(1)
+
+            total_cash = get_balance("KRW") # 현금잔고 조회
+        
+            formatted_amount = "{:,.0f}원".format(total_cash)
+            message_list += f"현금 잔고: {formatted_amount}\n"
+            message_list += "\n"
 
             for sym in symbol_list: # 초기화
                 message_list += f"[{symbol_list[sym]['종목명']}]\n"
@@ -259,7 +260,7 @@ try:
                             symbol_list[sym]['손절_3차'] = False     
 
                             
-                            message_list += f"[{symbol_list[sym]['종목명']}] {symbol_list[sym]['매수카운트']}차 매수 성공\n"
+                            message_list += f"++++ {symbol_list[sym]['매수카운트']}차 매수 성공 ++++\n"
                             
                             formatted_amount = "{:,.1f}원".format(symbol_list[sym]['시가'])
                             message_list += f"- 시가: {formatted_amount}\n"
@@ -482,13 +483,22 @@ try:
             message_list += "\n"
             total_cash = get_balance("KRW") # 현금잔고 조회
             formatted_amount = "{:,.0f}원".format(total_cash)
-            message_list += f"현금 잔고: {formatted_amount}\n"
+            message_list += f"현금 잔고: {formatted_amount}\n\n"
 
             for sym in symbol_list:
                 qty = get_balance(symbol_list[sym]['매도티커'])
                 if qty > 0:
-                    message_list += f"{symbol_list[sym]['종목명']}: {qty}개 보유중\n"
+                    message_list += f"{symbol_list[sym]['종목명']}: {qty}개\n"
+                    
+                    current_price = get_current_price(sym)
+                    total = current_price * qty
+                    formatted_amount = "{:,.0f}원".format(total)
+                    message_list += f"{symbol_list[sym]['종목명']}: {formatted_amount}\n"
+                    total_cash += total
+
             
+            formatted_amount = "{:,.0f}원".format(total_cash)
+            message_list += f"보유 자산: {formatted_amount}\n\n"
             send_message(message_list)
 
         
@@ -500,12 +510,22 @@ try:
             message_list += "\n"
             total_cash = get_balance("KRW") # 현금잔고 조회
             formatted_amount = "{:,.0f}원".format(total_cash)
-            message_list += f"현금 잔고: {formatted_amount}\n"
+            message_list += f"현금 잔고: {formatted_amount}\n\n"
 
             for sym in symbol_list:
                 qty = get_balance(symbol_list[sym]['매도티커'])
                 if qty > 0:
-                    message_list += f"{symbol_list[sym]['종목명']}: {qty}개 보유중\n"
+                    message_list += f"{symbol_list[sym]['종목명']}: {qty}개\n"
+
+                    current_price = get_current_price(sym)
+                    total = current_price * qty
+                    formatted_amount = "{:,.0f}원".format(total)
+                    message_list += f"{symbol_list[sym]['종목명']}: {formatted_amount}\n"
+                    total_cash += total
+
+            
+            formatted_amount = "{:,.0f}원".format(total_cash)
+            message_list += f"보유 자산: {formatted_amount}\n\n"
             
             send_message(message_list)
 
