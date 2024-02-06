@@ -399,9 +399,6 @@ try:
                             if(sell_qty < 0.001): sell_qty = 0.001
                             sell_qty = round(qty,4)
                             
-                            if(sell_qty < 0.001): sell_qty = 0.001
-                            sell_qty = round(qty,4)
-                            
                             send_message(f"[{symbol_list[sym]['종목명']}]: 1차 손절매 시도 ({sell_qty}/{total_qty}개)")
                             
                             sell_result = upbit.sell_market_order(sym, sell_qty)
