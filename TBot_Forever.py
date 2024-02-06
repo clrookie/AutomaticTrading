@@ -230,7 +230,6 @@ try:
                         symbol_list[sym]['매수카운트'] += 1
 
                         qty = math.floor(symbol_list[sym]['배분예산']/current_price* buy_rate * 1000 )/1000  # 소수점 3자리 반내림 # 분할 매수
-                        if(qty < 0.001): qty = 0.001
                         qty = round(qty,4)
 
                         message_list = ""
