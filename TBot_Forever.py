@@ -184,6 +184,7 @@ try:
             formatted_amount = "{:,.0f}원".format(total_cash)
             message_list += f"현금 잔고: {formatted_amount}\n"
             message_list += "\n"
+            total_cash *= 0.97 # 짜투리 머니 보정
 
             for sym in symbol_list: # 초기화
                 message_list += f"[{symbol_list[sym]['종목명']}]\n"
