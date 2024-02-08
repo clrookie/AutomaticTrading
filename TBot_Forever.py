@@ -234,8 +234,6 @@ try:
 
                     if symbol_list[sym]['목표매수가'] < current_price and symbol_list[sym]['매수카운트'] < buy_max_cnt: # 목표매수가와 횟수 체크
                         
-                        symbol_list[sym]['매수카운트'] += 1
-
                         qty = math.floor(symbol_list[sym]['배분예산']/current_price* buy_rate * 1000 )/1000  # 소수점 3자리 반내림 # 분할 매수
                         qty = round(qty,4)
                         if qty <= 0: qty = 0.001
@@ -247,7 +245,8 @@ try:
                         message_list += f"[{symbol_list[sym]['종목명']}] 매수 시도 ({qty}개)\n"
                         
                         buy_result = upbit.buy_market_order(sym, price) # 현금
-                        if buy_result is not None:                            
+                        if buy_result is not None:          
+                            symbol_list[sym]['매수카운트'] += 1                  
                             symbol_list[sym]['실매수가'] = current_price
                             symbol_list[sym]['보유'] = True
                             symbol_list[sym]['매매유무'] = True

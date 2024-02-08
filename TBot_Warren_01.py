@@ -600,7 +600,6 @@ try:
                         
                         if symbol_list[sym]['목표매수가'] < current_price and symbol_list[sym]['매수카운트'] < buy_max_cnt: # 목표매수가와 횟수 체크
                                 
-                                symbol_list[sym]['매수카운트'] += 1
                                 message_list =""
 
                                 qty = int((symbol_list[sym]['배분예산'] // current_price) * buy_rate) # 분할 매수
@@ -608,6 +607,7 @@ try:
                                 if qty > 0:
                                     if buy(sym, qty):
                                         
+                                        symbol_list[sym]['매수카운트'] += 1
                                         symbol_list[sym]['실매수가'] = current_price
                                         symbol_list[sym]['보유'] = True
                                         symbol_list[sym]['매매유무'] = True
