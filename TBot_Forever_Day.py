@@ -14,12 +14,12 @@ def send_message(msg):
 
 def get_target_price(ticker): # 음봉 윗꼬리 평균 + 보정
 
-    data_period = 50 # 최근 추출 기간
+    data_period = 30 # 최근 추출 기간
     cnt = 0 # 음봉 카운트
     target_price = 0 # 초기화
     delta = 0 # 윗꼬리값
 
-    df = pyupbit.get_ohlcv(ticker, interval="minute240", count=data_period)
+    df = pyupbit.get_ohlcv(ticker, interval="day", count=data_period)
 
     for i in range(0,data_period-1):
         stck_hgpr = int(df.iloc[i]['high']) #고가
@@ -63,7 +63,7 @@ def get_current_price(ticker):
 
 def get_stck_oprc(ticker):
 
-    df = pyupbit.get_ohlcv(ticker, interval="minute240", count=1)
+    df = pyupbit.get_ohlcv(ticker, interval="day", count=1)
     stck_oprc = int(df.iloc[0]['open']) #오늘 시가
     
     return stck_oprc
@@ -77,7 +77,7 @@ try:
     upbit = pyupbit.Upbit(access, secret)
     send_message("=== 코인거래 초기화 합니다 ===")
 
-    last240_hour = 0
+    last_day = 0
     t_0 = True
     t_30 = True
 
@@ -98,7 +98,7 @@ try:
     # 매수
     buy_rate = 0.2
     buy_max_cnt = 5
-    buy_interval = 15
+    buy_interval = 30
     
     previous_time = datetime.datetime.now()
 
@@ -135,13 +135,19 @@ try:
     '익절_가중치':1.0,
     **common_data},
 
-    'KRW-ETC':{'종목명':'이더리움클래식 #2', #2
+    'KRW-ETH':{'종목명':'이더리움 #2', #2
+    '매도티커':'ETH',
+    '예산_가중치':1.0,
+    '익절_가중치':1.0,
+    **common_data},
+
+    'KRW-ETC':{'종목명':'이더리움클래식 #3', #2
     '매도티커':'ETC',
     '예산_가중치':1.0,
     '익절_가중치':1.0,
     **common_data},
 
-    'KRW-XRP':{'종목명':'리플 #3', #3 
+    'KRW-XRP':{'종목명':'리플 #4', #3 
     '매도티커':'XRP',
     '예산_가중치':1.0,
     '익절_가중치':1.0,
@@ -151,13 +157,13 @@ try:
 
     while True:
         
-        df = pyupbit.get_ohlcv("KRW-BTC", interval="minute240", count=1)    
+        df = pyupbit.get_ohlcv("KRW-BTC", interval="day", count=1)    
 
-        if df.index[0].hour != last240_hour:    # 240분 캔들 갱신
-            last240_hour = df.index[0].hour
+        if df.index[0].day != last_day:    # 240분 캔들 갱신
+            last_day = df.index[0].day
             
             message_list = ""
-            message_list += f"=== 코인거래 240분봉 갱신합니다 === ({last240_hour}시)\n"
+            message_list += f"=== 코인거래 일봉 갱신합니다 === ({last_day}일)\n"
             message_list += "\n"
 
             t_0 = True
@@ -370,7 +376,8 @@ try:
 
                         if qty > 0:
                             
-                            sell_qty = math.floor(symbol_list[sym]['매수최대량'] * sell_rate * 1000)/1000 # 소수점 3자리 반내림
+                            # sell_qty = math.floor(symbol_list[sym]['매수최대량'] * sell_rate * 1000)/1000 # 소수점 3자리 반내림
+                            sell_qty = float(symbol_list[sym]['매수최대량'] * sell_rate)
                             if(sell_qty < 0.001): sell_qty = 0.001
                             sell_qty = round(qty,4)
 
@@ -402,7 +409,8 @@ try:
                             total_qty = qty
                             qty = float(qty) * 0.33 # 분할 손절
 
-                            sell_qty = math.floor(qty * 1000)/1000 # 소수점 3자리 반내림
+                            # sell_qty = math.floor(qty * 1000)/1000 # 소수점 3자리 반내림
+                            sell_qty = qty
                             if(sell_qty < 0.001): sell_qty = 0.001
                             sell_qty = round(qty,4)
                             
@@ -426,8 +434,9 @@ try:
                             
                             total_qty = qty
                             qty = float(qty) * 0.5 # 분할 손절
-
-                            sell_qty = math.floor(qty * 1000)/1000 # 소수점 3자리 반내림
+                            
+                            # sell_qty = math.floor(qty * 1000)/1000 # 소수점 3자리 반내림
+                            sell_qty = qty
                             if(sell_qty < 0.001): sell_qty = 0.001
                             sell_qty = round(qty,4)
                             
@@ -451,7 +460,9 @@ try:
                         if qty > 0:
                             
                             total_qty = qty
-                            sell_qty = math.floor(qty * 1000)/1000 # 소수점 3자리 반내림
+                            
+                            # sell_qty = math.floor(qty * 1000)/1000 # 소수점 3자리 반내림
+                            sell_qty = qty
                             if(sell_qty < 0.001): sell_qty = 0.001
                             sell_qty = round(qty,4)
                             
@@ -533,4 +544,14 @@ try:
 except Exception as e:
     print(e)
     send_message(f"[오류 발생]{e}")
+
+    for sym in symbol_list: # 오류나면 일괄 매도
+        coin = get_balance(symbol_list[sym]['매도티커'])  # 보유량
+        if coin >= 0.001 : # 최소 거래량
+            sell_result = upbit.sell_market_order(sym, coin)
+            if sell_result is not None:
+                send_message(f"[{symbol_list[sym]['종목명']}] {coin} 오류 전량 매도했습니다~")
+            else:
+                send_message(f"[{symbol_list[sym]['매도티커']}] 오류 매도실패 ({sell_result})")
+
     time.sleep(1)
