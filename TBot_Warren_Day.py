@@ -402,7 +402,7 @@ try:
     # 매수
     buy_rate = 0.2
     buy_max_cnt = 5
-    buy_interval = 15
+    buy_interval = 30
 
     previous_time = datetime.datetime.now()
     
@@ -508,10 +508,10 @@ try:
         else:
             t_now = datetime.datetime.now()
             
-            t_start = t_now.replace(hour=9, minute=0, second=15, microsecond=0)
+            t_start = t_now.replace(hour=9, minute=4, second=0, microsecond=0)
             t_930 = t_now.replace(hour=9, minute=30, second=0, microsecond=0)
             t_1510 = t_now.replace(hour=15, minute=10, second=0,microsecond=0)
-            t_exit = t_now.replace(hour=15, minute=18, second=0,microsecond=0)
+            t_exit = t_now.replace(hour=15, minute=17, second=0,microsecond=0)
             
             if t_start < t_now < t_exit and startoncebyday == False: # 매매 준비
             
@@ -596,6 +596,7 @@ try:
 
                     for sym in symbol_list:
                         
+                        time.sleep(0.2) # 유량 에러 대응
                         current_price = get_current_price(sym)
                         
                         if symbol_list[sym]['목표매수가'] < current_price and symbol_list[sym]['매수카운트'] < buy_max_cnt: # 목표매수가와 횟수 체크
@@ -834,7 +835,7 @@ try:
                 elif t_1510 <= t_now < t_exit:
                     time.sleep(1)
                 else:
-                    time.sleep(15)
+                    time.sleep(10)
 
             if t_exit < t_now and startoncebyday == True:  # PM 03:19 ~ : 데일리 프로그램 종료
                 startoncebyday = False
@@ -895,6 +896,14 @@ try:
                 continue
 except Exception as e:
     send_message(f"[오류 발생]{e}")
+    stock_dict = get_stock_balance() # 보유 주식 조회                
+    for sym, qty in stock_dict.items(): # 오류 있으면 일괄 매도
+        
+        current_price = get_current_price(sym)
+        send_message(f">>> [{symbol_list[sym]['종목명']}] {current_price}원에 오류 매도 시도 ({sym}개)")
+
+        if sell(sym, int(qty)):
+            send_message(f">>> [{symbol_list[sym]['종목명']}] 오류 일괄 매도 성공 !!")
     time.sleep(1)
 
 
