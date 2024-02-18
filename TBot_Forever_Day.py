@@ -470,8 +470,9 @@ try:
                             if sell_result is not None:
                                 symbol_list[sym]['손절_3차'] = True
                                 symbol_list[sym]['매수카운트'] = 0
-                                symbol_list[sym]['매수최대량'] = 0      
-                                send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/avg_price,4)}% 3차 손절매")
+                                symbol_list[sym]['매수최대량'] = 0
+                                symbol_list[sym]['보유'] = False # 전량 손절     
+                                send_message(f"[{symbol_list[sym]['종목명']}]: {round(current_price/avg_price,4)}% 3차 전량 손절매")
                                 send_message(f"[{symbol_list[sym]['종목명']}]: 손절가({current_price}) 평단가({avg_price})") 
                             else:
                                 send_message(f"매도 실패 ({sell_result})")  
