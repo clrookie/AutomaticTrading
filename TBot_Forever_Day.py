@@ -382,10 +382,10 @@ try:
 
                         if qty > 0:
                             
-                            # sell_qty = math.floor(symbol_list[sym]['매수최대량'] * sell_rate * 1000)/1000 # 소수점 3자리 반내림
-                            sell_qty = float(symbol_list[sym]['매수최대량'] * sell_rate)
+                            sell_qty = math.floor(symbol_list[sym]['매수최대량'] * sell_rate * 1000)/1000 # 소수점 3자리 반내림
+
                             if(sell_qty < 0.001): sell_qty = 0.001
-                            sell_qty = round(qty,4)
+                            # sell_qty = round(sell_qty,4) 불필요한 로직인듯??
 
                             if qty > sell_qty: # 분할 익절
                                 send_message(f"[{symbol_list[sym]['종목명']}]: 분할 익절 시도 ({sell_qty}/{qty}개)")
@@ -415,10 +415,9 @@ try:
                             total_qty = qty
                             qty = float(qty) * 0.33 # 분할 손절
 
-                            # sell_qty = math.floor(qty * 1000)/1000 # 소수점 3자리 반내림
-                            sell_qty = qty
+                            sell_qty = math.floor(qty * 1000)/1000 # 소수점 3자리 반내림
+
                             if(sell_qty < 0.001): sell_qty = 0.001
-                            sell_qty = round(qty,4)
                             
                             send_message(f"[{symbol_list[sym]['종목명']}]: 1차 손절매 시도 ({sell_qty}/{total_qty}개)")
                             
@@ -441,10 +440,8 @@ try:
                             total_qty = qty
                             qty = float(qty) * 0.5 # 분할 손절
                             
-                            # sell_qty = math.floor(qty * 1000)/1000 # 소수점 3자리 반내림
-                            sell_qty = qty
+                            sell_qty = math.floor(qty * 1000)/1000 # 소수점 3자리 반내림
                             if(sell_qty < 0.001): sell_qty = 0.001
-                            sell_qty = round(qty,4)
                             
                             send_message(f"[{symbol_list[sym]['종목명']}]: 2차 손절매 시도 ({sell_qty}/{total_qty}개)")
                             
@@ -467,14 +464,9 @@ try:
                             
                             total_qty = qty
                             
-                            # sell_qty = math.floor(qty * 1000)/1000 # 소수점 3자리 반내림
-                            sell_qty = qty
-                            if(sell_qty < 0.001): sell_qty = 0.001
-                            sell_qty = round(qty,4)
+                            send_message(f"[{symbol_list[sym]['종목명']}]: 3차 전량 손절매 시도 ({total_qty}개)")
                             
-                            send_message(f"[{symbol_list[sym]['종목명']}]: 3차 손절매 시도 ({sell_qty}/{total_qty}개)")
-                            
-                            sell_result = upbit.sell_market_order(sym, sell_qty)
+                            sell_result = upbit.sell_market_order(sym, total_qty)
                             if sell_result is not None:
                                 symbol_list[sym]['손절_3차'] = True
                                 symbol_list[sym]['매수카운트'] = 0
