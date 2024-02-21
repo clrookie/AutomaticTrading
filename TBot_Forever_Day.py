@@ -89,8 +89,8 @@ try:
     
     # 손절 기준선
     loss_cut1 = 0.990
-    loss_cut2 = 0.985
-    loss_cut3 = 0.980
+    loss_cut2 = 0.9875
+    loss_cut3 = 0.985
 
     # 익절비율
     sell_rate = 0.2
