@@ -194,11 +194,8 @@ try:
 
     while True:
         
-        
-        send_message("1111")
         df = pyupbit.get_ohlcv("KRW-BTC", interval="day", count=1)    
         
-        send_message("2222")
         if df.index[0].day != last_day:    # 240분 캔들 갱신
             last_day = df.index[0].day
             
@@ -244,10 +241,8 @@ try:
                 message_list += f"- 시가: {formatted_amount}\n"   
 
                 
-                send_message("3333")
                 target_price,profit_rate = get_target_price(sym,(((profit_rate22-1)*symbol_list[sym]['익절_가중치'])+1))
                 
-                send_message("4444")
                 symbol_list[sym]['익절_가중치'] *= profit_rate
 
                 symbol_list[sym]['목표매수가'] = round(target_price,2)
