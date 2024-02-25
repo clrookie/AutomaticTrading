@@ -130,7 +130,7 @@ def get_hotstart(code="005930"):
     return False
 
 
-def get_target_price(code="005930"): # 음봉 윗꼬리 평균 + 보정
+def get_target_price(code,profit_max): # 음봉 윗꼬리 평균 + 보정
     PATH = "uapi/domestic-stock/v1/quotations/inquire-daily-price"
     URL = f"{URL_BASE}/{PATH}"
     headers = {"Content-Type":"application/json", 
@@ -167,6 +167,41 @@ def get_target_price(code="005930"): # 음봉 윗꼬리 평균 + 보정
         delta /= cnt # 평균
 
     target_price += delta
+
+    # 5일 이평선 ----------------------------------------------------------------
+
+    stck_clpr_5 = 0
+    for i in range(0,5):
+        stck_clpr_5 += int(res.json()['output'][i]['stck_clpr']) #종가
+
+    stck_clpr_5 /= 5
+    stck_oprc_day = int(res.json()['output'][0]['stck_oprc']) #오늘 시가
+
+    profit_rate = 1
+    
+    # 시가 이평선 아래
+    if stck_oprc_day < stck_clpr_5:
+        profit_limit = target_price * profit_max
+
+        # 이격도가 크면
+        if stck_oprc_day > profit_limit:
+            return target_price,profit_rate
+        
+        else: # 이격도가 작으면
+            profit_limit = target_price * (((profit_max-1)/2)+1)
+            
+            if stck_oprc_day > profit_limit:
+                return target_price, (profit_rate/2) # 익절선 짧게
+            
+            else: # 이격도가 '매우' 작으면
+                target_price = stck_clpr_5 + delta
+                return target_price,profit_rate
+
+    # 이평선 위에 시가 시작이면 평소처럼
+    return target_price, profit_rate
+
+
+
 
     return target_price
 
@@ -496,11 +531,62 @@ try:
     **common_data},                        
     }
 
+
+    # 초반 테스트용 코드
+
+    # # 토큰 세팅
+    # ACCESS_TOKEN = get_access_token()
+    
+    # startoncebyday = True
+    # holiday = False
+    
+    # t_0 = True
+    # t_30 = True              
+    
+    # total_cash = get_balance() # 보유 현금 조회
+
+    # # total_cash /= 5 
+
+    # stock_dict = get_stock_balance() # 보유 주식 조회
+    # target_buy_count = int(len(symbol_list)) # 매수종목 수량
+
+    
+    # for sym, qty in stock_dict.items(): # 있으면 일괄 매도
+        
+    #     current_price = get_current_price(sym)
+    #     send_message(f">>> [{symbol_list[sym]['종목명']}] {current_price}원에 매도 시도 ({sym}개)")
+
+    #     if sell(sym, int(qty)):
+    #         send_message(f">>> [{symbol_list[sym]['종목명']}] 일괄 매도 성공 !!")
+
+    # message_list = "" # 초기화
+    # for sym in symbol_list: # 초기화
+
+    #     message_list += f"[{symbol_list[sym]['종목명']}]\n"
+    #     symbol_list[sym]['배분예산'] = int(total_cash * (1/target_buy_count) * symbol_list[sym]['예산_가중치'])
+    #     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['배분예산'])
+    #     message_list += f"- 배분예산: {formatted_amount}\n"
+
+    #     symbol_list[sym]['시가'] = int(get_stck_oprc(sym))
+    #     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['시가'])
+    #     message_list += f"- 시가: {formatted_amount}\n"   
+
+    #     target_price,profit_rate = get_target_price(sym,(((profit_rate22-1)*symbol_list[sym]['익절_가중치'])+1))
+    #     symbol_list[sym]['익절_가중치'] *= profit_rate
+
+    #     symbol_list[sym]['목표매수가'] = int(target_price)
+    #     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['목표매수가'])
+    #     message_list += f"- 목표매수가: {formatted_amount}\n"   
+
+    #     message_list += f"- 타겟%: {round((symbol_list[sym]['목표매수가'])/symbol_list[sym]['시가'],4)}\n"
+
+
     while True:
         today = datetime.datetime.today().weekday()
         today_date = datetime.datetime.today().strftime("%Y%m%d")
 
         if today == 5 or today == 6 or get_holiday(today_date):  # 토,일 자동종료, 2024 공휴일 포함
+                        
             if holiday == False:
                 send_message("KOSPI 휴장일 입니다~")
                 holiday = True
@@ -559,7 +645,10 @@ try:
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['시가'])
                     message_list += f"- 시가: {formatted_amount}\n"   
 
-                    symbol_list[sym]['목표매수가'] = int(get_target_price(sym))
+                    target_price,profit_rate = get_target_price(sym,(((profit_rate22-1)*symbol_list[sym]['익절_가중치'])+1))
+                    symbol_list[sym]['익절_가중치'] *= profit_rate
+
+                    symbol_list[sym]['목표매수가'] = int(target_price)
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['목표매수가'])
                     message_list += f"- 목표매수가: {formatted_amount}\n"   
 
