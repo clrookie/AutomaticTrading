@@ -184,13 +184,13 @@ def get_target_price(code,profit_max): # 음봉 윗꼬리 평균 + 보정
         profit_limit = target_price * profit_max
 
         # 이격도가 크면
-        if stck_oprc_day > profit_limit:
+        if stck_clpr_5 > profit_limit:
             return target_price,profit_rate
         
         else: # 이격도가 작으면
             profit_limit = target_price * (((profit_max-1)/2)+1)
             
-            if stck_oprc_day > profit_limit:
+            if stck_clpr_5 > profit_limit:
                 return target_price, (profit_rate/2) # 익절선 짧게
             
             else: # 이격도가 '매우' 작으면

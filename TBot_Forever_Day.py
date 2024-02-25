@@ -35,7 +35,7 @@ def get_target_price(ticker,profit_max): # 음봉 윗꼬리 평균 + 보정
     if cnt > 0:
         delta /= cnt # 평균
 
-    target_price += delta
+    target_price += int(delta)
 
     # 5일 이평선 ----------------------------------------------------------------
     df = pyupbit.get_ohlcv(ticker, interval="day", count=5)
@@ -54,17 +54,17 @@ def get_target_price(ticker,profit_max): # 음봉 윗꼬리 평균 + 보정
         profit_limit = target_price * profit_max
 
         # 이격도가 크면
-        if stck_oprc_day > profit_limit:
+        if stck_clpr_5 > profit_limit:
             return target_price,profit_rate
         
         else: # 이격도가 작으면
             profit_limit = target_price * (((profit_max-1)/2)+1)
             
-            if stck_oprc_day > profit_limit:
+            if stck_clpr_5 > profit_limit:
                 return target_price, (profit_rate/2) # 익절선 짧게
             
             else: # 이격도가 '매우' 작으면
-                target_price = stck_clpr_5 + delta
+                target_price = stck_clpr_5 + int(delta)
                 return target_price,profit_rate
 
     # 이평선 위에 시가 시작이면 평소처럼
