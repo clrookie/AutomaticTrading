@@ -12,14 +12,14 @@ def send_message(msg):
     requests.post('https://discord.com/api/webhooks/1200644595919360010/IGX1ctpFUQLHuMchUET2N7qfIkV4VedBfzg3JRppv3SyHAm3v6pV1tGrz-UvLXdnpmBj', data=message)
     print(message)
 
-def get_target_price(ticker,profit_max): # 음봉 윗꼬리 평균 + 보정
+def get_target_price(ticker): # 음봉 윗꼬리 평균 + 보정
 
-    data_period = 30 # 최근 추출 기간
+    data_period = 50 # 최근 추출 기간
     cnt = 0 # 음봉 카운트
     target_price = 0 # 초기화
     delta = 0 # 윗꼬리값
 
-    df = pyupbit.get_ohlcv(ticker, interval="day", count=data_period)
+    df = pyupbit.get_ohlcv(ticker, interval="week", count=data_period)
 
     for i in range(0,data_period-1):
         stck_hgpr = int(df.iloc[i]['high']) #고가
@@ -37,43 +37,12 @@ def get_target_price(ticker,profit_max): # 음봉 윗꼬리 평균 + 보정
 
     target_price += delta
 
-    # 5일 이평선 ----------------------------------------------------------------
-    df = pyupbit.get_ohlcv(ticker, interval="day", count=5)
-
-    stck_clpr_5 = 0
-    for i in range(0,5):
-        stck_clpr_5 += int(df.iloc[i]['close']) #종가
-
-    stck_clpr_5 /= 5
-    stck_oprc_day = int(df.iloc[4]['open'])
-
-    profit_rate = 1
-    
-    # 시가 이평선 아래
-    if stck_oprc_day < stck_clpr_5:
-        profit_limit = target_price * profit_max
-
-        # 이격도가 크면
-        if stck_oprc_day > profit_limit:
-            return target_price,profit_rate
-        
-        else: # 이격도가 작으면
-            profit_limit = target_price * (((profit_max-1)/2)+1)
-            
-            if stck_oprc_day > profit_limit:
-                return target_price, (profit_rate/2) # 익절선 짧게
-            
-            else: # 이격도가 '매우' 작으면
-                target_price = stck_clpr_5 + delta
-                return target_price,profit_rate
-
-    # 이평선 위에 시가 시작이면 평소처럼
-    return target_price, profit_rate
+    return target_price
 
 
 def get_start_time(ticker):
     """시작 시간 조회"""
-    df = pyupbit.get_ohlcv(ticker, interval="day", count=1)
+    df = pyupbit.get_ohlcv(ticker, interval="week", count=1)
     start_time = df.index[0]
     return start_time
 
@@ -94,7 +63,7 @@ def get_current_price(ticker):
 
 def get_stck_oprc(ticker):
 
-    df = pyupbit.get_ohlcv(ticker, interval="day", count=1)
+    df = pyupbit.get_ohlcv(ticker, interval="week", count=1)
     stck_oprc = int(df.iloc[0]['open']) #오늘 시가
     
     return stck_oprc
@@ -113,10 +82,10 @@ try:
     t_30 = True
 
     # 익절 기준선
-    profit_rate07 = 1.016
-    profit_rate12 = 1.021
-    profit_rate17 = 1.026
-    profit_rate22 = 1.031
+    profit_rate07 = 1.031
+    profit_rate12 = 1.041
+    profit_rate17 = 1.051
+    profit_rate22 = 1.061
     
     # 손절 기준선
     loss_cut1 = 0.990
@@ -194,23 +163,23 @@ try:
 
     while True:
         
+        df = pyupbit.get_ohlcv("KRW-BTC", interval="week", count=1)    
 
-        df = pyupbit.get_ohlcv("KRW-BTC", interval="day", count=1)    
-
-        if df.index[0].day != last_day:    # 240분 캔들 갱신
+        if df.index[0].day != last_day:    # 주봉 첫날
             last_day = df.index[0].day
             
             message_list = ""
-            message_list += f"=== 코인거래 일봉 갱신합니다 === ({last_day}일)\n"
+            message_list += f"=== 코인거래 주봉 갱신합니다 === ({last_day}일)\n"
             message_list += "\n"
 
             t_0 = True
             t_30 = True
 
+            
+
             target_buy_count = int(len(symbol_list)) # 매수종목 수량
 
             for sym in symbol_list: # 있으면 일괄 매도
-
                 coin = get_balance(symbol_list[sym]['매도티커'])  # 보유량
                 if coin >= 0.001 : # 최소 거래량
                     sell_result = upbit.sell_market_order(sym, coin)
@@ -239,11 +208,7 @@ try:
                 formatted_amount = "{:,.1f}원".format(symbol_list[sym]['시가'])
                 message_list += f"- 시가: {formatted_amount}\n"   
 
-                target_price,profit_rate = get_target_price(sym,(((profit_rate22-1)*symbol_list[sym]['익절_가중치'])+1))
-                
-                symbol_list[sym]['익절_가중치'] *= profit_rate
-
-                symbol_list[sym]['목표매수가'] = round(target_price,2)
+                symbol_list[sym]['목표매수가'] = round(get_target_price(sym),2)
                 formatted_amount = "{:,.1f}원".format(symbol_list[sym]['목표매수가'])
                 message_list += f"- 목표매수가: {formatted_amount}\n"   
 
