@@ -19,7 +19,11 @@ def get_target_price(ticker,profit_max): # 음봉 윗꼬리 평균 + 보정
     target_price = 0 # 초기화
     delta = 0 # 윗꼬리값
 
-    df = pyupbit.get_ohlcv(ticker, interval="day", count=data_period)
+    try:
+        df = pyupbit.get_ohlcv(ticker, interval="day", count=data_period)
+    except Exception as e:
+        print(f"Error fetching data: {e}")
+        return None, None  # 데이터를 가져오지 못할 경우 None을 반환
 
     for i in range(0,data_period-1):
         stck_hgpr = int(df.iloc[i]['high']) #고가
