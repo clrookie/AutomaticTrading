@@ -20,6 +20,8 @@ def get_target_price(ticker,profit_max): # 음봉 윗꼬리 평균 + 보정
     delta = 0 # 윗꼬리값
 
     df = pyupbit.get_ohlcv(ticker, interval="day", count=data_period)
+    if df is not None: # 비어 있으면 한번 더 요청
+        df = pyupbit.get_ohlcv(ticker, interval="day", count=data_period)
 
     for i in range(0,data_period-1):
         stck_hgpr = int(df.iloc[i]['high']) #고가
@@ -39,6 +41,8 @@ def get_target_price(ticker,profit_max): # 음봉 윗꼬리 평균 + 보정
 
     # 5일 이평선 ----------------------------------------------------------------
     df = pyupbit.get_ohlcv(ticker, interval="day", count=5)
+    if df is not None: # 비어 있으면 한번 더 요청
+        df = pyupbit.get_ohlcv(ticker, interval="day", count=data_period)
 
     stck_clpr_5 = 0
     for i in range(0,5):
