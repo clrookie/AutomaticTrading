@@ -38,14 +38,14 @@ def get_target_price(ticker,profit_max): # 음봉 윗꼬리 평균 + 보정
     target_price += int(delta)
 
     # 5일 이평선 ----------------------------------------------------------------
-    df = pyupbit.get_ohlcv(ticker, interval="day", count=5)
+    df_5 = pyupbit.get_ohlcv(ticker, interval="day", count=5)
 
     stck_clpr_5 = 0
     for i in range(0,5):
-        stck_clpr_5 += int(df.iloc[i]['close']) #종가
+        stck_clpr_5 += int(df_5.iloc[i]['close']) #종가
 
     stck_clpr_5 /= 5
-    stck_oprc_day = int(df.iloc[4]['open'])
+    stck_oprc_day = int(df_5.iloc[4]['open'])
 
     profit_rate = 1
     
