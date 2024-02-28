@@ -23,7 +23,7 @@ def get_target_price(ticker,profit_max): # 음봉 윗꼬리 평균 + 보정
     try:
         df = pyupbit.get_ohlcv(ticker, interval="day", count=data_period)
     except Exception as e:
-        print(f"Error fetching data: {e}")
+        send_message(f"Error fetching data: {e}")
         return None, None  # 데이터를 가져오지 못할 경우 None을 반환
 
     for i in range(0,data_period-1):
@@ -47,7 +47,7 @@ def get_target_price(ticker,profit_max): # 음봉 윗꼬리 평균 + 보정
     try:
         df_5 = pyupbit.get_ohlcv(ticker, interval="day", count=5)
     except Exception as e:
-        print(f"Error fetching data: {e}")
+        send_message(f"Error fetching data: {e}")
         return None, None  # 데이터를 가져오지 못할 경우 None을 반환
 
     stck_clpr_5 = 0
