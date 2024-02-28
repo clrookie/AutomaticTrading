@@ -250,8 +250,9 @@ try:
                 formatted_amount = "{:,.1f}원".format(symbol_list[sym]['시가'])
                 message_list += f"- 시가: {formatted_amount}\n"   
 
-                
+                send_message(f"{sym}111")
                 target_price,profit_rate = get_target_price(sym,(((profit_rate22-1)*symbol_list[sym]['익절_가중치'])+1))
+                send_message("222")
                 
                 symbol_list[sym]['익절_가중치'] *= profit_rate
 
