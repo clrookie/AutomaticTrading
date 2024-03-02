@@ -420,11 +420,18 @@ try:
     t_0 = True
     t_30 = True
 
+    
+    # # 익절 기준선
+    # profit_rate07 = 1.016
+    # profit_rate12 = 1.021
+    # profit_rate17 = 1.026
+    # profit_rate22 = 1.031
+    
     # 익절 기준선
-    profit_rate07 = 1.016
-    profit_rate12 = 1.021
-    profit_rate17 = 1.026
-    profit_rate22 = 1.031
+    profit_rate07 = 1.0055
+    profit_rate12 = 1.0076
+    profit_rate17 = 1.0105
+    profit_rate22 = 1.0126
     
     # 손절 기준선
     loss_cut1 = 0.990
@@ -457,6 +464,8 @@ try:
     '손절_1차': False,
     '손절_2차': False,
     '손절_3차': False,
+    '손절청산': False,
+    '익절청산': False,
         
     'profit_rate07_up':True,
     'profit_rate12_up':True,
@@ -674,6 +683,8 @@ try:
                     symbol_list[sym]['매매유무'] = False
                     symbol_list[sym]['매수카운트'] = 0
                     symbol_list[sym]['매수최대량'] = 0
+                    symbol_list[sym]['손절청산'] = False
+                    symbol_list[sym]['익절청산'] = False
 
                     message_list += "---------------------------------\n"
                     
@@ -847,6 +858,7 @@ try:
                                         qty = sell_qty
                                     else:
                                         symbol_list[sym]['보유'] = False # 전량 익절 -> 일간 매매 종료
+                                        symbol_list[sym]['익절청산'] = True
                                         send_message(f"[{symbol_list[sym]['종목명']}]: 전량 익절 시도 ({qty}개)")
 
                                     if sell(sym, qty):
@@ -906,7 +918,8 @@ try:
 
                                         # 매수 unlock... ;;
                                         symbol_list[sym]['보유'] = False
-                                        symbol_list[sym]['매수카운트'] = 0
+                                        symbol_list[sym]['손절청산'] = True
+                                        symbol_list[sym]['매수카운트'] = 5
                                         symbol_list[sym]['매수최대량'] = 0   
 
 #---------------------- 여기까지 보유중 루프 -----------------------------------------------------------------------------
@@ -919,6 +932,13 @@ try:
                     message_list =""
                     message_list += "===30분===30분===30분===30분===\n"
                     message_list += "\n"
+                    
+                    for sym in symbol_list:
+                        if symbol_list[sym]['익절청산']:
+                            message_list += f"[{symbol_list[sym]['종목명']}] : ++익절청산++ ^^ \n"
+                        elif symbol_list[sym]['손절청산']:
+                            message_list += f"[{symbol_list[sym]['종목명']}] : --손절청산-- ㅠ \n"
+
                     send_message(message_list)
                     get_stock_balance()
                 if t_now.minute == 0 and t_0:
@@ -928,6 +948,13 @@ try:
                     message_list =""
                     message_list += "===0분===0분===0분===0분===\n"
                     message_list += "\n"
+                    
+                    for sym in symbol_list:
+                        if symbol_list[sym]['익절청산']:
+                            message_list += f"[{symbol_list[sym]['종목명']}] : ++익절청산++ ^^ \n"
+                        elif symbol_list[sym]['손절청산']:
+                            message_list += f"[{symbol_list[sym]['종목명']}] : --손절청산-- ㅠ \n"
+                    
                     send_message(message_list)
                     get_stock_balance()
                 
