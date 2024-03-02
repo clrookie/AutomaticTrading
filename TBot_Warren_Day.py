@@ -627,8 +627,12 @@ try:
                 
                 total_cash = get_balance() # 보유 현금 조회
 
-                # 고정 시드머니 설정 (1000만원)
-                if total_cash > 10000000: total_cash = 10000000
+                # 고정 시드머니 설정 (100만원대 날리기)
+                b = 10000000
+                b = total_cash % b
+                
+                if total_cash > b:
+                    total_cash -= b
 
                 stock_dict = get_stock_balance() # 보유 주식 조회
                 target_buy_count = int(len(symbol_list)) # 매수종목 수량

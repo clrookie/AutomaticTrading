@@ -59,17 +59,14 @@ formatted_amount = "{:,.0f}원".format(aaa())
 print(formatted_amount)
 
 try:
-    a = 123
-    aaa = ''
-    aaa += f"------{a}---------\n"
-    aaa += "aaaaaaaaaa\n"
-    aaa += "bbbbbbbbbbb\n"
-    aaa += 'cccccccccc\n'
-
-    aaa = "111"
+    total_cash = 3000000
+    b = 10000000
+    b = total_cash % b
     
+    if total_cash > b:
+        total_cash -= b
 
-    print(aaa)
+    print(total_cash)
 
     time.sleep(1)
 except Exception as e:

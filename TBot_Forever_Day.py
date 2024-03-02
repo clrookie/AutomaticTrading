@@ -237,8 +237,12 @@ try:
             message_list += f"현금 잔고: {formatted_amount}\n"
             message_list += "\n"
 
-            # 고정 시드머니 설정 (100만원)
-            if total_cash > 1000000: total_cash = 1000000
+            # 고정 시드머니 설정 (10만원대 날리기)
+            b = 1000000
+            b = total_cash % b
+            
+            if total_cash > b:
+                total_cash -= b
 
             for sym in symbol_list: # 초기화
                 message_list += f"[{symbol_list[sym]['종목명']}]\n"
