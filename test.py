@@ -59,7 +59,7 @@ formatted_amount = "{:,.0f}원".format(aaa())
 print(formatted_amount)
 
 try:
-    total_cash = 5234560
+    total_cash = 9234560
     b = 5000000
     b = total_cash % b
     
