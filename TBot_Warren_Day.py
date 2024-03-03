@@ -428,9 +428,9 @@ try:
     # profit_rate22 = 1.031
     
     # 익절 기준선
-    profit_rate07 = 1.0055
+    profit_rate07 = 1.0051
     profit_rate12 = 1.0076
-    profit_rate17 = 1.0105
+    profit_rate17 = 1.0101
     profit_rate22 = 1.0126
     
     # 손절 기준선
