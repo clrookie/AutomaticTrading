@@ -246,7 +246,7 @@ try:
             message_list += "\n"
 
             # 고정 시드머니 설정 (10만원대 날리기)
-            b = 1000000
+            b = 5000000
             b = total_cash % b
             
             if total_cash > b:

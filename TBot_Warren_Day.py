@@ -637,7 +637,7 @@ try:
                 total_cash = get_balance() # 보유 현금 조회
 
                 # 고정 시드머니 설정 (100만원대 날리기)
-                b = 10000000
+                b = 5000000
                 b = total_cash % b
                 
                 if total_cash > b:
