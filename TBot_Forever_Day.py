@@ -245,7 +245,7 @@ try:
             message_list += f"현금 잔고: {formatted_amount}\n"
             message_list += "\n"
 
-            # 고정 시드머니 설정 (10만원대 날리기)
+            # 고정 시드머니 설정 (500만원대 잔액 날리기)
             b = 5000000
             b = total_cash % b
             
