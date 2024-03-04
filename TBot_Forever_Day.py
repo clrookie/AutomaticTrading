@@ -215,6 +215,9 @@ try:
         df = pyupbit.get_ohlcv("KRW-BTC", interval="day", count=1)    
         
         if df.index[0].day != last_day:    # 240분 캔들 갱신
+
+            time.sleep(15)
+            
             last_day = df.index[0].day
             
             message_list = ""
