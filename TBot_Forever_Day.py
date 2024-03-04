@@ -216,8 +216,6 @@ try:
         
         if df.index[0].day != last_day:    # 240분 캔들 갱신
 
-            time.sleep(15)
-            
             last_day = df.index[0].day
             
             message_list = ""
@@ -265,9 +263,9 @@ try:
                 formatted_amount = "{:,.1f}원".format(symbol_list[sym]['시가'])
                 message_list += f"- 시가: {formatted_amount}\n"   
 
-                # send_message(f"{sym}111")
+                send_message(f"{sym}")
                 target_price,profit_rate = get_target_price(sym,(((profit_rate22-1)*symbol_list[sym]['익절_가중치'])+1))
-                # send_message("222")
+                send_message("---")
                 
                 symbol_list[sym]['익절_가중치'] *= profit_rate
 
