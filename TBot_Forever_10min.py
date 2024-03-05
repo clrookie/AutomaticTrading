@@ -257,8 +257,10 @@ try:
 
                         # 직전 거래량
                         last_volume = data.iloc[18]['volume']
-                        formatted_amount = "{:,.0f}".format(last_volume)
-                        message_list += f"직전 거래량: {formatted_amount}\n"
+                        avg = last_volume / average_volume
+                        formatted_amount1 = "{:,.0f}".format(last_volume)
+                        formatted_amount2 = "{:,.1f}".format(avg)
+                        message_list += f"직전 거래량: {formatted_amount1} ({formatted_amount2}%)\n"
                         
                         if last_open > last_close: 
                             message_list += "(---음봉---)\n"
@@ -276,7 +278,7 @@ try:
                                     continue
 
                                 symbol_list[sym]['공포상태'] = True
-                                message_list += "!!! 공포상태 !!!\n"
+                                message_list += "!!! 공포패턴 !!!\n"
 
                                 symbol_list[sym]['보유'] = False
                                 symbol_list[sym]['손절_1차'] = False
