@@ -245,18 +245,23 @@ try:
                         # KRW-BTC 페어의 10분봉 데이터 가져오기 (최근 20봉)
                         data = pyupbit.get_ohlcv(sym, interval="minute10", count=20)
 
-                        # 평균 거래량 계산
-                        average_volume = data['volume'].mean()
-                        message_list += f"평균 거래량: {average_volume}\n"
-
-                        # 직전 거래량
-                        last_volume = data.iloc[18]['volume']
-                        message_list += f"직전 거래량: {last_volume}\n"
                         
                         # 음봉일때만
                         last_open = data.iloc[18]['open']
                         last_close = data.iloc[18]['close']
+                        
+                        # 평균 거래량 계산
+                        average_volume = data['volume'].mean()
+                        formatted_amount = "{:,.0f}".format(average_volume)
+                        message_list += f"평균 거래량: {formatted_amount}\n"
+
+                        # 직전 거래량
+                        last_volume = data.iloc[18]['volume']
+                        formatted_amount = "{:,.0f}".format(last_volume)
+                        message_list += f"직전 거래량: {formatted_amount}\n"
+                        
                         if last_open > last_close: 
+                            message_list += "(---음봉---)\n"
 
                             # 공포상태 체크
                             if last_volume > (average_volume*3):
@@ -267,6 +272,7 @@ try:
                                 last2_volume = data.iloc[17]['volume']
                                 if last2_open < last2_close and last2_volume > last_volume:
                                     message_list += "!!! 상투 패턴이라 패스 !!!\n"
+                                    message_list += "---------------------------------\n"
                                     continue
 
                                 symbol_list[sym]['공포상태'] = True
@@ -282,7 +288,10 @@ try:
                                 symbol_list[sym]['profit_rate_touch'] = 1.01
                                 symbol_list[sym]['profit_rate_last'] = 1.01
                                 symbol_list[sym]['익절준비'] = False
-                    
+
+                        else:
+                            message_list += "(+++양봉+++)\n"
+
                 message_list += "---------------------------------\n"
             
             formatted_amount = "{:,.0f}원".format(total_cash)
