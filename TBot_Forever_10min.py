@@ -257,9 +257,9 @@ try:
 
                         # 직전 거래량
                         last_volume = data.iloc[18]['volume']
-                        avg = last_volume / average_volume
+                        avg = (last_volume / average_volume) * 100
                         formatted_amount1 = "{:,.0f}".format(last_volume)
-                        formatted_amount2 = "{:,.1f}".format(avg)
+                        formatted_amount2 = "{:,.0f}".format(avg)
                         message_list += f"직전 거래량: {formatted_amount1} ({formatted_amount2}%)\n"
                         
                         if last_open > last_close: 
