@@ -200,12 +200,6 @@ try:
         if df.index[0].minute != last_min:    # 10분 캔들 갱신
 
             last_min = df.index[0].minute
-            
-            # 착수 상태로 변경
-            # 10초 인터벌 분할매수
-            # 익절 코드
-            # 상태 초기화
-
 
             message_list = ""
             message_list += f"=== 코인거래 10분봉 갱신합니다 === ({last_min}분)\n"
@@ -259,16 +253,18 @@ try:
                             # 평균 거래량 계산
                             average_volume = data['volume'].mean()
 
+                            # 직전 거래량
+                            last_volume = data.iloc[18]['volume']
+
+                            # 전전 정보
                             last2_open = data.iloc[17]['open']
                             last2_close = data.iloc[17]['close']
                             last2_volume = data.iloc[17]['volume']
 
-                            if last2_open < last2_close and last2_volume > (average_volume*2):
-                                message_list += "!!! 상투 공포라 패스 !!!\n"
+                            if last2_open < last2_close and last2_volume > last_volume:
+                                message_list += "!!! 상투 패턴이라 패스 !!!\n"
                                 continue
 
-                            # 직전 거래량
-                            last_volume = data.iloc[18]['volume']
 
                             # 공포상태 체크
                             if last_volume > (average_volume*3):
