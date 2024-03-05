@@ -428,15 +428,15 @@ try:
     # profit_rate22 = 1.031
     
     # 익절 기준선
-    profit_rate07 = 1.0091
-    profit_rate12 = 1.0131
-    profit_rate17 = 1.0171
-    profit_rate22 = 1.0211
+    profit_rate07 = 1.0066
+    profit_rate12 = 1.0091
+    profit_rate17 = 1.0111
+    profit_rate22 = 1.0131
     
     # 손절 기준선
-    loss_cut1 = 0.9875
-    loss_cut2 = 0.9850
-    loss_cut3 = 0.9825
+    loss_cut1 = 0.992
+    loss_cut2 = 0.990
+    loss_cut3 = 0.988
 
     # 익절비율
     sell_rate = 0.2
