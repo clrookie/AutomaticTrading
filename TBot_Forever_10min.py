@@ -128,6 +128,11 @@ try:
     loss_cut2 = 0.990
     loss_cut3 = 0.989
 
+    # 손절 기준선
+    # loss_cut1 = 0.999
+    # loss_cut2 = 0.998
+    # loss_cut3 = 0.997
+
     # 익절비율
     sell_rate = 0.2
     
@@ -157,8 +162,8 @@ try:
     '손절청산': False,
     '익절청산': False,
         
-    'profit_rate_touch': 1.01,
-    'profit_rate_last': 1.01
+    'profit_rate_touch': 1.005,
+    'profit_rate_last': 1.005
     }
 
     #개별 종목 데이터
@@ -214,7 +219,7 @@ try:
 
             total_cash = get_balance("KRW") # 현금잔고 조회
             
-            total_cash /= 5 # 임시코드
+            total_cash /= 10 # 임시코드
         
             formatted_amount = "{:,.0f}원".format(total_cash)
             message_list += f"현금잔고: {formatted_amount}\n"
@@ -232,11 +237,26 @@ try:
             for sym in symbol_list: # 초기화
                 message_list += f"[{symbol_list[sym]['종목명']}]\n"
 
+                symbol_list[sym]['배분예산'] = round((total_cash * (1/target_buy_count) * symbol_list[sym]['예산_가중치']),2)
+                formatted_amount = "{:,.1f}원".format(symbol_list[sym]['배분예산'])
+                message_list += f"배분예산: {formatted_amount}\n"
+                    
                 qty = get_balance(symbol_list[sym]['매도티커'])
                 if qty > 0:
-                    message_list += f"보유 수량: {qty}개\n"
+                    
+                    symbol_list[sym]['보유'] = True
                     
                     current_price = get_current_price(sym)
+                    formatted_amount = "{:,.1f}원".format(current_price)
+                    message_list += f"현재가: {formatted_amount}\n"
+                    
+                    avg_price = upbit.get_avg_buy_price(sym)
+                    formatted_amount = "{:,.1f}원".format(avg_price)
+                    formatted_amount1 = "{:,.1f}%".format(current_price/avg_price*100)
+                    message_list += f"평단가: {formatted_amount} ({formatted_amount1})\n"
+                    
+                    message_list += f"보유 수량: {qty}개\n"
+
                     total = current_price * qty
                     formatted_amount = "{:,.0f}원".format(total)
                     message_list += f"보유 잔고: {formatted_amount}\n"
@@ -245,10 +265,10 @@ try:
                 else:
 
                     if symbol_list[sym]['공포상태'] == False:
+
                         # KRW-BTC 페어의 10분봉 데이터 가져오기 (최근 20봉)
                         data = pyupbit.get_ohlcv(sym, interval="minute10", count=20)
 
-                        
                         # 음봉일때만
                         last_open = data.iloc[18]['open']
                         last_close = data.iloc[18]['close']
@@ -269,7 +289,7 @@ try:
                             message_list += "(---음봉---)\n"
 
                             # 공포상태 체크
-                            if last_volume > (average_volume*3):
+                            if last_volume > (average_volume*1):
                                 
                                 # 전전 정보
                                 last2_open = data.iloc[17]['open']
@@ -290,8 +310,8 @@ try:
                                 symbol_list[sym]['매수카운트'] = 0
                                 symbol_list[sym]['매수최대량'] = 0
 
-                                symbol_list[sym]['profit_rate_touch'] = 1.01
-                                symbol_list[sym]['profit_rate_last'] = 1.01
+                                symbol_list[sym]['profit_rate_touch'] = 1.005
+                                symbol_list[sym]['profit_rate_last'] = 1.005
                                 symbol_list[sym]['익절준비'] = False
 
                         else:
@@ -395,7 +415,7 @@ try:
 
                         if qty > 0:
                             
-                            sell_qty = math.floor(symbol_list[sym]['매수최대량'] * sell_rate * 1000)/1000 # 소수점 3자리 반내림
+                            sell_qty = symbol_list[sym]['매수최대량'] * sell_rate
 
                             if(sell_qty < 0.001): sell_qty = 0.001
 
@@ -423,11 +443,10 @@ try:
                         if qty > 0:
                             
                             total_qty = qty
-                            qty = float(qty) * 0.33 # 분할 손절
+                            sell_qty = float(qty) * 0.33 # 분할 손절
 
-                            sell_qty = math.floor(qty * 1000)/1000 # 소수점 3자리 반내림
-
-                            if(sell_qty < 0.001): sell_qty = 0.001
+                            # sell_qty = math.floor(qty * 1000)/1000 # 소수점 3자리 반내림
+                            # if(sell_qty < 0.001): sell_qty = 0.001
                             
                             send_message(f"[{symbol_list[sym]['종목명']}]: 1차 손절매 ({sell_qty}/{total_qty}개)")
                             
@@ -448,10 +467,10 @@ try:
                         if qty > 0:
                             
                             total_qty = qty
-                            qty = float(qty) * 0.5 # 분할 손절
+                            sell_qty = float(qty) * 0.5 # 분할 손절
                             
-                            sell_qty = math.floor(qty * 1000)/1000 # 소수점 3자리 반내림
-                            if(sell_qty < 0.001): sell_qty = 0.001
+                            # sell_qty = math.floor(qty * 1000)/1000 # 소수점 3자리 반내림
+                            # if(sell_qty < 0.001): sell_qty = 0.001
                             
                             send_message(f"[{symbol_list[sym]['종목명']}]: 2차 손절매 ({sell_qty}/{total_qty}개)")
                             
