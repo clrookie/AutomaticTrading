@@ -116,7 +116,10 @@ try:
     access = "QBgTbRF0Z3f13iAbzxusZkFu21N7j6M3xfuSsPe3"
     secret = "Kh9Weug6GDkBiT4kLzLdu9jfH7hMntHHs9AZCGVV"
     upbit = pyupbit.Upbit(access, secret)
-    send_message("\n=== 코인거래 초기화 합니다 ===")
+    send_message("")
+    send_message("======================")
+    send_message("=== 코인거래 초기화 ===")
+    send_message("======================")
 
     last_min = 77
     
@@ -202,7 +205,7 @@ try:
             last_min = df.index[0].minute
 
             message_list = ""
-            message_list += f"\n=== 코인거래 10분봉 갱신합니다 === ({last_min}분)\n"
+            message_list += f">>> 코인거래 10분봉 갱신합니다 <<< ({last_min}분)\n"
             message_list += "\n"
 
 
@@ -263,7 +266,7 @@ try:
                         message_list += f"직전 거래량: {formatted_amount1} ({formatted_amount2}%)\n"
                         
                         if last_open > last_close: 
-                            message_list += f"{"\033[94m"}(---음봉---){"\033[0m"}\n"
+                            message_list += "(---음봉---)\n"
 
                             # 공포상태 체크
                             if last_volume > (average_volume*3):
