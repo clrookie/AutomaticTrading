@@ -245,29 +245,30 @@ try:
                         # KRW-BTC 페어의 10분봉 데이터 가져오기 (최근 20봉)
                         data = pyupbit.get_ohlcv(sym, interval="minute10", count=20)
 
+                        # 평균 거래량 계산
+                        average_volume = data['volume'].mean()
+                        message_list += f"평균 거래량: {average_volume}\n"
+
+                        # 직전 거래량
+                        last_volume = data.iloc[18]['volume']
+                        message_list += f"직전 거래량: {last_volume}\n"
+                        
                         # 음봉일때만
                         last_open = data.iloc[18]['open']
                         last_close = data.iloc[18]['close']
                         if last_open > last_close: 
-                        
-                            # 평균 거래량 계산
-                            average_volume = data['volume'].mean()
-
-                            # 직전 거래량
-                            last_volume = data.iloc[18]['volume']
-
-                            # 전전 정보
-                            last2_open = data.iloc[17]['open']
-                            last2_close = data.iloc[17]['close']
-                            last2_volume = data.iloc[17]['volume']
-
-                            if last2_open < last2_close and last2_volume > last_volume:
-                                message_list += "!!! 상투 패턴이라 패스 !!!\n"
-                                continue
-
 
                             # 공포상태 체크
                             if last_volume > (average_volume*3):
+                                
+                                # 전전 정보
+                                last2_open = data.iloc[17]['open']
+                                last2_close = data.iloc[17]['close']
+                                last2_volume = data.iloc[17]['volume']
+                                if last2_open < last2_close and last2_volume > last_volume:
+                                    message_list += "!!! 상투 패턴이라 패스 !!!\n"
+                                    continue
+
                                 symbol_list[sym]['공포상태'] = True
                                 message_list += "!!! 공포상태 !!!\n"
 
