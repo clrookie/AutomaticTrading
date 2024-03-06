@@ -134,7 +134,7 @@ try:
     # loss_cut3 = 0.997
 
     # 익절비율
-    sell_rate = 0.2
+    sell_rate = 0.35
     
     # 매수
     buy_rate = 0.33
