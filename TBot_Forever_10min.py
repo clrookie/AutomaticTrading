@@ -139,7 +139,7 @@ try:
     # 매수
     buy_rate = 0.33
     buy_max_cnt = 3
-    buy_interval = 0.2
+    buy_interval = 0.05
     
     previous_time = datetime.datetime.now()
 
