@@ -162,8 +162,8 @@ try:
     '손절청산': False,
     '익절청산': False,
         
-    'profit_rate_touch': 1.005,
-    'profit_rate_last': 1.005
+    'profit_rate_touch': 1.007,
+    'profit_rate_last': 1.007
     }
 
     #개별 종목 데이터
@@ -321,8 +321,8 @@ try:
                             symbol_list[sym]['매수카운트'] = 0
                             symbol_list[sym]['매수최대량'] = 0
 
-                            symbol_list[sym]['profit_rate_touch'] = 1.005
-                            symbol_list[sym]['profit_rate_last'] = 1.005
+                            symbol_list[sym]['profit_rate_touch'] = 1.007
+                            symbol_list[sym]['profit_rate_last'] = 1.007
                             symbol_list[sym]['익절준비'] = False
 
                     else:
@@ -350,8 +350,8 @@ try:
                             symbol_list[sym]['매수카운트'] = 0
                             symbol_list[sym]['매수최대량'] = 0
 
-                            symbol_list[sym]['profit_rate_touch'] = 1.005
-                            symbol_list[sym]['profit_rate_last'] = 1.005
+                            symbol_list[sym]['profit_rate_touch'] = 1.007
+                            symbol_list[sym]['profit_rate_last'] = 1.007
                             symbol_list[sym]['익절준비'] = False
 
                 message_list += "---------------------------------\n"
@@ -436,14 +436,14 @@ try:
                         # 로그 추가
                         send_message(f"{symbol_list[sym]['종목명']} 익절 터치값 ({symbol_list[sym]['profit_rate_touch']}%)")
 
-                        symbol_list[sym]['profit_rate_last'] = symbol_list[sym]['profit_rate_touch'] - 0.001
-                        symbol_list[sym]['profit_rate_touch'] += 0.005
+                        symbol_list[sym]['profit_rate_last'] = symbol_list[sym]['profit_rate_touch'] - 0.0015
+                        symbol_list[sym]['profit_rate_touch'] += 0.0045
                         symbol_list[sym]['익절준비'] = True
 
                     # 하향 익절
                     elif symbol_list[sym]['익절준비'] == True and current_price <= avg_price * symbol_list[sym]['profit_rate_last']:
-                        symbol_list[sym]['profit_rate_last'] -= 0.001
-                        symbol_list[sym]['profit_rate_touch'] -= 0.001
+                        symbol_list[sym]['profit_rate_last'] -= 0.0015
+                        symbol_list[sym]['profit_rate_touch'] -= 0.0015
                         sell_fix = True
 
 
