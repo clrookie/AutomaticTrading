@@ -611,7 +611,7 @@ try:
         else:
             t_now = datetime.datetime.now()
             
-            t_start = t_now.replace(hour=9, minute=4, second=0, microsecond=0)
+            t_start = t_now.replace(hour=9, minute=10, second=0, microsecond=0)
             t_930 = t_now.replace(hour=9, minute=30, second=0, microsecond=0)
             t_1510 = t_now.replace(hour=15, minute=10, second=0,microsecond=0)
             t_exit = t_now.replace(hour=15, minute=17, second=0,microsecond=0)
