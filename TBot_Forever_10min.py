@@ -128,7 +128,7 @@ try:
     loss_cut2 = 0.990
     loss_cut3 = 0.989
 
-    # 손절 기준선
+    # 손절 기준선 (테스트용)
     # loss_cut1 = 0.999
     # loss_cut2 = 0.998
     # loss_cut3 = 0.997
@@ -200,6 +200,16 @@ try:
     }
 
 
+    for sym in symbol_list: # 있으면 일괄 매도
+        coin = get_balance(symbol_list[sym]['매도티커'])  # 보유량
+        if coin >= 0.001 : # 최소 거래량
+            sell_result = upbit.sell_market_order(sym, coin)
+            if sell_result is not None:
+                send_message(f"[{symbol_list[sym]['종목명']}] {coin} 전량 매도했습니다~")
+            else:
+                send_message(f"[{symbol_list[sym]['매도티커']}] 매도실패 ({sell_result})")
+
+
     while True:
         
         df = pyupbit.get_ohlcv("KRW-BTC", interval="minute10", count=1)    
@@ -242,14 +252,17 @@ try:
                 message_list += f"배분예산: {formatted_amount}\n"
                     
                 qty = get_balance(symbol_list[sym]['매도티커'])
-                if qty > 0:
+                
+                current_price = get_current_price(sym)
+                current_total = current_price * qty
+
+                if current_total >= 5000: # 최소 주문 가격 이상일 때
                     
                     symbol_list[sym]['보유'] = True
-                    
-                    current_price = get_current_price(sym)
+
                     formatted_amount = "{:,.1f}원".format(current_price)
                     message_list += f"현재가: {formatted_amount}\n"
-                    
+
                     avg_price = upbit.get_avg_buy_price(sym)
                     formatted_amount = "{:,.1f}원".format(avg_price)
                     formatted_amount1 = "{:,.1f}%".format(current_price/avg_price*100)
@@ -259,63 +272,87 @@ try:
 
                     total = current_price * qty
                     formatted_amount = "{:,.0f}원".format(total)
-                    message_list += f"보유 잔고: {formatted_amount}\n"
+                    message_list += f"보유 잔고: {formatted_amount}\n\n"
                     total_cash += total
 
-                else:
+                elif symbol_list[sym]['공포상태'] == False:
 
-                    if symbol_list[sym]['공포상태'] == False:
+                    # KRW-BTC 페어의 10분봉 데이터 가져오기 (최근 20봉)
+                    data = pyupbit.get_ohlcv(sym, interval="minute10", count=20)
 
-                        # KRW-BTC 페어의 10분봉 데이터 가져오기 (최근 20봉)
-                        data = pyupbit.get_ohlcv(sym, interval="minute10", count=20)
+                    # 음봉일때만
+                    last_open = data.iloc[18]['open']
+                    last_close = data.iloc[18]['close']
+                    
+                    # 평균 거래량 계산
+                    average_volume = data['volume'].mean()
+                    formatted_amount = "{:,.0f}".format(average_volume)
+                    message_list += f"평균 거래량: {formatted_amount}\n"
 
-                        # 음봉일때만
-                        last_open = data.iloc[18]['open']
-                        last_close = data.iloc[18]['close']
+                    # 직전 거래량
+                    last_volume = data.iloc[18]['volume']
+                    avg = (last_volume / average_volume) * 100
+                    formatted_amount1 = "{:,.0f}".format(last_volume)
+                    formatted_amount2 = "{:,.0f}".format(avg)
+                    message_list += f"직전 거래량: {formatted_amount1} ({formatted_amount2}%)\n"
+                    
+                    if last_open > last_close: 
+                        message_list += "(---음봉---)\n"
+
+                        # 공포상태 체크
+                        if last_volume > (average_volume*3):
+                            
+                            # 전전 정보
+                            last2_open = data.iloc[17]['open']
+                            last2_close = data.iloc[17]['close']
+                            last2_volume = data.iloc[17]['volume']
+                            if last2_open < last2_close and last2_volume > average_volume*2:
+                                message_list += "!!! 상투 패턴이라 패스 !!!\n"
+                                message_list += "---------------------------------\n"
+                                continue
+
+                            symbol_list[sym]['공포상태'] = True
+                            message_list += "!-!-!-! 공포패턴 !-!-!-!\n"
+
+                            symbol_list[sym]['보유'] = False
+                            symbol_list[sym]['손절_1차'] = False
+                            symbol_list[sym]['손절_2차'] = False
+                            symbol_list[sym]['손절_3차'] = False
+                            symbol_list[sym]['매수카운트'] = 0
+                            symbol_list[sym]['매수최대량'] = 0
+
+                            symbol_list[sym]['profit_rate_touch'] = 1.005
+                            symbol_list[sym]['profit_rate_last'] = 1.005
+                            symbol_list[sym]['익절준비'] = False
+
+                    else:
+                        message_list += "(+++양봉+++)\n"
                         
-                        # 평균 거래량 계산
-                        average_volume = data['volume'].mean()
-                        formatted_amount = "{:,.0f}".format(average_volume)
-                        message_list += f"평균 거래량: {formatted_amount}\n"
+                        # 탐욕상태 체크
+                        if last_volume > (average_volume*2):
+                            
+                            # 전전 정보
+                            last2_open = data.iloc[17]['open']
+                            last2_close = data.iloc[17]['close']
+                            last2_volume = data.iloc[17]['volume']
+                            if last2_open < last2_close:
+                                message_list += "!!! 상투 패턴이라 패스 !!!\n"
+                                message_list += "---------------------------------\n"
+                                continue
+                            
+                            symbol_list[sym]['공포상태'] = True
+                            message_list += "!+!+!+! 탐욕패턴 !+!+!+!\n"
 
-                        # 직전 거래량
-                        last_volume = data.iloc[18]['volume']
-                        avg = (last_volume / average_volume) * 100
-                        formatted_amount1 = "{:,.0f}".format(last_volume)
-                        formatted_amount2 = "{:,.0f}".format(avg)
-                        message_list += f"직전 거래량: {formatted_amount1} ({formatted_amount2}%)\n"
-                        
-                        if last_open > last_close: 
-                            message_list += "(---음봉---)\n"
+                            symbol_list[sym]['보유'] = False
+                            symbol_list[sym]['손절_1차'] = False
+                            symbol_list[sym]['손절_2차'] = False
+                            symbol_list[sym]['손절_3차'] = False
+                            symbol_list[sym]['매수카운트'] = 0
+                            symbol_list[sym]['매수최대량'] = 0
 
-                            # 공포상태 체크
-                            if last_volume > (average_volume*1):
-                                
-                                # 전전 정보
-                                last2_open = data.iloc[17]['open']
-                                last2_close = data.iloc[17]['close']
-                                last2_volume = data.iloc[17]['volume']
-                                if last2_open < last2_close and last2_volume > last_volume:
-                                    message_list += "!!! 상투 패턴이라 패스 !!!\n"
-                                    message_list += "---------------------------------\n"
-                                    continue
-
-                                symbol_list[sym]['공포상태'] = True
-                                message_list += "!!! 공포패턴 !!!\n"
-
-                                symbol_list[sym]['보유'] = False
-                                symbol_list[sym]['손절_1차'] = False
-                                symbol_list[sym]['손절_2차'] = False
-                                symbol_list[sym]['손절_3차'] = False
-                                symbol_list[sym]['매수카운트'] = 0
-                                symbol_list[sym]['매수최대량'] = 0
-
-                                symbol_list[sym]['profit_rate_touch'] = 1.005
-                                symbol_list[sym]['profit_rate_last'] = 1.005
-                                symbol_list[sym]['익절준비'] = False
-
-                        else:
-                            message_list += "(+++양봉+++)\n"
+                            symbol_list[sym]['profit_rate_touch'] = 1.005
+                            symbol_list[sym]['profit_rate_last'] = 1.005
+                            symbol_list[sym]['익절준비'] = False
 
                 message_list += "---------------------------------\n"
             
@@ -409,7 +446,7 @@ try:
                         sell_fix = True
 
 
-                    # 익절하거나 손절하거나 if절
+                    # 익절하거나
                     if sell_fix:
                         qty = get_balance(symbol_list[sym]['매도티커']) # 보유주식 정보 최신화 
 
