@@ -306,7 +306,7 @@ try:
                             last2_open = data.iloc[17]['open']
                             last2_close = data.iloc[17]['close']
                             last2_volume = data.iloc[17]['volume']
-                            if last2_open < last2_close and last2_volume > average_volume*2:
+                            if last2_open < last2_close and last2_volume > average_volume*1.5:
                                 message_list += "!!! 상투 패턴이라 패스 !!!\n"
                                 message_list += "---------------------------------\n"
                                 continue
@@ -335,7 +335,7 @@ try:
                             last2_open = data.iloc[17]['open']
                             last2_close = data.iloc[17]['close']
                             last2_volume = data.iloc[17]['volume']
-                            if last2_open < last2_close:
+                            if last2_volume > average_volume*1.5:
                                 message_list += "!!! 상투 패턴이라 패스 !!!\n"
                                 message_list += "---------------------------------\n"
                                 continue
