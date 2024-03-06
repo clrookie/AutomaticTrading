@@ -139,7 +139,7 @@ try:
     # 매수
     buy_rate = 0.33
     buy_max_cnt = 3
-    buy_interval = 0.05
+    buy_interval = 0.2
     
     previous_time = datetime.datetime.now()
 
@@ -548,7 +548,7 @@ try:
 
         # for문 끝 라인..
                                 
-        time.sleep(1)
+        time.sleep(0.2)
         t_now = datetime.datetime.now()
 
 except Exception as e:
