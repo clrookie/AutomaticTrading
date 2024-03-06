@@ -137,9 +137,9 @@ try:
     sell_rate = 0.2
     
     # 매수
-    buy_rate = 0.2
-    buy_max_cnt = 5
-    buy_interval = 5
+    buy_rate = 0.33
+    buy_max_cnt = 3
+    buy_interval = 0.2
     
     previous_time = datetime.datetime.now()
 
@@ -300,7 +300,7 @@ try:
                         message_list += "(---음봉---)\n"
 
                         # 공포상태 체크
-                        if last_volume > (average_volume*3):
+                        if last_volume > (average_volume*1.5):
                             
                             # 전전 정보
                             last2_open = data.iloc[17]['open']
@@ -329,7 +329,7 @@ try:
                         message_list += "(+++양봉+++)\n"
                         
                         # 탐욕상태 체크
-                        if last_volume > (average_volume*2):
+                        if last_volume > (average_volume*1.5):
                             
                             # 전전 정보
                             last2_open = data.iloc[17]['open']
@@ -443,6 +443,7 @@ try:
                     # 하향 익절
                     elif symbol_list[sym]['익절준비'] == True and current_price <= avg_price * symbol_list[sym]['profit_rate_last']:
                         symbol_list[sym]['profit_rate_last'] -= 0.001
+                        symbol_list[sym]['profit_rate_touch'] -= 0.001
                         sell_fix = True
 
 
