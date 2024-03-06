@@ -229,7 +229,7 @@ try:
 
             total_cash = get_balance("KRW") # 현금잔고 조회
             
-            total_cash /= 10 # 임시코드
+            total_cash /= 5 # 임시코드
         
             formatted_amount = "{:,.0f}원".format(total_cash)
             message_list += f"현금잔고: {formatted_amount}\n"
@@ -300,7 +300,7 @@ try:
                         message_list += "(---음봉---)\n"
 
                         # 공포상태 체크
-                        if last_volume > (average_volume*1.5):
+                        if last_volume > (average_volume*2):
                             
                             # 전전 정보
                             last2_open = data.iloc[17]['open']
@@ -329,7 +329,7 @@ try:
                         message_list += "(+++양봉+++)\n"
                         
                         # 탐욕상태 체크
-                        if last_volume > (average_volume*1.5):
+                        if last_volume > (average_volume*2):
                             
                             # 전전 정보
                             last2_open = data.iloc[17]['open']
