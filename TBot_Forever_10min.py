@@ -236,7 +236,7 @@ try:
             message_list += "\n"
 
             # 고정 시드머니 설정 (500만원대 잔액 날리기)
-            b = 5000000
+            b = 1000000
             b = total_cash % b
             
             if total_cash > b:
@@ -294,10 +294,10 @@ try:
                     avg = (last_volume / average_volume) * 100
                     formatted_amount1 = "{:,.0f}".format(last_volume)
                     formatted_amount2 = "{:,.0f}".format(avg)
-                    message_list += f"직전 거래량: {formatted_amount1} ({formatted_amount2}%)\n"
+                    message_list += f"직전 거래량: {formatted_amount1} ({formatted_amount2}%) - "
                     
                     if last_open > last_close: 
-                        message_list += "(---음봉---)\n"
+                        message_list += "(---음봉---)\n\n"
 
                         # 공포상태 체크
                         if last_volume > (average_volume*2):
