@@ -287,7 +287,7 @@ try:
                     # 평균 거래량 계산
                     average_volume = data['volume'].mean()
                     formatted_amount = "{:,.0f}".format(average_volume)
-                    message_list += f"평균: {formatted_amount}"
+                    message_list += f"평균: {formatted_amount} | "
 
                     # 직전 거래량
                     last_volume = data.iloc[18]['volume']
