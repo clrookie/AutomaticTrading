@@ -229,11 +229,11 @@ try:
 
             total_cash = get_balance("KRW") # 현금잔고 조회
             
-            total_cash /= 5 # 임시코드
-        
             formatted_amount = "{:,.0f}원".format(total_cash)
             message_list += f"현금잔고: {formatted_amount}\n"
             message_list += "\n"
+            
+            total_cash /= 5 # 임시코드
 
             # 고정 시드머니 설정 (500만원대 잔액 날리기)
             b = 1000000
@@ -287,14 +287,14 @@ try:
                     # 평균 거래량 계산
                     average_volume = data['volume'].mean()
                     formatted_amount = "{:,.0f}".format(average_volume)
-                    message_list += f"평균 거래량: {formatted_amount}\n"
+                    message_list += f"평균: {formatted_amount}"
 
                     # 직전 거래량
                     last_volume = data.iloc[18]['volume']
                     avg = (last_volume / average_volume) * 100
                     formatted_amount1 = "{:,.0f}".format(last_volume)
                     formatted_amount2 = "{:,.0f}".format(avg)
-                    message_list += f"직전 거래량: {formatted_amount1} ({formatted_amount2}%) - "
+                    message_list += f"직전: {formatted_amount1} ({formatted_amount2}%) - "
                     
                     if last_open > last_close: 
                         message_list += "(---음봉---)\n\n"
@@ -312,7 +312,7 @@ try:
                                 continue
 
                             symbol_list[sym]['공포상태'] = True
-                            message_list += "!-!-!-! 공포패턴 !-!-!-!\n"
+                            message_list += ">>>>>>>>>>>> !-!-!-! 공포패턴 !-!-!-! <<<<<<<<<<<<<\n"
 
                             symbol_list[sym]['보유'] = False
                             symbol_list[sym]['손절_1차'] = False
@@ -326,7 +326,7 @@ try:
                             symbol_list[sym]['익절준비'] = False
 
                     else:
-                        message_list += "(+++양봉+++)\n"
+                        message_list += "(+++양봉+++)\n\n"
                         
                         # # 탐욕상태 체크
                         # if last_volume > (average_volume*2):
