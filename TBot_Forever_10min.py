@@ -162,8 +162,8 @@ try:
     '손절청산': False,
     '익절청산': False,
         
-    'profit_rate_touch': 1.007,
-    'profit_rate_last': 1.007
+    'profit_rate_touch': 1.03,
+    'profit_rate_last': 1.03
     }
 
     #개별 종목 데이터
@@ -228,6 +228,7 @@ try:
 
 
             total_cash = get_balance("KRW") # 현금잔고 조회
+            temp_total_cash = total_cash
             
             formatted_amount = "{:,.0f}원".format(total_cash)
             message_list += f"현금잔고: {formatted_amount}\n"
@@ -273,7 +274,7 @@ try:
                     total = current_price * qty
                     formatted_amount = "{:,.0f}원".format(total)
                     message_list += f"보유 잔고: {formatted_amount}\n\n"
-                    total_cash += total
+                    temp_total_cash += total
 
                 elif symbol_list[sym]['공포상태'] == False:
 
@@ -321,8 +322,8 @@ try:
                             symbol_list[sym]['매수카운트'] = 0
                             symbol_list[sym]['매수최대량'] = 0
 
-                            symbol_list[sym]['profit_rate_touch'] = 1.007
-                            symbol_list[sym]['profit_rate_last'] = 1.007
+                            symbol_list[sym]['profit_rate_touch'] = 1.03
+                            symbol_list[sym]['profit_rate_last'] = 1.03
                             symbol_list[sym]['익절준비'] = False
 
                     else:
@@ -356,8 +357,8 @@ try:
 
                 message_list += "---------------------------------\n"
             
-            formatted_amount = "{:,.0f}원".format(total_cash)
-            message_list += f"총 보유 잔고: {formatted_amount}\n\n"
+            formatted_amount = "{:,.0f}원".format(temp_total_cash)
+            message_list += f"\n\n총 보유 잔고: {formatted_amount}\n\n"
 
             previous_time = datetime.datetime.now()
 
@@ -436,14 +437,14 @@ try:
                         # 로그 추가
                         send_message(f"{symbol_list[sym]['종목명']} 익절 터치값 ({symbol_list[sym]['profit_rate_touch']}%)")
 
-                        symbol_list[sym]['profit_rate_last'] = symbol_list[sym]['profit_rate_touch'] - 0.0015
-                        symbol_list[sym]['profit_rate_touch'] += 0.0045
+                        symbol_list[sym]['profit_rate_last'] = symbol_list[sym]['profit_rate_touch'] - 0.005
+                        symbol_list[sym]['profit_rate_touch'] += 0.02
                         symbol_list[sym]['익절준비'] = True
 
                     # 하향 익절
                     elif symbol_list[sym]['익절준비'] == True and current_price <= avg_price * symbol_list[sym]['profit_rate_last']:
-                        symbol_list[sym]['profit_rate_last'] -= 0.0015
-                        symbol_list[sym]['profit_rate_touch'] -= 0.0015
+                        symbol_list[sym]['profit_rate_last'] -= 0.005
+                        symbol_list[sym]['profit_rate_touch'] -= 0.005
                         sell_fix = True
 
 
