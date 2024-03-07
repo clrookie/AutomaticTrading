@@ -328,31 +328,31 @@ try:
                     else:
                         message_list += "(+++양봉+++)\n"
                         
-                        # 탐욕상태 체크
-                        if last_volume > (average_volume*2):
+                        # # 탐욕상태 체크
+                        # if last_volume > (average_volume*2):
                             
-                            # 전전 정보
-                            last2_open = data.iloc[17]['open']
-                            last2_close = data.iloc[17]['close']
-                            last2_volume = data.iloc[17]['volume']
-                            if last2_volume > average_volume*1.5:
-                                message_list += "!!! 상투 패턴이라 패스 !!!\n"
-                                message_list += "---------------------------------\n"
-                                continue
+                        #     # 전전 정보
+                        #     last2_open = data.iloc[17]['open']
+                        #     last2_close = data.iloc[17]['close']
+                        #     last2_volume = data.iloc[17]['volume']
+                        #     if last2_volume > average_volume*1.5:
+                        #         message_list += "!!! 상투 패턴이라 패스 !!!\n"
+                        #         message_list += "---------------------------------\n"
+                        #         continue
                             
-                            symbol_list[sym]['공포상태'] = True
-                            message_list += "!+!+!+! 탐욕패턴 !+!+!+!\n"
+                        #     symbol_list[sym]['공포상태'] = True
+                        #     message_list += "!+!+!+! 탐욕패턴 !+!+!+!\n"
 
-                            symbol_list[sym]['보유'] = False
-                            symbol_list[sym]['손절_1차'] = False
-                            symbol_list[sym]['손절_2차'] = False
-                            symbol_list[sym]['손절_3차'] = False
-                            symbol_list[sym]['매수카운트'] = 0
-                            symbol_list[sym]['매수최대량'] = 0
+                        #     symbol_list[sym]['보유'] = False
+                        #     symbol_list[sym]['손절_1차'] = False
+                        #     symbol_list[sym]['손절_2차'] = False
+                        #     symbol_list[sym]['손절_3차'] = False
+                        #     symbol_list[sym]['매수카운트'] = 0
+                        #     symbol_list[sym]['매수최대량'] = 0
 
-                            symbol_list[sym]['profit_rate_touch'] = 1.007
-                            symbol_list[sym]['profit_rate_last'] = 1.007
-                            symbol_list[sym]['익절준비'] = False
+                        #     symbol_list[sym]['profit_rate_touch'] = 1.007
+                        #     symbol_list[sym]['profit_rate_last'] = 1.007
+                        #     symbol_list[sym]['익절준비'] = False
 
                 message_list += "---------------------------------\n"
             
