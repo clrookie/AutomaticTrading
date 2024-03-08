@@ -148,14 +148,15 @@ try:
                 data = pyupbit.get_ohlcv(sym, interval="minute10", count=20)
 
 
-                # 10분봉 데이터 가져오기 (최근 60봉)
-                data_60 = pyupbit.get_ohlcv(sym, interval="minute10", count=60)
-                average_price_60 = data_60['close'].mean()
+                # # 10분봉 데이터 가져오기 (최근 60봉)
+                # data_60 = pyupbit.get_ohlcv(sym, interval="minute10", count=60)
+                # average_price_60 = data_60['close'].mean()
 
-                # 10분봉 데이터 가져오기 (최근 120봉)
-                data_120 = pyupbit.get_ohlcv(sym, interval="minute10", count=120)
-                average_price_120 = data_120['close'].mean()
-                
+                # # 10분봉 데이터 가져오기 (최근 120봉)
+                # data_120 = pyupbit.get_ohlcv(sym, interval="minute10", count=120)
+                # average_price_120 = data_120['close'].mean()
+                average_price_60 = 1
+                average_price_120 = 0
 
                 # 평균 거래량 계산
                 average_volume = data['volume'].mean()
