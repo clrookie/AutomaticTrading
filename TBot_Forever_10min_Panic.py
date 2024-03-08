@@ -297,7 +297,7 @@ try:
 
         # for문 끝 라인..
                                 
-        # time.sleep(0.2)
+        time.sleep(0.2)
 
 except Exception as e:
     print(e)
