@@ -266,7 +266,7 @@ try:
 
                 message_list += "---------------------------------\n\n"
             
-            formatted_amount = "{:,.0f}원".format(total_temp)
+            formatted_amount = "{:,.0f}원".format(total_cash)
             message_list += f"\n총 보유 잔고: {formatted_amount}\n\n"
 
             send_message(message_list)
