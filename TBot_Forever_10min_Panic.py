@@ -239,7 +239,7 @@ try:
 
 
                         else: # 음봉
-                            message_list += "20 이평선 위 + '음봉' 나가리~\n"
+                            message_list += "120 위 + '음봉' 나가리~\n"
 
                     # 저가 120 이평선 아래        
                     elif last_low < average_price_120:
@@ -284,7 +284,7 @@ try:
                                 message_list += "잔여 예산이 고갈 됐습니다 ㅠ\n"
 
                         else: # 양봉
-                            message_list += "20 이평선 아래 + '양봉' 나가리~\n"
+                            message_list += "120 아래 + '양봉' 나가리~\n"
                              
 
                 message_list += "---------------------------------\n\n"
