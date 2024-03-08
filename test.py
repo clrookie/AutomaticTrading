@@ -2,6 +2,7 @@ import time
 from datetime import datetime, timedelta
 import pyupbit
 import requests
+import math
 
 access = "your-access"
 secret = "your-secret"
@@ -59,8 +60,8 @@ formatted_amount = "{:,.0f}원".format(aaa())
 print(formatted_amount)
 
 try:
-    total_cash = 560
-    b = 5000000
+    total_cash = 13444560
+    b = 1000000
     b = total_cash % b
     
     print(b)
@@ -69,6 +70,14 @@ try:
         total_cash -= b
 
     print(total_cash)
+
+    # 소수점을 올림할 값
+    floating_point_number = 1.001
+
+    # 소수점을 올림하여 정수로 만들기
+    rounded_integer = math.ceil(floating_point_number)
+
+    print(f"올림된 정수: {rounded_integer}")
 
     time.sleep(1)
 except Exception as e:
