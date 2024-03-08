@@ -52,16 +52,10 @@ def aaa():
     aa = 34790.0000
     return int(aa) 
 
-# 초기 시간 설정
-previous_time = datetime.now()
-
-
-formatted_amount = "{:,.0f}원".format(aaa())
-print(formatted_amount)
 
 try:
-    total_cash = 13444560
-    b = 1000000
+    total_cash = 144560
+    b = 40000
     b = total_cash % b
     
     print(b)
@@ -72,10 +66,10 @@ try:
     print(total_cash)
 
     # 소수점을 올림할 값
-    floating_point_number = 1.001
+    floating_point_number = 59999 / 40000
 
     # 소수점을 올림하여 정수로 만들기
-    rounded_integer = math.ceil(floating_point_number)
+    rounded_integer = round(floating_point_number)
 
     print(f"올림된 정수: {rounded_integer}")
 

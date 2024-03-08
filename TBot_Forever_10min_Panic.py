@@ -44,9 +44,11 @@ try:
     
     # 기준 거래량 비율
     volume_rate = 2
+    
 
     
     # 매수
+    allotment_budget = 200000
     buy_rate = 0.2
     buy_max_cnt = 5
 
@@ -98,24 +100,16 @@ try:
             message_list += f">>> 코인거래 10분봉 갱신합니다 <<< ({last_min}분)\n"
             message_list += "\n"
 
-            target_buy_count = int(len(symbol_list)) # 매수종목 수량
+            # target_buy_count = int(len(symbol_list)) # 매수종목 수량
 
             total_cash = get_balance("KRW") # 현금잔고 조회
-            temp_total_cash = total_cash
+            total_temp = total_cash
 
             total_cash /= 5 # 임시 코드
             
             formatted_amount = "{:,.0f}원".format(total_cash)
             message_list += f"현금잔고: {formatted_amount}\n"
 
-            # 고정 시드머니 설정 (100만원대 잔액 날리기)
-            b = 1000000
-            b = total_cash % b
-            
-            if total_cash > b:
-                total_cash -= b
-
-            allotment_budget = round((total_cash * (1/target_buy_count)),2)
             formatted_amount = "{:,.0f}원".format(allotment_budget)
             formatted_amount1 = "{:,.0f}원".format(allotment_budget * buy_rate)
             message_list += f"기준예산: {formatted_amount} (분할매수 {formatted_amount1}) \n"
@@ -138,7 +132,7 @@ try:
                 if current_total >= 5000: # 최소 주문 가격 이상일 때
 
                     # 공포적립,잔여예산 초기화
-                    symbol_list[sym]['공포적립'] = math.ceil(current_total / (allotment_budget * buy_rate))
+                    symbol_list[sym]['공포적립'] += round(current_total / (allotment_budget * buy_rate))
                     symbol_list[sym]['잔여예산'] = allotment_budget - ((allotment_budget * buy_rate) * symbol_list[sym]['공포적립'])
                     if symbol_list[sym]['잔여예산'] < 0: symbol_list[sym]['잔여예산'] = 0
 
@@ -151,7 +145,7 @@ try:
                     formatted_amount = "{:,.0f}원".format(temp)
                     message_list += f"보유 잔고: {formatted_amount} (수량 {qty}개) \n"
 
-                    temp_total_cash += temp
+                    total_temp += temp
                 else:
                     symbol_list[sym]['공포적립'] = 0
                     symbol_list[sym]['잔여예산'] = allotment_budget
@@ -192,16 +186,17 @@ try:
 
                         # 양봉이니?
                         if last_open < last_close:
-                            message_list += "(--- 탐욕 매도 ---)\n\n"
 
                             # 탐욕 매도
                             if symbol_list[sym]['공포적립'] > 0:
 
                                 sell_qty = qty / symbol_list[sym]['공포적립']
-                                symbol_list[sym]['공포적립'] -= 1
 
                                 sell_result = upbit.sell_market_order(sym, sell_qty)
                                 if sell_result is not None:
+                                    
+                                    message_list += "(--- 탐욕 매도 ---)\n\n"
+                                    symbol_list[sym]['공포적립'] -= 1
                                     avg_price = upbit.get_avg_buy_price(sym)
                                     message_list += f"{round(current_price/avg_price,4)}% 탐욕 매도합니다 ^^ ({sell_qty}개)\n"
 
@@ -215,8 +210,8 @@ try:
                                     formatted_amount = "{:,.0f}원".format(total)
                                     message_list += f"갱신 보유 잔고: {formatted_amount}\n"
 
-                                    temp_total_cash -= temp
-                                    temp_total_cash += total
+                                    total_temp -= temp
+                                    total_temp += total
 
                                     message_list += f"공포 적립 변화 : {symbol_list[sym]['공포적립']+1} -> {symbol_list[sym]['공포적립']}개)\n"
                                 else:
@@ -260,8 +255,8 @@ try:
                                     formatted_amount = "{:,.0f}원".format(total)
                                     message_list += f"갱신 보유 잔고: {formatted_amount}\n"
 
-                                    temp_total_cash -= temp
-                                    temp_total_cash += total
+                                    total_temp -= temp
+                                    total_temp += total
 
                                     message_list += f"공포 적립 변화 : {symbol_list[sym]['공포적립']-1} -> {symbol_list[sym]['공포적립']}개)\n"                         
 
@@ -276,7 +271,7 @@ try:
 
                 message_list += "---------------------------------\n\n"
             
-            formatted_amount = "{:,.0f}원".format(temp_total_cash)
+            formatted_amount = "{:,.0f}원".format(total_temp)
             message_list += f"\n총 보유 잔고: {formatted_amount}\n\n"
 
             send_message(message_list)
