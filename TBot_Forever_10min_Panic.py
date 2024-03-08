@@ -147,29 +147,29 @@ try:
                 # 10분봉 데이터 가져오기 (최근 20봉)
                 data = pyupbit.get_ohlcv(sym, interval="minute10", count=20)
                    
-                time.sleep(0.2)
+                time.sleep(0.02)
 
                 # 최근 60봉
-                average_price_60 = 0
+                # data_60 = pyupbit.get_ohlcv(sym, interval="minute10", count=60)
+                # average_price_60 = 0
+
+                # if data_60 is not None:
+                #     average_price_60 = data_60['close'].mean()
+
+                #     time.sleep(0.02)
+
+                # else:
+                #     message_list += "60 이평선 실패 !! \n"
+                #     continue
+
+                # 최근 120봉
+                data_120 = pyupbit.get_ohlcv(sym, interval="minute10", count=120)
                 average_price_120 = 0
-                data_60 = pyupbit.get_ohlcv(sym, interval="minute10", count=60)
 
-                if data_60 is not None:
-                    average_price_60 = data_60['close'].mean()
-
-                    time.sleep(0.2)
-
-                    # 최근 120봉
-                    data_120 = pyupbit.get_ohlcv(sym, interval="minute10", count=120)
-
-                    if data_120 is not None:
-                        average_price_120 = data_120['close'].mean()
-                    else:
-                        message_list += "120 이평선 실패 !! \n"
-                        continue
-
+                if data_120 is not None:
+                    average_price_120 = data_120['close'].mean()
                 else:
-                    message_list += "60 이평선 실패 !! \n"
+                    message_list += "120 이평선 실패 !! \n"
                     continue
                 
                 
@@ -191,14 +191,16 @@ try:
                 # 직전 차트
                 last_open = data.iloc[18]['open']
                 last_close = data.iloc[18]['close']
+                last_high = data.iloc[18]['high']
+                last_low = data.iloc[18]['low']
 
                 # 거래량 변동성 신호
                 if last_volume > (average_volume*volume_rate):
                     
                     message_list += "\n>>>>>>>>>>>> !-!-!-! 변동성 발생 !-!-!-! <<<<<<<<<<<<<\n\n"
 
-                    # 60이 120 위에?
-                    if average_price_60 > average_price_120:
+                    # 고가 120 이평선 위에
+                    if last_high > average_price_120:
 
                         # 양봉이니?
                         if last_open < last_close:
@@ -239,8 +241,8 @@ try:
                         else: # 음봉
                             message_list += "20 이평선 위 + '음봉' 나가리~\n"
 
-                    # 이평선 아래        
-                    else:
+                    # 저가 120 이평선 아래        
+                    elif last_low < average_price_120:
                         # 음봉이니?
                         if last_open > last_close: 
 
@@ -295,7 +297,7 @@ try:
 
         # for문 끝 라인..
                                 
-        time.sleep(0.2)
+        # time.sleep(0.2)
 
 except Exception as e:
     print(e)
