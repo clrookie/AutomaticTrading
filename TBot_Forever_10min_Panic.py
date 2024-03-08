@@ -146,7 +146,8 @@ try:
 
                 # 10분봉 데이터 가져오기 (최근 20봉)
                 data = pyupbit.get_ohlcv(sym, interval="minute10", count=20)
-
+                   
+                time.sleep(0.2)
 
                 # 최근 60봉
                 average_price_60 = 0
@@ -156,6 +157,8 @@ try:
                 if data_60 is not None:
                     average_price_60 = data_60['close'].mean()
 
+                    time.sleep(0.2)
+
                     # 최근 120봉
                     data_120 = pyupbit.get_ohlcv(sym, interval="minute10", count=120)
 
@@ -164,7 +167,7 @@ try:
                     else:
                         message_list += "120 이평선 실패 !! \n"
                         continue
-                    
+
                 else:
                     message_list += "60 이평선 실패 !! \n"
                     continue
