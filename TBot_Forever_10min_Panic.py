@@ -45,21 +45,14 @@ try:
     # 기준 거래량 비율
     volume_rate = 2
     
-
-    
     # 매수
-    allotment_budget = 200000
+    allotment_budget = 1000000
     buy_rate = 0.2
-    buy_max_cnt = 5
 
 
     # 공용 데이터
     common_data ={
     '잔여예산':0,
-        
-    '공포신호': False,
-    '탐욕신호': False,
-
     '공포적립': 0,
     }
 
@@ -103,9 +96,6 @@ try:
             # target_buy_count = int(len(symbol_list)) # 매수종목 수량
 
             total_cash = get_balance("KRW") # 현금잔고 조회
-            total_temp = total_cash
-
-            total_cash /= 5 # 임시 코드
             
             formatted_amount = "{:,.0f}원".format(total_cash)
             message_list += f"현금잔고: {formatted_amount}\n"
@@ -132,7 +122,7 @@ try:
                 if current_total >= 5000: # 최소 주문 가격 이상일 때
 
                     # 공포적립,잔여예산 초기화
-                    symbol_list[sym]['공포적립'] += round(current_total / (allotment_budget * buy_rate))
+                    symbol_list[sym]['공포적립'] = round(current_total / (allotment_budget * buy_rate))
                     symbol_list[sym]['잔여예산'] = allotment_budget - ((allotment_budget * buy_rate) * symbol_list[sym]['공포적립'])
                     if symbol_list[sym]['잔여예산'] < 0: symbol_list[sym]['잔여예산'] = 0
 
@@ -145,7 +135,7 @@ try:
                     formatted_amount = "{:,.0f}원".format(temp)
                     message_list += f"보유 잔고: {formatted_amount} (수량 {qty}개) \n"
 
-                    total_temp += temp
+                    total_cash += temp
                 else:
                     symbol_list[sym]['공포적립'] = 0
                     symbol_list[sym]['잔여예산'] = allotment_budget
@@ -157,8 +147,13 @@ try:
                 # 10분봉 데이터 가져오기 (최근 20봉)
                 data = pyupbit.get_ohlcv(sym, interval="minute10", count=20)
 
-                # 20봉 평균선
-                average_price_20 = data['close'].mean()
+                # 10분봉 데이터 가져오기 (최근 60봉)
+                data_60 = pyupbit.get_ohlcv(sym, interval="minute10", count=60)
+                average_price_60 = data_60['close'].mean()
+
+                # 10분봉 데이터 가져오기 (최근 120봉)
+                data_120 = pyupbit.get_ohlcv(sym, interval="minute10", count=120)
+                average_price_120 = data_120['close'].mean()
 
                 # 평균 거래량 계산
                 average_volume = data['volume'].mean()
@@ -181,8 +176,8 @@ try:
                     
                     message_list += "\n>>>>>>>>>>>> !-!-!-! 변동성 발생 !-!-!-! <<<<<<<<<<<<<\n\n"
 
-                    # 이평선 위
-                    if current_price > average_price_20:
+                    # 60이 120 위에?
+                    if average_price_60 > average_price_120:
 
                         # 양봉이니?
                         if last_open < last_close:
@@ -210,8 +205,8 @@ try:
                                     formatted_amount = "{:,.0f}원".format(total)
                                     message_list += f"갱신 보유 잔고: {formatted_amount}\n"
 
-                                    total_temp -= temp
-                                    total_temp += total
+                                    total_cash -= temp
+                                    total_cash += total
 
                                     message_list += f"공포 적립 변화 : {symbol_list[sym]['공포적립']+1} -> {symbol_list[sym]['공포적립']}개)\n"
                                 else:
@@ -255,8 +250,8 @@ try:
                                     formatted_amount = "{:,.0f}원".format(total)
                                     message_list += f"갱신 보유 잔고: {formatted_amount}\n"
 
-                                    total_temp -= temp
-                                    total_temp += total
+                                    total_cash -= temp
+                                    total_cash += total
 
                                     message_list += f"공포 적립 변화 : {symbol_list[sym]['공포적립']-1} -> {symbol_list[sym]['공포적립']}개)\n"                         
 
