@@ -218,11 +218,11 @@ try:
 
                                 sell_qty = qty / symbol_list[sym]['공포적립']
 
+                                avg_price = upbit.get_avg_buy_price(sym)
                                 sell_result = upbit.sell_market_order(sym, sell_qty)
                                 if sell_result is not None:
                                     
                                     symbol_list[sym]['공포적립'] -= 1
-                                    avg_price = upbit.get_avg_buy_price(sym)
                                     message_list += f"{round(current_price/avg_price,4)}% 탐욕 매도합니다 ^^ ({sell_qty}개)\n"
 
 
