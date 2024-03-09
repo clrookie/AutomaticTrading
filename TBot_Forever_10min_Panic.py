@@ -203,7 +203,7 @@ try:
                 # 거래량 변동성 신호
                 if last_volume > (average_volume*volume_rate):
                     
-                    message_list += "\n>>>>>>>>>>>> !-!-!-! 변동성 발생 !-!-!-! <<<<<<<<<<<<<\n\n"
+                    message_list += ">>>>>>>>>>>> !-!-!-! 변동성 발생 !-!-!-! <<<<<<<<<<<<<\n"
 
                     # 고가 120 이평선 위에
                     if last_high > average_price_20 and last_high > average_price_60 and last_high > average_price_120:
@@ -246,7 +246,7 @@ try:
 
 
                         else: # 음봉
-                            message_list += "20 60 120 위 + '음봉' 나가리~\n"
+                            message_list += "20 60 120 위 ↑↑↑↑ '음봉' 나가리~\n"
 
                     # 저가 120 이평선 아래        
                     elif last_low < average_price_20 and last_low < average_price_60 and last_low < average_price_120:
@@ -292,7 +292,7 @@ try:
                                 message_list += "잔여 예산이 고갈 됐습니다 ㅠ\n"
 
                         else: # 양봉
-                            message_list += "20 60 120 아래 + '양봉' 나가리~\n"
+                            message_list += "20 60 120 아래 ↓↓↓↓ '양봉' 나가리~\n"
                     else: 
                         message_list += "20 60 120 이평선 '조건실패' 나가리~\n"
 
