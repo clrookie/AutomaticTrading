@@ -89,8 +89,8 @@ try:
 
             last_min = df.index[0].minute
 
-            message_list = ""
-            message_list += f">>> 코인거래 10분봉 갱신합니다 <<< ({last_min}분)\n"
+            message_list = "\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+            message_list += f"\n>>> 코인거래 10분봉 갱신합니다 <<< ({last_min}분)\n"
             message_list += "\n"
 
             # target_buy_count = int(len(symbol_list)) # 매수종목 수량
@@ -114,7 +114,7 @@ try:
                 current_price = get_current_price(sym)
                 
                 formatted_amount = "{:,.0f}원".format(current_price)
-                message_list += f"현재가: {formatted_amount} / "
+                message_list += f"현재: {formatted_amount} / "
 
                 qty = get_balance(symbol_list[sym]['매도티커'])
                 current_total = current_price * qty
@@ -129,7 +129,7 @@ try:
                     avg_price = upbit.get_avg_buy_price(sym)
                     formatted_amount = "{:,.1f}원".format(avg_price)
                     formatted_amount1 = "{:,.1f}%".format(current_price/avg_price*100)
-                    message_list += f"평단가: {formatted_amount} ({formatted_amount1})\n"
+                    message_list += f"평단: {formatted_amount} ({formatted_amount1})\n"
                     
                     temp = current_price * qty
                     formatted_amount = "{:,.0f}원".format(temp)
@@ -140,7 +140,7 @@ try:
                     symbol_list[sym]['공포적립'] = 0
                     symbol_list[sym]['잔여예산'] = allotment_budget
 
-                message_list += f"공포 적립: {symbol_list[sym]['공포적립']}개\n"
+                message_list += f"공포 적립: {symbol_list[sym]['공포적립']}개 / "
                 formatted_amount = "{:,.0f}원".format(symbol_list[sym]['잔여예산'])
                 message_list += f"잔여 예산: {formatted_amount}\n\n"
 
@@ -296,10 +296,10 @@ try:
                     else: 
                         message_list += "20 60 120 이평선 '조건실패' 나가리~\n"
 
-                message_list += "---------------------------------\n\n"
+                message_list += "-------------------------------------------\n\n"
             
             formatted_amount = "{:,.0f}원".format(total_cash)
-            message_list += f"\n총 보유 잔고: {formatted_amount}\n\n"
+            message_list += f"총 보유 잔고: {formatted_amount}"
 
             send_message(message_list)
                           
