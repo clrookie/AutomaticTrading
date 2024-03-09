@@ -47,7 +47,7 @@ try:
     
     # 매수
     allotment_budget = 1000000
-    buy_rate = 0.2
+    buy_rate = 0.1
 
 
     # 공용 데이터
@@ -114,7 +114,7 @@ try:
                 current_price = get_current_price(sym)
                 
                 formatted_amount = "{:,.0f}원".format(current_price)
-                message_list += f"현재가: {formatted_amount}\n"
+                message_list += f"현재가: {formatted_amount} / "
 
                 qty = get_balance(symbol_list[sym]['매도티커'])
                 current_total = current_price * qty
@@ -133,7 +133,7 @@ try:
                     
                     temp = current_price * qty
                     formatted_amount = "{:,.0f}원".format(temp)
-                    message_list += f"보유 잔고: {formatted_amount} (수량 {qty}개) \n"
+                    message_list += f"보유 잔고: {formatted_amount}\n"
 
                     total_cash += temp
                 else:
@@ -192,7 +192,7 @@ try:
                 avg = (last_volume / average_volume) * 100
                 formatted_amount1 = "{:,.0f}".format(last_volume)
                 formatted_amount2 = "{:,.0f}".format(avg)
-                message_list += f"직전: {formatted_amount1} ({formatted_amount2}%)\n"
+                message_list += f"직전: {formatted_amount1} [{formatted_amount2}%]\n"
 
                 # 직전 차트
                 last_open = data.iloc[18]['open']
