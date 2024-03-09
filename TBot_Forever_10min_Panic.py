@@ -140,9 +140,9 @@ try:
                     symbol_list[sym]['공포적립'] = 0
                     symbol_list[sym]['잔여예산'] = allotment_budget
 
-                message_list += f"공포 적립: {symbol_list[sym]['공포적립']}개 / "
+                message_list += f"공포 적립: {symbol_list[sym]['공포적립']}개"
                 formatted_amount = "{:,.0f}원".format(symbol_list[sym]['잔여예산'])
-                message_list += f"잔여 예산: {formatted_amount}\n\n"
+                message_list += f" (잔여 예산: {formatted_amount})\n\n"
 
                 
                 average_price_20 = 0
