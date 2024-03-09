@@ -144,36 +144,42 @@ try:
                 formatted_amount = "{:,.0f}원".format(symbol_list[sym]['잔여예산'])
                 message_list += f"잔여 예산: {formatted_amount}\n\n"
 
-                # 10분봉 데이터 가져오기 (최근 20봉)
-                data = pyupbit.get_ohlcv(sym, interval="minute10", count=20)
-                   
-                time.sleep(0.02)
-
-                # 최근 60봉
-                # data_60 = pyupbit.get_ohlcv(sym, interval="minute10", count=60)
-                # average_price_60 = 0
-
-                # if data_60 is not None:
-                #     average_price_60 = data_60['close'].mean()
-
-                #     time.sleep(0.02)
-
-                # else:
-                #     message_list += "60 이평선 실패 !! \n"
-                #     continue
-
-                # 최근 120봉
-                data_120 = pyupbit.get_ohlcv(sym, interval="minute10", count=120)
+                
+                average_price_20 = 0
+                average_price_60 = 0
                 average_price_120 = 0
 
-                if data_120 is not None:
-                    average_price_120 = data_120['close'].mean()
-                else:
-                    message_list += "120 이평선 실패 !! \n"
-                    continue
-                
-                
+                # 10분봉 데이터 가져오기 (최근 20봉)
+                data = pyupbit.get_ohlcv(sym, interval="minute10", count=20)
 
+                if data is not None:
+                    average_price_20 = data['close'].mean()
+                    time.sleep(0.02)
+
+                    # 최근 60봉
+                    data_60 = pyupbit.get_ohlcv(sym, interval="minute10", count=60)
+
+                    if data_60 is not None:
+                        average_price_60 = data_60['close'].mean()
+                        time.sleep(0.02)
+
+                        # 최근 120봉
+                        data_120 = pyupbit.get_ohlcv(sym, interval="minute10", count=120)
+
+                        if data_120 is not None:
+                            average_price_120 = data_120['close'].mean()
+                        else:
+                            message_list += "120 이평선 실패 !! \n"
+                            continue
+                    else:
+                        message_list += "60 이평선 실패 !! \n"
+                        continue
+
+                else:
+                    message_list += "20 이평선 실패 !! \n"
+                    continue
+                   
+                time.sleep(0.02)
                 
 
                 # 평균 거래량 계산
@@ -200,10 +206,12 @@ try:
                     message_list += "\n>>>>>>>>>>>> !-!-!-! 변동성 발생 !-!-!-! <<<<<<<<<<<<<\n\n"
 
                     # 고가 120 이평선 위에
-                    if last_high > average_price_120:
+                    if last_high > average_price_20 and last_high > average_price_60 and last_high > average_price_120:
 
                         # 양봉이니?
                         if last_open < last_close:
+                            
+                            message_list += "(--- 탐욕 매도 ---)\n\n"
 
                             # 탐욕 매도
                             if symbol_list[sym]['공포적립'] > 0:
@@ -213,7 +221,6 @@ try:
                                 sell_result = upbit.sell_market_order(sym, sell_qty)
                                 if sell_result is not None:
                                     
-                                    message_list += "(--- 탐욕 매도 ---)\n\n"
                                     symbol_list[sym]['공포적립'] -= 1
                                     avg_price = upbit.get_avg_buy_price(sym)
                                     message_list += f"{round(current_price/avg_price,4)}% 탐욕 매도합니다 ^^ ({sell_qty}개)\n"
@@ -239,12 +246,14 @@ try:
 
 
                         else: # 음봉
-                            message_list += "120 위 + '음봉' 나가리~\n"
+                            message_list += "20 60 120 위 + '음봉' 나가리~\n"
 
                     # 저가 120 이평선 아래        
-                    elif last_low < average_price_120:
+                    elif last_low < average_price_20 and last_low < average_price_60 and last_low < average_price_120:
                         # 음봉이니?
                         if last_open > last_close: 
+                            
+                            message_list += "(+++ 공포 매수 +++)\n\n"
 
                             # 잔여예산 있니?
                             if symbol_list[sym]['잔여예산'] >= (allotment_budget * buy_rate):                            
@@ -256,7 +265,6 @@ try:
                                 buy_result = upbit.buy_market_order(sym, price) # 현금
                                 if buy_result is not None:          
                                     
-                                    message_list += "(+++ 공포 매수 +++)\n\n"
                                     symbol_list[sym]['공포적립'] += 1
                                     
                                     avg_price = upbit.get_avg_buy_price(sym)
@@ -284,8 +292,9 @@ try:
                                 message_list += "잔여 예산이 고갈 됐습니다 ㅠ\n"
 
                         else: # 양봉
-                            message_list += "120 아래 + '양봉' 나가리~\n"
-                             
+                            message_list += "20 60 120 아래 + '양봉' 나가리~\n"
+                    else: 
+                        message_list += "20 60 120 이평선 '조건실패' 나가리~\n"
 
                 message_list += "---------------------------------\n\n"
             
