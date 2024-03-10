@@ -259,12 +259,7 @@ try:
                                     
                                     symbol_list[sym]['공포적립'] += 1
                                     
-                                    time.sleep(0.02)
-                                    avg_price = upbit.get_avg_buy_price(sym)
-                                    formatted_amount = "{:,.1f}원".format(avg_price)
-                                    formatted_amount1 = "{:,.1f}%".format(current_price/avg_price*100)
-                                    message_list += f"갱신 평단가: {formatted_amount} ({formatted_amount1})\n"  
-                                    
+                                    time.sleep(0.02)                                    
                                     qty = get_balance(symbol_list[sym]['매도티커'])
 
                                     symbol_list[sym]['total'] = current_price * qty

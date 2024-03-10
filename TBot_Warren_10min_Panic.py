@@ -382,11 +382,9 @@ try:
                 total_cash = get_balance() # 보유 현금 조회
 
                 stock_dict = get_stock_balance() # 보유 주식 조회
-                target_buy_count = int(len(symbol_list)) # 매수종목 수량
 
                 message_list = "" 
                 for sym in symbol_list: # 초기화
-
 
                     message_list += "---------------------------------\n"
                     
