@@ -298,6 +298,8 @@ try:
             send_message(message_list)
                           
         # for문 끝 라인..
+        
+        time.sleep(0.02)
 
 except Exception as e:
     print(e)
