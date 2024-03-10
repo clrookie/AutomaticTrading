@@ -84,7 +84,6 @@ try:
     while True:
         
         df = pyupbit.get_ohlcv("KRW-BTC", interval="minute10", count=1)    
-    
 
         if df.index[0].minute != last_min:    # 10분 캔들 갱신
 
@@ -192,7 +191,7 @@ try:
                 avg = (last_volume / average_volume) * 100
                 formatted_amount1 = "{:,.0f}".format(last_volume)
                 formatted_amount2 = "{:,.0f}".format(avg)
-                message_list += f"직전: {formatted_amount1} [{formatted_amount2}%] - "
+                message_list += f"직전: {formatted_amount1} [{formatted_amount2}%]"
 
                 # 직전 차트
                 last_open = data.iloc[18]['open']
@@ -290,7 +289,7 @@ try:
                         message_list += "20 60 120 이평선 '조건실패' 나가리~\n"
 
                 total_cash += symbol_list[sym]['total']
-                message_list += "\n-------------------------------------------\n\n"
+                message_list += "\n-----------------------------------------------\n\n"
             
             formatted_amount = "{:,.0f}원".format(total_cash)
             message_list += f"총 보유 잔고: {formatted_amount}"
@@ -299,7 +298,7 @@ try:
                           
         # for문 끝 라인..
         
-        time.sleep(0.2) # 없거나 짧으면 -> [오류 발생]'NoneType' object has no attribute 'index'
+        time.sleep(1) # 없거나 짧으면 -> [오류 발생]'NoneType' object has no attribute 'index'
 
 except Exception as e:
     print(e)
