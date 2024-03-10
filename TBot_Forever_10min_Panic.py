@@ -141,7 +141,7 @@ try:
 
                 message_list += f"공포 적립: {symbol_list[sym]['공포적립']}개"
                 formatted_amount = "{:,.0f}원".format(symbol_list[sym]['잔여예산'])
-                message_list += f" (잔여 예산: {formatted_amount})\n\n"
+                message_list += f" (예산: {formatted_amount})\n\n"
 
                 
                 average_price_20 = 0
@@ -290,7 +290,7 @@ try:
                         message_list += "20 60 120 이평선 '조건실패' 나가리~\n"
 
                 total_cash += symbol_list[sym]['total']
-                message_list += "-------------------------------------------\n\n"
+                message_list += "\n-------------------------------------------\n\n"
             
             formatted_amount = "{:,.0f}원".format(total_cash)
             message_list += f"총 보유 잔고: {formatted_amount}"
@@ -299,7 +299,7 @@ try:
                           
         # for문 끝 라인..
         
-        time.sleep(0.2)
+        time.sleep(0.2) # 없거나 짧으면 -> [오류 발생]'NoneType' object has no attribute 'index'
 
 except Exception as e:
     print(e)
