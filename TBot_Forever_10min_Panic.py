@@ -43,7 +43,8 @@ try:
     last_min = 77
     
     # 기준 거래량 비율
-    volume_rate = 2
+    panic_volume_rate = 3
+    greed_volume_rate = 1.5
     
     # 매수
     allotment_budget = 1000000
@@ -195,14 +196,14 @@ try:
                 last_low = data.iloc[18]['low']
 
                 # 거래량 변동성 신호
-                if last_volume > (average_volume*volume_rate):
+                if last_volume > (average_volume*greed_volume_rate):
                     
                     message_list += "    >>>>>>>>>>>> !-!-!-! 변동성 발생 !-!-!-! <<<<<<<<<<<<< !-!-!-! 변동성 발생 !-!-!-! \n"
 
-                    # 고가 120 이평선 위에
-                    if last_high > average_price_20 and last_high > average_price_60 and last_high > average_price_120:
+                    # 시가 120 이평선 위에
+                    if last_open > average_price_20 and last_open > average_price_60 and last_open > average_price_120:
 
-                        message_list += "\n(--- 탐욕 매도 ---)\n"
+                        message_list += "\n(--- 탐욕 매도 --- 탐욕 매도 ---)\n"
 
                         # 양봉이니?
                         if last_open < last_close:
@@ -239,9 +240,9 @@ try:
                             message_list += "20 60 120 위 ↑↑↑↑ '음봉' 나가리~\n"
 
                     # 저가 120 이평선 아래        
-                    elif last_low < average_price_20 and last_low < average_price_60 and last_low < average_price_120:
+                    elif last_volume > average_volume*panic_volume_rate and last_open < average_price_20 and last_open < average_price_60 and last_open < average_price_120:
 
-                        message_list += "\n(+++ 공포 매수 +++)\n"
+                        message_list += "\n(+++ 공포 매수 +++ 공포 매수 +++ 공포 매수 +++ 공포 매수 +++ )\n"
 
                         # 음봉이니?
                         if last_open > last_close: 
@@ -276,7 +277,7 @@ try:
                         else: # 양봉
                             message_list += "20 60 120 아래 ↓↓↓↓ '양봉' 나가리~\n"
                     else: 
-                        message_list += "20 60 120 이평선 '조건실패' 나가리~\n"
+                        message_list += "'조건실패' 나가리~\n"
 
                 total += symbol_list[sym]['total']
                 message_list += "\n-----------------------------------------------\n\n"
