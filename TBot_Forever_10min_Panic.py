@@ -93,16 +93,11 @@ try:
             message_list += f"\n>>> 코인거래 10분봉 갱신합니다 <<< ({last_min}분)\n"
             message_list += "\n"
 
-            # target_buy_count = int(len(symbol_list)) # 매수종목 수량
-
-            total_cash = get_balance("KRW") # 현금잔고 조회
+            total = 0
             
-            formatted_amount = "{:,.0f}원".format(total_cash)
-            message_list += f"현금잔고: {formatted_amount}\n"
-
             formatted_amount = "{:,.0f}원".format(allotment_budget)
             formatted_amount1 = "{:,.0f}원".format(allotment_budget * buy_rate)
-            message_list += f"기준예산: {formatted_amount} (분할매수 {formatted_amount1}) \n"
+            message_list += f"배분예산: {formatted_amount} (분할매수 {formatted_amount1}) \n"
             message_list += "-----------\n\n"
             
             for sym in symbol_list: # 초기화
@@ -202,12 +197,12 @@ try:
                 # 거래량 변동성 신호
                 if last_volume > (average_volume*volume_rate):
                     
-                    message_list += ">>>>>>>>>>>> !-!-!-! 변동성 발생 !-!-!-! <<<<<<<<<<<<< !-!-!-! 변동성 발생 !-!-!-! \n"
+                    message_list += "    >>>>>>>>>>>> !-!-!-! 변동성 발생 !-!-!-! <<<<<<<<<<<<< !-!-!-! 변동성 발생 !-!-!-! \n"
 
                     # 고가 120 이평선 위에
                     if last_high > average_price_20 and last_high > average_price_60 and last_high > average_price_120:
 
-                        message_list += "(--- 탐욕 매도 ---)\n\n"
+                        message_list += "\n(--- 탐욕 매도 ---)\n"
 
                         # 양봉이니?
                         if last_open < last_close:
@@ -234,7 +229,7 @@ try:
                                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
                                     message_list += f"갱신 보유 잔고: {formatted_amount}\n"
 
-                                    message_list += f"공포 적립 변화 : {symbol_list[sym]['공포적립']+1} -> {symbol_list[sym]['공포적립']}개)\n"
+                                    message_list += f"공포 적립 변화 : {symbol_list[sym]['공포적립']+1} -> {symbol_list[sym]['공포적립']}개\n"
                                 else:
                                     message_list += f"탐욕 매도 실패 ({sell_result})\n"
                             else:
@@ -246,7 +241,7 @@ try:
                     # 저가 120 이평선 아래        
                     elif last_low < average_price_20 and last_low < average_price_60 and last_low < average_price_120:
 
-                        message_list += "(+++ 공포 매수 +++)\n\n"
+                        message_list += "\n(+++ 공포 매수 +++)\n"
 
                         # 음봉이니?
                         if last_open > last_close: 
@@ -276,7 +271,7 @@ try:
                                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
                                     message_list += f"갱신 보유 잔고: {formatted_amount}\n"
 
-                                    message_list += f"공포 적립 변화 : {symbol_list[sym]['공포적립']-1} -> {symbol_list[sym]['공포적립']}개)\n"                         
+                                    message_list += f"공포 적립 변화 : {symbol_list[sym]['공포적립']-1} -> {symbol_list[sym]['공포적립']}개\n"                         
 
                                 else:
                                     message_list += f"공포 매수 실패 ({buy_result})\n"
@@ -288,10 +283,15 @@ try:
                     else: 
                         message_list += "20 60 120 이평선 '조건실패' 나가리~\n"
 
-                total_cash += symbol_list[sym]['total']
+                total += symbol_list[sym]['total']
                 message_list += "\n-----------------------------------------------\n\n"
             
+
+            total_cash = get_balance("KRW") # 현금잔고 조회
             formatted_amount = "{:,.0f}원".format(total_cash)
+            message_list += f"현금잔고: {formatted_amount}\n"
+
+            formatted_amount = "{:,.0f}원".format(total_cash+total)
             message_list += f"총 보유 잔고: {formatted_amount}"
 
             send_message(message_list)
