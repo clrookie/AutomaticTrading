@@ -203,8 +203,7 @@ try:
                     # 거래량 변동성 신호
                     if last_volume > (average_volume*greed_volume_rate):
                     
-                        message_list += "    >>>>>>>>>>>> !-!-!-! 변동성 발생 !-!-!-! <<<<<<<<<<<<< !-!-!-! 변동성 발생 !-!-!-! \n"
-                        message_list += "\n(--- 탐욕 매도 --- 탐욕 매도 ---)\n"
+                        message_list += "\n(--- 탐욕 매도 --- 탐욕 매도 --- 탐욕 매도 --- 탐욕 매도 ---)\n"
 
                         # 양봉이니?
                         if last_open < last_close:
