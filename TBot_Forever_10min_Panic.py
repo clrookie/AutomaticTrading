@@ -89,6 +89,8 @@ try:
 
         if df.index[0].minute != last_min:    # 10분 캔들 갱신
 
+            time.sleep(0.02) # 데이터 갱신 보정
+
             last_min = df.index[0].minute
 
             message_list = "\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
@@ -184,7 +186,7 @@ try:
                 message_list += f"평균: {formatted_amount} | "
 
                 # 직전 거래량
-                last_volume = data.iloc[19]['volume']
+                last_volume = data.iloc[18]['volume']
 
                 avg = (last_volume / average_volume) * 100
                 formatted_amount1 = "{:,.0f}".format(last_volume)
