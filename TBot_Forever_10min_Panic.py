@@ -44,6 +44,7 @@ try:
     
     # 기준 거래량 비율
     panic_volume_rate = 2
+    panic_volume_rate_max = 3
     greed_volume_rate = 1.1
     
     # 매수
@@ -188,7 +189,7 @@ try:
                 avg = (last_volume / average_volume) * 100
                 formatted_amount1 = "{:,.0f}".format(last_volume)
                 formatted_amount2 = "{:,.0f}".format(avg)
-                message_list += f"직전: {formatted_amount1} [{formatted_amount2}%]\n"
+                message_list += f"직전: {formatted_amount1} [{formatted_amount2}%]"
 
                 # 직전 차트
                 last_open = data.iloc[18]['open']
@@ -227,9 +228,8 @@ try:
 
                                 symbol_list[sym]['total'] = current_price * qty
                                 formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
-                                message_list += f"갱신 보유 잔고: {formatted_amount}\n"
-
                                 message_list += f"공포 예탁 변화 : {symbol_list[sym]['공포적립']+1} -> {symbol_list[sym]['공포적립']}개\n"
+                                message_list += f"갱신 보유 잔고: {formatted_amount}\n"
                             else:
                                 message_list += f"탐욕 매도 실패 ({sell_result})\n"
 
@@ -248,9 +248,14 @@ try:
 
                         # 음봉이니?
                         if last_open > last_close: 
-                                                      
-                            price = allotment_budget * buy_rate
-                            if price < 5000: price = 5000 # 최소 주문량
+                            
+                            # 과공포 상태니?
+                            if last_volume > (average_volume*panic_volume_rate_max) and symbol_list[sym]['잔여예산'] >= (allotment_budget * buy_rate * 2):
+                                price = allotment_budget * buy_rate * 2
+                                message_list += "!!! 과공포 x2 예탁 !!! \n"
+                            else:
+                                price = allotment_budget * buy_rate
+                                if price < 5000: price = 5000 # 최소 주문량
 
                             # 공포 매수
                             buy_result = upbit.buy_market_order(sym, price) # 현금
@@ -263,9 +268,8 @@ try:
 
                                 symbol_list[sym]['total'] = current_price * qty
                                 formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
-                                message_list += f"갱신 보유 잔고: {formatted_amount}\n"
-
-                                message_list += f"공포 예탁 변화 : {symbol_list[sym]['공포적립']-1} -> {symbol_list[sym]['공포적립']}개\n"                         
+                                message_list += f"공포 예탁 변화 : {symbol_list[sym]['공포적립']-1} -> {symbol_list[sym]['공포적립']}개\n"   
+                                message_list += f"갱신 보유 잔고: {formatted_amount}\n"                      
 
                             else:
                                 message_list += f"공포 매수 실패 ({buy_result})\n"
