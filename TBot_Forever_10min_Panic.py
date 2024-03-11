@@ -195,14 +195,15 @@ try:
                 last_high = data.iloc[18]['high']
                 last_low = data.iloc[18]['low']
 
-                # 거래량 변동성 신호
-                if last_volume > (average_volume*greed_volume_rate):
+                
+
+                # 시가 120 이평선 위에
+                if last_open > average_price_20 and last_open > average_price_60 and last_open > average_price_120:
+
+                    # 거래량 변동성 신호
+                    if last_volume > (average_volume*greed_volume_rate):
                     
-                    message_list += "    >>>>>>>>>>>> !-!-!-! 변동성 발생 !-!-!-! <<<<<<<<<<<<< !-!-!-! 변동성 발생 !-!-!-! \n"
-
-                    # 시가 120 이평선 위에
-                    if last_open > average_price_20 and last_open > average_price_60 and last_open > average_price_120:
-
+                        message_list += "    >>>>>>>>>>>> !-!-!-! 변동성 발생 !-!-!-! <<<<<<<<<<<<< !-!-!-! 변동성 발생 !-!-!-! \n"
                         message_list += "\n(--- 탐욕 매도 --- 탐욕 매도 ---)\n"
 
                         # 양봉이니?
@@ -238,16 +239,20 @@ try:
 
                         else: # 음봉
                             message_list += "20 60 120 위 ↑↑↑↑ '음봉' 나가리~\n"
+                    else: # 변동성 조건 미달
+                            message_list += "변동성 조건 미달 (탐욕)\n"
 
-                    # 저가 120 이평선 아래        
-                    elif last_volume > average_volume*panic_volume_rate and last_open < average_price_20 and last_open < average_price_60 and last_open < average_price_120:
+                # 저가 120 이평선 아래        
+                elif last_open < average_price_20 and last_open < average_price_60 and last_open < average_price_120:
 
+                    # 거래량 변동성 신호
+                    if last_volume > (average_volume*panic_volume_rate):
+                    
                         message_list += "\n(+++ 공포 매수 +++ 공포 매수 +++ 공포 매수 +++ 공포 매수 +++ )\n"
 
                         # 음봉이니?
                         if last_open > last_close: 
                             
-
                             # 잔여예산 있니?
                             if symbol_list[sym]['잔여예산'] >= (allotment_budget * buy_rate):                            
 
@@ -276,8 +281,9 @@ try:
 
                         else: # 양봉
                             message_list += "20 60 120 아래 ↓↓↓↓ '양봉' 나가리~\n"
-                    else: 
-                        message_list += "'조건실패' 나가리~\n"
+                    else: # 변동성 조건 미달
+                            message_list += "변동성 조건 미달 (공포)\n"
+
 
                 total += symbol_list[sym]['total']
                 message_list += "\n-----------------------------------------------\n\n"
