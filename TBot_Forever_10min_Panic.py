@@ -43,12 +43,12 @@ try:
     last_min = 77
     
     # 기준 거래량 비율
-    panic_volume_rate = 3
-    greed_volume_rate = 1.5
+    panic_volume_rate = 2
+    greed_volume_rate = 1.1
     
     # 매수
     allotment_budget = 1000000
-    buy_rate = 0.1
+    buy_rate = 0.05
 
 
     # 공용 데이터
