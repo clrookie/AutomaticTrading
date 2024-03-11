@@ -184,7 +184,7 @@ try:
                 message_list += f"평균: {formatted_amount} | "
 
                 # 직전 거래량
-                last_volume = data.iloc[18]['volume']
+                last_volume = data.iloc[19]['volume']
 
                 avg = (last_volume / average_volume) * 100
                 formatted_amount1 = "{:,.0f}".format(last_volume)
