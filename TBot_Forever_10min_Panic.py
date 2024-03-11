@@ -98,7 +98,8 @@ try:
             
             formatted_amount = "{:,.0f}원".format(allotment_budget)
             formatted_amount1 = "{:,.0f}원".format(allotment_budget * buy_rate)
-            message_list += f"배분예산: {formatted_amount} (분할매수 {formatted_amount1}) \n"
+            message_list += f"배분 예산: {formatted_amount} (분할 {formatted_amount1}) \n"
+            message_list += f"공포 거래량 배율: {panic_volume_rate} / 탐욕 거래량 배율: {greed_volume_rate} \n"
             message_list += "-----------\n\n"
             
             for sym in symbol_list: # 초기화
@@ -203,7 +204,7 @@ try:
                     # 거래량 변동성 신호
                     if last_volume > (average_volume*greed_volume_rate):
                     
-                        message_list += "\n(--- 탐욕 매도 --- 탐욕 매도 --- 탐욕 매도 --- 탐욕 매도 ---)\n"
+                        message_list += "\n(--- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 ---)\n"
 
                         # 양봉이니?
                         if last_open < last_close:
@@ -230,7 +231,7 @@ try:
                                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
                                     message_list += f"갱신 보유 잔고: {formatted_amount}\n"
 
-                                    message_list += f"공포 적립 변화 : {symbol_list[sym]['공포적립']+1} -> {symbol_list[sym]['공포적립']}개\n"
+                                    message_list += f"공포 예탁 변화 : {symbol_list[sym]['공포적립']+1} -> {symbol_list[sym]['공포적립']}개\n"
                                 else:
                                     message_list += f"탐욕 매도 실패 ({sell_result})\n"
                             else:
@@ -239,7 +240,7 @@ try:
                         else: # 음봉
                             message_list += "20 60 120 위 ↑↑↑↑ '음봉' 나가리~\n"
                     else: # 변동성 조건 미달
-                            message_list += "변동성 조건 미달 (탐욕)\n"
+                            message_list += " - 탐욕구간\n"
 
                 # 저가 120 이평선 아래        
                 elif last_open < average_price_20 and last_open < average_price_60 and last_open < average_price_120:
@@ -247,7 +248,7 @@ try:
                     # 거래량 변동성 신호
                     if last_volume > (average_volume*panic_volume_rate):
                     
-                        message_list += "\n(+++ 공포 매수 +++ 공포 매수 +++ 공포 매수 +++ 공포 매수 +++ )\n"
+                        message_list += "\n(+++ 공포 예탁 +++ 공포 예탁 +++ 공포 예탁 +++ 공포 예탁 +++ )\n"
 
                         # 음봉이니?
                         if last_open > last_close: 
@@ -271,7 +272,7 @@ try:
                                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
                                     message_list += f"갱신 보유 잔고: {formatted_amount}\n"
 
-                                    message_list += f"공포 적립 변화 : {symbol_list[sym]['공포적립']-1} -> {symbol_list[sym]['공포적립']}개\n"                         
+                                    message_list += f"공포 예탁 변화 : {symbol_list[sym]['공포적립']-1} -> {symbol_list[sym]['공포적립']}개\n"                         
 
                                 else:
                                     message_list += f"공포 매수 실패 ({buy_result})\n"
@@ -281,7 +282,7 @@ try:
                         else: # 양봉
                             message_list += "20 60 120 아래 ↓↓↓↓ '양봉' 나가리~\n"
                     else: # 변동성 조건 미달
-                            message_list += "변동성 조건 미달 (공포)\n"
+                            message_list += " - 공포구간\n"
 
 
                 total += symbol_list[sym]['total']
@@ -290,7 +291,10 @@ try:
 
             total_cash = get_balance("KRW") # 현금잔고 조회
             formatted_amount = "{:,.0f}원".format(total_cash)
-            message_list += f"현금잔고: {formatted_amount}\n"
+            message_list += f"현금 잔고: {formatted_amount}\n"
+            
+            formatted_amount = "{:,.0f}원".format(total)
+            message_list += f"주식 잔고: {formatted_amount}\n"
 
             formatted_amount = "{:,.0f}원".format(total_cash+total)
             message_list += f"총 보유 잔고: {formatted_amount}"
