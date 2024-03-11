@@ -84,6 +84,38 @@ def get_current_price(code="005930"):
     res = requests.get(URL, headers=headers, params=params)
     return int(res.json()['output']['stck_prpr'])
 
+# 10분봉
+def get_10min_chart(code="005930"):
+    PATH = "/uapi/domestic-stock/v1/quotations/inquire-time-itemchartprice"
+    URL = f"{URL_BASE}/{PATH}"
+    headers = {"Content-Type":"application/json", 
+        "authorization":f"Bearer {ACCESS_TOKEN}",
+        "appKey":APP_KEY,
+        "appSecret":APP_SECRET,
+        "tr_id":"FHKST03010200",
+        "custtype":"P",
+    }
+    params = {
+        "CANO": CANO,
+        "ACNT_PRDT_CD": ACNT_PRDT_CD,
+        "AFHR_FLPR_YN": "N",
+        "OFL_YN": "",
+        "INQR_DVSN": "00",
+        "UNPR_DVSN": "01",
+        "FUND_STTL_ICLD_YN": "N",
+        "FNCG_AMT_AUTO_RDPT_YN": "N",
+        "PRCS_DVSN": "01",
+        "COST_ICLD_YN": "N",
+        "CTX_AREA_FK100": "",
+        "CTX_AREA_NK100": ""
+    }
+    res = requests.get(URL, headers=headers, params=params)
+
+    evaluation1 = float(res.json()['output2'][0]['asst_icdc_amt'])
+    evaluation2 = float(res.json()['output2'][0]['asst_icdc_erng_rt'])
+
+    
+    return evaluation1, evaluation2
 
 def get_real_total():
     PATH = "uapi/domestic-stock/v1/trading/inquire-balance-rlz-pl"
@@ -300,16 +332,15 @@ try:
     t_0 = True
     t_30 = True
 
-    # 익절비율
-    sell_rate = 0.2
+    
+    # 기준 거래량 비율
+    panic_volume_rate = 2
+    greed_volume_rate = 1.1
     
     # 매수
-    buy_rate = 0.2
-    buy_max_cnt = 5
-    buy_interval = 30
-
-    previous_time = datetime.datetime.now()
-    
+    allotment_budget = 1000000
+    buy_rate = 0.05
+        
 
     # 공용 데이터
     common_data ={
@@ -365,11 +396,7 @@ try:
             # 매매 준비
             if t_start < t_now < t_exit and startoncebyday == False: 
             
-                message_list = ""
-                message_list += "=== 자동매매를 준비합니다 ===\n"
-                message_list += "\n"
-                send_message(message_list)
-                message_list = ""
+                send_message(f"=== 자동매매를 시작합니다 ({today_date})===\n\n")
 
                 
                 # 토큰 세팅
@@ -379,24 +406,11 @@ try:
                 holiday = False
                 
                 
-                total_cash = get_balance() # 보유 현금 조회
+                # total_cash = get_balance() # 보유 현금 조회
+                # stock_dict = get_stock_balance() # 보유 주식 조회                    
 
-                stock_dict = get_stock_balance() # 보유 주식 조회
 
-                message_list = "" 
-                for sym in symbol_list: # 초기화
-
-                    message_list += "---------------------------------\n"
-                    
-                
-                message_list +="\n"
-                message_list +="매매를 시작합니다~~\n"
-                message_list +="\n"
-
-                send_message(message_list)
-                message_list =""
-
-            # AM 09:00 ~ PM 03:19 : 매수
+            # AM 09:00 ~ PM 03:17 : 매수
             if t_start < t_now < t_exit and startoncebyday == True:  
 
                 for sym in symbol_list:

@@ -54,6 +54,15 @@ def aaa():
 
 
 try:
+    
+    df = pyupbit.get_ohlcv("396500", interval="minute10", count=1) 
+
+    aa = df.index[0].minute
+
+    data = pyupbit.get_ohlcv("KRW-00593", interval="minute10", count=20)
+
+    average_price_20 = data['close'].mean()
+
     total_cash = 144560
     b = 40000
     b = total_cash % b

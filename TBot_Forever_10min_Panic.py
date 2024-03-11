@@ -188,7 +188,7 @@ try:
                 avg = (last_volume / average_volume) * 100
                 formatted_amount1 = "{:,.0f}".format(last_volume)
                 formatted_amount2 = "{:,.0f}".format(avg)
-                message_list += f"직전: {formatted_amount1} [{formatted_amount2}%]"
+                message_list += f"직전: {formatted_amount1} [{formatted_amount2}%]\n"
 
                 # 직전 차트
                 last_open = data.iloc[18]['open']
@@ -199,7 +199,7 @@ try:
                 
 
                 # 시가 120 이평선 위에
-                if last_open > average_price_20 and last_open > average_price_60 and last_open > average_price_120:
+                if symbol_list[sym]['공포적립'] > 0 and last_open > average_price_20 and last_open > average_price_60 and last_open > average_price_120:
 
                     # 거래량 변동성 신호
                     if last_volume > (average_volume*greed_volume_rate):
@@ -209,33 +209,29 @@ try:
                         # 양봉이니?
                         if last_open < last_close:
                             
-                            # 탐욕 매도
-                            if symbol_list[sym]['공포적립'] > 0:
 
-                                sell_qty = qty / symbol_list[sym]['공포적립']
+                            sell_qty = qty / symbol_list[sym]['공포적립']
+
+                            time.sleep(0.02)
+                            avg_price = upbit.get_avg_buy_price(sym)
+
+                            time.sleep(0.02)
+                            sell_result = upbit.sell_market_order(sym, sell_qty)
+                            if sell_result is not None:
+                                
+                                symbol_list[sym]['공포적립'] -= 1
+                                message_list += f"{round(current_price/avg_price,4)}% 탐욕 매도합니다 ^^ ({sell_qty}개)\n"
 
                                 time.sleep(0.02)
-                                avg_price = upbit.get_avg_buy_price(sym)
+                                qty = get_balance(symbol_list[sym]['매도티커'])
 
-                                time.sleep(0.02)
-                                sell_result = upbit.sell_market_order(sym, sell_qty)
-                                if sell_result is not None:
-                                    
-                                    symbol_list[sym]['공포적립'] -= 1
-                                    message_list += f"{round(current_price/avg_price,4)}% 탐욕 매도합니다 ^^ ({sell_qty}개)\n"
+                                symbol_list[sym]['total'] = current_price * qty
+                                formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
+                                message_list += f"갱신 보유 잔고: {formatted_amount}\n"
 
-                                    time.sleep(0.02)
-                                    qty = get_balance(symbol_list[sym]['매도티커'])
-
-                                    symbol_list[sym]['total'] = current_price * qty
-                                    formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
-                                    message_list += f"갱신 보유 잔고: {formatted_amount}\n"
-
-                                    message_list += f"공포 예탁 변화 : {symbol_list[sym]['공포적립']+1} -> {symbol_list[sym]['공포적립']}개\n"
-                                else:
-                                    message_list += f"탐욕 매도 실패 ({sell_result})\n"
+                                message_list += f"공포 예탁 변화 : {symbol_list[sym]['공포적립']+1} -> {symbol_list[sym]['공포적립']}개\n"
                             else:
-                                message_list += "공포 적립이 없습니다 ㅠ\n"
+                                message_list += f"탐욕 매도 실패 ({sell_result})\n"
 
                         else: # 음봉
                             message_list += "20 60 120 위 ↑↑↑↑ '음봉' 나가리~\n"
@@ -243,7 +239,7 @@ try:
                             message_list += " - 탐욕구간\n"
 
                 # 저가 120 이평선 아래        
-                elif last_open < average_price_20 and last_open < average_price_60 and last_open < average_price_120:
+                elif symbol_list[sym]['잔여예산'] >= (allotment_budget * buy_rate) and last_open < average_price_20 and last_open < average_price_60 and last_open < average_price_120:
 
                     # 거래량 변동성 신호
                     if last_volume > (average_volume*panic_volume_rate):
@@ -252,32 +248,27 @@ try:
 
                         # 음봉이니?
                         if last_open > last_close: 
-                            
-                            # 잔여예산 있니?
-                            if symbol_list[sym]['잔여예산'] >= (allotment_budget * buy_rate):                            
+                                                      
+                            price = allotment_budget * buy_rate
+                            if price < 5000: price = 5000 # 최소 주문량
 
-                                price = allotment_budget * buy_rate
-                                if price < 5000: price = 5000 # 최소 주문량
+                            # 공포 매수
+                            buy_result = upbit.buy_market_order(sym, price) # 현금
+                            if buy_result is not None:          
+                                
+                                symbol_list[sym]['공포적립'] += 1
+                                
+                                time.sleep(0.02)                                    
+                                qty = get_balance(symbol_list[sym]['매도티커'])
 
-                                # 공포 매수
-                                buy_result = upbit.buy_market_order(sym, price) # 현금
-                                if buy_result is not None:          
-                                    
-                                    symbol_list[sym]['공포적립'] += 1
-                                    
-                                    time.sleep(0.02)                                    
-                                    qty = get_balance(symbol_list[sym]['매도티커'])
+                                symbol_list[sym]['total'] = current_price * qty
+                                formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
+                                message_list += f"갱신 보유 잔고: {formatted_amount}\n"
 
-                                    symbol_list[sym]['total'] = current_price * qty
-                                    formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
-                                    message_list += f"갱신 보유 잔고: {formatted_amount}\n"
+                                message_list += f"공포 예탁 변화 : {symbol_list[sym]['공포적립']-1} -> {symbol_list[sym]['공포적립']}개\n"                         
 
-                                    message_list += f"공포 예탁 변화 : {symbol_list[sym]['공포적립']-1} -> {symbol_list[sym]['공포적립']}개\n"                         
-
-                                else:
-                                    message_list += f"공포 매수 실패 ({buy_result})\n"
                             else:
-                                message_list += "잔여 예산이 고갈 됐습니다 ㅠ\n"
+                                message_list += f"공포 매수 실패 ({buy_result})\n"
 
                         else: # 양봉
                             message_list += "20 60 120 아래 ↓↓↓↓ '양봉' 나가리~\n"
