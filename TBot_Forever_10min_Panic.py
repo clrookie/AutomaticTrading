@@ -99,7 +99,7 @@ try:
             formatted_amount = "{:,.0f}원".format(allotment_budget)
             formatted_amount1 = "{:,.0f}원".format(allotment_budget * buy_rate)
             message_list += f"배분 예산: {formatted_amount} (분할 {formatted_amount1}) \n"
-            message_list += f"공포 거래량 배율: {panic_volume_rate} / 탐욕 거래량 배율: {greed_volume_rate} \n"
+            message_list += f"공포 배율: {panic_volume_rate} / 탐욕 배율: {greed_volume_rate} \n"
             message_list += "-----------\n\n"
             
             for sym in symbol_list: # 초기화
@@ -204,7 +204,7 @@ try:
                     # 거래량 변동성 신호
                     if last_volume > (average_volume*greed_volume_rate):
                     
-                        message_list += "\n(--- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 ---)\n"
+                        message_list += "\n\n(--- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 ---)\n"
 
                         # 양봉이니?
                         if last_open < last_close:
@@ -248,7 +248,7 @@ try:
                     # 거래량 변동성 신호
                     if last_volume > (average_volume*panic_volume_rate):
                     
-                        message_list += "\n(+++ 공포 예탁 +++ 공포 예탁 +++ 공포 예탁 +++ 공포 예탁 +++ )\n"
+                        message_list += "\n\n(+++ 공포 예탁 +++ 공포 예탁 +++ 공포 예탁 +++ 공포 예탁 +++ )\n"
 
                         # 음봉이니?
                         if last_open > last_close: 
