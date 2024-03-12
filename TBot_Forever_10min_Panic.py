@@ -300,8 +300,8 @@ try:
 
             result_rate = ((total_cash+total) / principal * 100) - 100
             formatted_amount = "{:,.0f}원".format(total_cash+total)
-            message_list += f"총 잔고: {formatted_amount}"
-            formatted_amount1 = "{:,.2f}원".format(principal - total_cash+total)
+            message_list += f"총 잔고: {formatted_amount}\n"
+            formatted_amount1 = "{:,0f}원".format((total_cash+total)-principal)
             formatted_amount2 = "{:,.2f}%".format(result_rate)
             message_list += f"수익율: {formatted_amount1} ({formatted_amount2})"
 
