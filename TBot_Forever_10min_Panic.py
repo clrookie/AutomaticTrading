@@ -60,6 +60,8 @@ try:
     '잔여예산': 0,
     '공포적립': 0,
     'total': 0,
+    '공포에너지': 0,
+    '탐욕에너지': 0,
     }
 
     #개별 종목 데이터
@@ -296,7 +298,7 @@ try:
             formatted_amount = "{:,.0f}원".format(total)
             message_list += f"주식 잔고: {formatted_amount}\n"
 
-            result_rate = (total_cash+total) / principal * 100
+            result_rate = ((total_cash+total) / principal * 100)-100
             formatted_amount = "{:,.0f}원".format(total_cash+total)
             formatted_amount1 = "{:,.2f}%".format(result_rate)
             message_list += f"총 보유 잔고: {formatted_amount} ({formatted_amount1})"
