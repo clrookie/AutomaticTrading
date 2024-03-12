@@ -293,15 +293,17 @@ try:
 
             total_cash = get_balance("KRW") # 현금잔고 조회
             formatted_amount = "{:,.0f}원".format(total_cash)
-            message_list += f"현금 잔고: {formatted_amount}\n"
+            message_list += f"현금 잔고: {formatted_amount} / "
             
             formatted_amount = "{:,.0f}원".format(total)
             message_list += f"주식 잔고: {formatted_amount}\n"
 
             result_rate = ((total_cash+total) / principal * 100) - 100
             formatted_amount = "{:,.0f}원".format(total_cash+total)
-            formatted_amount1 = "{:,.2f}%".format(result_rate)
-            message_list += f"총 보유 잔고: {formatted_amount} ({formatted_amount1})"
+            message_list += f"총 잔고: {formatted_amount}"
+            formatted_amount1 = "{:,.2f}원".format(principal - total_cash+total)
+            formatted_amount2 = "{:,.2f}%".format(result_rate)
+            message_list += f"수익율: {formatted_amount1} ({formatted_amount2})"
 
             send_message(message_list)
                           
