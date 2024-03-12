@@ -297,9 +297,9 @@ try:
             message_list += f"총 잔고: {formatted_amount} = "
 
             formatted_amount = "{:,.0f}원".format(total_cash)
-            message_list += f"(현금: {formatted_amount} + "
+            message_list += f"(현금 {formatted_amount} + "
             formatted_amount = "{:,.0f}원".format(total)
-            message_list += f"주식: {formatted_amount})"
+            message_list += f"주식 {formatted_amount})\n"
 
             result_rate = ((total_cash+total) / principal * 100) - 100
             formatted_amount1 = "{:,.0f}원".format((total_cash+total)-principal)
