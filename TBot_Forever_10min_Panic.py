@@ -42,6 +42,9 @@ try:
 
     last_min = 77
     
+    #원금
+    principal = 5200000
+    
     # 기준 거래량 비율
     panic_volume_rate = 2
     panic_volume_rate_max = 3
@@ -102,7 +105,7 @@ try:
             formatted_amount = "{:,.0f}원".format(allotment_budget)
             formatted_amount1 = "{:,.0f}원".format(allotment_budget * buy_rate)
             message_list += f"배분 예산: {formatted_amount} (분할 {formatted_amount1}) \n"
-            message_list += f"공포 배율: {panic_volume_rate} / 탐욕 배율: {greed_volume_rate} \n"
+            message_list += f"공포 거래량: {panic_volume_rate}배 (패닉: {panic_volume_rate_max}배) / 탐욕 거래량: {greed_volume_rate}배 \n"
             message_list += "-----------\n\n"
             
             for sym in symbol_list: # 초기화
@@ -293,8 +296,10 @@ try:
             formatted_amount = "{:,.0f}원".format(total)
             message_list += f"주식 잔고: {formatted_amount}\n"
 
+            result_rate = (total_cash+total) / principal * 100
             formatted_amount = "{:,.0f}원".format(total_cash+total)
-            message_list += f"총 보유 잔고: {formatted_amount}"
+            formatted_amount1 = "{:,.3f}%".format(result_rate)
+            message_list += f"총 보유 잔고: {formatted_amount}({formatted_amount1}%)"
 
             send_message(message_list)
                           
