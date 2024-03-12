@@ -298,8 +298,8 @@ try:
 
             result_rate = (total_cash+total) / principal * 100
             formatted_amount = "{:,.0f}원".format(total_cash+total)
-            formatted_amount1 = "{:,.3f}%".format(result_rate)
-            message_list += f"총 보유 잔고: {formatted_amount}({formatted_amount1}%)"
+            formatted_amount1 = "{:,.2f}%".format(result_rate)
+            message_list += f"총 보유 잔고: {formatted_amount} ({formatted_amount1})"
 
             send_message(message_list)
                           
