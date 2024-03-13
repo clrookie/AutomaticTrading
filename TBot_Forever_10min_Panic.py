@@ -294,7 +294,7 @@ try:
             total_cash = get_balance("KRW") # 현금잔고 조회
 
             formatted_amount = "{:,.2f}%".format(total/total_cash*100)
-            message_list += f"주식 비중: {formatted_amount}"
+            message_list += f"주식 비중: {formatted_amount}\n"
 
             formatted_amount = "{:,.0f}원".format(total_cash+total)
             message_list += f"총 잔고: {formatted_amount} "
