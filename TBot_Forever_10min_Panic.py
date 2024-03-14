@@ -99,8 +99,8 @@ try:
     '매도티커':'AVAX',
     **common_data},
     
-    'KRW-SHIB':{'종목명':'시바이누 #8', 
-    '매도티커':'SHIB',
+    'KRW-BCH':{'종목명':'비트코인캐시 #8', 
+    '매도티커':'BCH',
     **common_data},
     
     'KRW-DOT':{'종목명':'폴카닷 #9', 
