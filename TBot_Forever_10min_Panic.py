@@ -43,15 +43,19 @@ try:
     last_min = 77
     
     #원금
-    principal = 5200000
+    principal = 15000000
     
     # 기준 거래량 비율
-    panic_volume_rate = 2
-    panic_volume_rate_max = 3
-    greed_volume_rate = 1.1
+    panic_volume_rate = 1.5 #1배
+    panic_volume_rate_max = 3 #2배
+    panic_volume_rate_max_more = 4.5 #3배
+
+    greed_volume_rate = 1.5 #2배
+    greed_volume_rate_max = 3 #3배
+    greed_volume_rate_max_more = 4.5 #4배
     
     # 매수
-    allotment_budget = 1000000
+    allotment_budget = 1500000
     buy_rate = 0.05
 
 
@@ -84,6 +88,27 @@ try:
 
     'KRW-ADA':{'종목명':'에이다 #5', #3 
     '매도티커':'ADA',
+    **common_data},
+
+    # ----
+    'KRW-DOGE':{'종목명':'도지코인 #6', #3 
+    '매도티커':'DOGE',
+    **common_data},
+
+    'KRW-AVAX':{'종목명':'아발란체 #7', #3 
+    '매도티커':'AVAX',
+    **common_data},
+    
+    'KRW-SHIB':{'종목명':'시바이누 #8', #3 
+    '매도티커':'SHIB',
+    **common_data},
+    
+    'KRW-DOT':{'종목명':'폴카닷 #9', #3 
+    '매도티커':'DOT',
+    **common_data},
+    
+    'KRW-MATIC':{'종목명':'폴리곤 #10', #3 
+    '매도티커':'MATIC',
     **common_data},
     }
 
@@ -217,9 +242,17 @@ try:
                         # 양봉이니?
                         if last_open < last_close:
                             
+                             # 과탐욕 상태니?
+                            if last_volume > (average_volume*greed_volume_rate_max_more) and symbol_list[sym]['공포적립'] >= 3:
+                                sell_qty = (qty / symbol_list[sym]['공포적립']) * 3
+                                message_list += "!!! 과공포 x3x3x3x3x3x3 지급 !!! \n"
+                            elif last_volume > (average_volume*greed_volume_rate_max) and symbol_list[sym]['공포적립'] >= 2:
+                                sell_qty = (qty / symbol_list[sym]['공포적립']) * 2
+                                message_list += "!!! 과탐욕 x2x2x2 지급 !!! \n"
+                            else:                                
+                                sell_qty = qty / symbol_list[sym]['공포적립']
 
-                            sell_qty = qty / symbol_list[sym]['공포적립']
-
+            
                             time.sleep(0.02)
                             avg_price = upbit.get_avg_buy_price(sym)
 
@@ -257,12 +290,16 @@ try:
                         if last_open > last_close: 
                             
                             # 과공포 상태니?
-                            if last_volume > (average_volume*panic_volume_rate_max) and symbol_list[sym]['잔여예산'] >= (allotment_budget * buy_rate * 2):
+                            if last_volume > (average_volume*panic_volume_rate_max_more) and symbol_list[sym]['잔여예산'] >= (allotment_budget * buy_rate * 3):
+                                price = allotment_budget * buy_rate * 3
+                                message_list += "!!! 과공포 x3x3x3x3x3x3 예탁 !!! \n"
+                            elif last_volume > (average_volume*panic_volume_rate_max) and symbol_list[sym]['잔여예산'] >= (allotment_budget * buy_rate * 2):
                                 price = allotment_budget * buy_rate * 2
-                                message_list += "!!! 과공포 x2 예탁 !!! \n"
+                                message_list += "!!! 과공포 x2x2x2 예탁 !!! \n"
                             else:
                                 price = allotment_budget * buy_rate
-                                if price < 5000: price = 5000 # 최소 주문량
+
+                            if price < 5000: price = 5000 # 최소 주문량    
 
                             # 공포 매수
                             buy_result = upbit.buy_market_order(sym, price) # 현금

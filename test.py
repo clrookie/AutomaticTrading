@@ -2,7 +2,8 @@ import time
 from datetime import datetime, timedelta
 import pyupbit
 import requests
-import math
+# import math
+
 
 access = "your-access"
 secret = "your-secret"
@@ -53,39 +54,44 @@ def aaa():
     return int(aa) 
 
 
-try:
+# try:
+      # # 코스피(KOSPI) 종목 코드
+    # kospi_code = "005930"  # 삼성전자 예시
+
+    # # 코스피 종목의 일별 데이터 가져오기
+    # df_daily = fdr.DataReader(kospi_code, exchange="KRX", start="2024-03-07", end="2024-03-07")
     
-    df = pyupbit.get_ohlcv("396500", interval="minute10", count=1) 
+    # df = pyupbit.get_ohlcv("396500", interval="minute10", count=1) 
 
-    aa = df.index[0].minute
+    # aa = df.index[0].minute
 
-    data = pyupbit.get_ohlcv("KRW-00593", interval="minute10", count=20)
+    # data = pyupbit.get_ohlcv("KRW-00593", interval="minute10", count=20)
 
-    average_price_20 = data['close'].mean()
+    # average_price_20 = data['close'].mean()
 
-    total_cash = 144560
-    b = 40000
-    b = total_cash % b
+    # total_cash = 144560
+    # b = 40000
+    # b = total_cash % b
     
-    print(b)
+    # print(b)
     
-    if total_cash > b:
-        total_cash -= b
+    # if total_cash > b:
+    #     total_cash -= b
 
-    print(total_cash)
+    # print(total_cash)
 
-    # 소수점을 올림할 값
-    floating_point_number = 59999 / 40000
+    # # 소수점을 올림할 값
+    # floating_point_number = 59999 / 40000
 
-    # 소수점을 올림하여 정수로 만들기
-    rounded_integer = round(floating_point_number)
+    # # 소수점을 올림하여 정수로 만들기
+    # rounded_integer = round(floating_point_number)
 
-    print(f"올림된 정수: {rounded_integer}")
+    # print(f"올림된 정수: {rounded_integer}")
 
-    time.sleep(1)
-except Exception as e:
-    print(e)
-    time.sleep(1)
+    # time.sleep(1)
+# except Exception as e:
+#     print(e)
+#     time.sleep(1)
 
 # while True:
 #     # 현재 시간 가져오기
