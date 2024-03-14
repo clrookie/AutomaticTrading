@@ -56,7 +56,7 @@ try:
     
     # 매수
     allotment_budget = 1500000
-    buy_rate = 0.05
+    buy_rate = 0.04
 
 
     # 공용 데이터
@@ -132,8 +132,8 @@ try:
             formatted_amount = "{:,.0f}원".format(allotment_budget)
             formatted_amount1 = "{:,.0f}원".format(allotment_budget * buy_rate)
             message_list += f"배분 예산: {formatted_amount} (분할 {formatted_amount1}) \n"
-            message_list += f"공포 거래량: {panic_volume_rate}배 (과패닉: {panic_volume_rate_max}배) / 극패닉: {panic_volume_rate_max_more}배 \n"
-            message_list += f"탐욕 거래량: {greed_volume_rate}배 (과탐욕: {greed_volume_rate_max}배) / 극탐욕: {greed_volume_rate_max_more}배 \n"
+            message_list += f"공포 거래량: {panic_volume_rate}배 / 과패닉: {panic_volume_rate_max}배) / 극패닉: {panic_volume_rate_max_more}배 \n"
+            message_list += f"탐욕 거래량: {greed_volume_rate}배 / 과탐욕: {greed_volume_rate_max}배) / 극탐욕: {greed_volume_rate_max_more}배 \n"
             message_list += "-----------\n\n"
             
             for sym in symbol_list: # 초기화
