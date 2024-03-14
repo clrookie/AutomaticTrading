@@ -99,16 +99,16 @@ try:
     '매도티커':'AVAX',
     **common_data},
     
-    'KRW-BCH':{'종목명':'비트코인캐시 #8', 
-    '매도티커':'BCH',
-    **common_data},
-    
-    'KRW-DOT':{'종목명':'폴카닷 #9', 
+    'KRW-DOT':{'종목명':'폴카닷 #8', 
     '매도티커':'DOT',
     **common_data},
     
-    'KRW-MATIC':{'종목명':'폴리곤 #10', 
+    'KRW-MATIC':{'종목명':'폴리곤 #9', 
     '매도티커':'MATIC',
+    **common_data},
+
+    'KRW-EOS':{'종목명':'이오스 #10', 
+    '매도티커':'EOS',
     **common_data},
     }
 
