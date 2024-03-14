@@ -70,44 +70,44 @@ try:
 
     #개별 종목 데이터
     symbol_list = { 
-    'KRW-BTC':{'종목명':'비트코인 #1', #1
+    'KRW-BTC':{'종목명':'비트코인 #1',
     '매도티커':'BTC',
     **common_data},
 
-    'KRW-ETH':{'종목명':'이더리움 #2', #2
+    'KRW-ETH':{'종목명':'이더리움 #2',
     '매도티커':'ETH',
     **common_data},
 
-    'KRW-SOL':{'종목명':'솔라나 #3', #2
+    'KRW-SOL':{'종목명':'솔라나 #3',
     '매도티커':'SOL',
     **common_data},
 
-    'KRW-XRP':{'종목명':'리플 #4', #3 
+    'KRW-XRP':{'종목명':'리플 #4', 
     '매도티커':'XRP',
     **common_data},
 
-    'KRW-ADA':{'종목명':'에이다 #5', #3 
+    'KRW-ADA':{'종목명':'에이다 #5', 
     '매도티커':'ADA',
     **common_data},
 
     # ----
-    'KRW-DOGE':{'종목명':'도지코인 #6', #3 
+    'KRW-DOGE':{'종목명':'도지코인 #6', 
     '매도티커':'DOGE',
     **common_data},
 
-    'KRW-AVAX':{'종목명':'아발란체 #7', #3 
+    'KRW-AVAX':{'종목명':'아발란체 #7', 
     '매도티커':'AVAX',
     **common_data},
     
-    'KRW-SHIB':{'종목명':'시바이누 #8', #3 
+    'KRW-SHIB':{'종목명':'시바이누 #8', 
     '매도티커':'SHIB',
     **common_data},
     
-    'KRW-DOT':{'종목명':'폴카닷 #9', #3 
+    'KRW-DOT':{'종목명':'폴카닷 #9', 
     '매도티커':'DOT',
     **common_data},
     
-    'KRW-MATIC':{'종목명':'폴리곤 #10', #3 
+    'KRW-MATIC':{'종목명':'폴리곤 #10', 
     '매도티커':'MATIC',
     **common_data},
     }
@@ -246,7 +246,7 @@ try:
                              # 과탐욕 상태니?
                             if last_volume > (average_volume*greed_volume_rate_max_more) and symbol_list[sym]['공포적립'] >= 3:
                                 sell_qty = (qty / symbol_list[sym]['공포적립']) * 3
-                                message_list += "!!! 과공포 x3x3x3x3x3x3 지급 !!! \n"
+                                message_list += "!!! --- 극탐욕 x3x3x3x3x3x3 지급 --- !!! \n"
                             elif last_volume > (average_volume*greed_volume_rate_max) and symbol_list[sym]['공포적립'] >= 2:
                                 sell_qty = (qty / symbol_list[sym]['공포적립']) * 2
                                 message_list += "!!! 과탐욕 x2x2x2 지급 !!! \n"
@@ -293,7 +293,7 @@ try:
                             # 과공포 상태니?
                             if last_volume > (average_volume*panic_volume_rate_max_more) and symbol_list[sym]['잔여예산'] >= (allotment_budget * buy_rate * 3):
                                 price = allotment_budget * buy_rate * 3
-                                message_list += "!!! 과공포 x3x3x3x3x3x3 예탁 !!! \n"
+                                message_list += "!!! +++ 극공포 x3x3x3x3x3x3 예탁 +++ !!! \n"
                             elif last_volume > (average_volume*panic_volume_rate_max) and symbol_list[sym]['잔여예산'] >= (allotment_budget * buy_rate * 2):
                                 price = allotment_budget * buy_rate * 2
                                 message_list += "!!! 과공포 x2x2x2 예탁 !!! \n"
