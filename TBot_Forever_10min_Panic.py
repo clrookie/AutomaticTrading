@@ -135,6 +135,9 @@ try:
             message_list += f"공포 거래량: {panic_volume_rate}배 / {panic_volume_rate_max}배 / {panic_volume_rate_max_more}배 \n"
             message_list += f"탐욕 거래량: {greed_volume_rate}배 / {greed_volume_rate_max}배 / {greed_volume_rate_max_more}배 \n"
             message_list += "-----------\n\n"
+
+            send_message(message_list)
+            message_list = ""
             
             for sym in symbol_list: # 초기화
 
@@ -242,14 +245,17 @@ try:
 
                         # 양봉이니?
                         if last_open < last_close:
-                            
-                             # 과탐욕 상태니?
+
+                            count = 1
+                            # 과탐욕 상태니?
                             if last_volume > (average_volume*greed_volume_rate_max_more) and symbol_list[sym]['공포적립'] >= 3:
                                 sell_qty = (qty / symbol_list[sym]['공포적립']) * 3
                                 message_list += "!!! --- 극탐욕 x3x3x3x3x3x3 지급 --- !!! \n"
+                                count = 3
                             elif last_volume > (average_volume*greed_volume_rate_max) and symbol_list[sym]['공포적립'] >= 2:
                                 sell_qty = (qty / symbol_list[sym]['공포적립']) * 2
                                 message_list += "!!! 과탐욕 x2x2x2 지급 !!! \n"
+                                count = 2
                             else:                                
                                 sell_qty = qty / symbol_list[sym]['공포적립']
 
@@ -261,7 +267,7 @@ try:
                             sell_result = upbit.sell_market_order(sym, sell_qty)
                             if sell_result is not None:
                                 
-                                symbol_list[sym]['공포적립'] -= 1
+                                symbol_list[sym]['공포적립'] -= count
                                 message_list += f"{round(current_price/avg_price,4)}% 탐욕 매도합니다 ^^ ({sell_qty}개)\n"
 
                                 time.sleep(0.02)
@@ -269,7 +275,7 @@ try:
 
                                 symbol_list[sym]['total'] = current_price * qty
                                 formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
-                                message_list += f"공포 예탁 변화 : {symbol_list[sym]['공포적립']+1} -> {symbol_list[sym]['공포적립']}개\n"
+                                message_list += f"공포 예치 변화 : {symbol_list[sym]['공포적립']+count} -> {symbol_list[sym]['공포적립']}개\n"
                                 message_list += f"갱신 보유 잔고: {formatted_amount}\n"
                             else:
                                 message_list += f"탐욕 매도 실패 ({sell_result})\n"
@@ -285,18 +291,21 @@ try:
                     # 거래량 변동성 신호
                     if last_volume > (average_volume*panic_volume_rate):
                     
-                        message_list += "\n\n(+++ 공포 예탁 +++ 공포 예탁 +++ 공포 예탁 +++ 공포 예탁 +++ )\n"
+                        message_list += "\n\n(+++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++ )\n"
 
                         # 음봉이니?
                         if last_open > last_close: 
                             
+                            count = 1
                             # 과공포 상태니?
                             if last_volume > (average_volume*panic_volume_rate_max_more) and symbol_list[sym]['잔여예산'] >= (allotment_budget * buy_rate * 3):
                                 price = allotment_budget * buy_rate * 3
-                                message_list += "!!! +++ 극공포 x3x3x3x3x3x3 예탁 +++ !!! \n"
+                                message_list += "!!! +++ 극공포 x3x3x3x3x3x3 예치 +++ !!! \n"
+                                count = 3
                             elif last_volume > (average_volume*panic_volume_rate_max) and symbol_list[sym]['잔여예산'] >= (allotment_budget * buy_rate * 2):
                                 price = allotment_budget * buy_rate * 2
-                                message_list += "!!! 과공포 x2x2x2 예탁 !!! \n"
+                                message_list += "!!! 과공포 x2x2x2 예치 !!! \n"
+                                count = 2
                             else:
                                 price = allotment_budget * buy_rate
 
@@ -306,14 +315,14 @@ try:
                             buy_result = upbit.buy_market_order(sym, price) # 현금
                             if buy_result is not None:          
                                 
-                                symbol_list[sym]['공포적립'] += 1
+                                symbol_list[sym]['공포적립'] += count
                                 
                                 time.sleep(0.02)                                    
                                 qty = get_balance(symbol_list[sym]['매도티커'])
 
                                 symbol_list[sym]['total'] = current_price * qty
                                 formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
-                                message_list += f"공포 예탁 변화 : {symbol_list[sym]['공포적립']-1} -> {symbol_list[sym]['공포적립']}개\n"   
+                                message_list += f"공포 예치 변화 : {symbol_list[sym]['공포적립']-count} -> {symbol_list[sym]['공포적립']}개\n"   
                                 message_list += f"갱신 보유 잔고: {formatted_amount}\n"                      
 
                             else:
@@ -331,7 +340,7 @@ try:
 
             total_cash = get_balance("KRW") # 현금잔고 조회
 
-            formatted_amount = "{:,.2f}%".format(total/total_cash*100)
+            formatted_amount = "{:,.2f}%".format(total/(total_cash+total)*100)
             message_list += f"주식 비중: {formatted_amount}\n"
 
             formatted_amount = "{:,.0f}원".format(total_cash+total)
