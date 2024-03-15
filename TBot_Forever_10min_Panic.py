@@ -125,11 +125,11 @@ try:
             last_min = df.index[0].minute
 
             
-            message_list = f"\n>>> 코인거래 10분봉 갱신합니다 <<< ({last_min}분)\n"
+            message_list = f"<<<< 코인거래 10분봉 갱신합니다 >>>> ({last_min}분)\n"
             send_message(message_list)
 
-            message_list = "\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-            message_list += "\n"
+            message_list = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+            message_list += "\n>>>\n"
 
             total = 0
             
@@ -337,7 +337,7 @@ try:
 
 
                 total += symbol_list[sym]['total']
-                message_list += "\n-------------------------------\n\n"
+                message_list += "\n-------------------------------\n"
             
             
             message_list += "\n======================\n"
