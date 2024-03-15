@@ -50,7 +50,7 @@ try:
     panic_volume_rate_max = 3 #2배
     panic_volume_rate_max_more = 4.5 #3배
 
-    greed_volume_rate = 2 #2배
+    greed_volume_rate = 2 #1배
     greed_volume_rate_max = 4 #3배
     greed_volume_rate_max_more = 6 #4배
     
