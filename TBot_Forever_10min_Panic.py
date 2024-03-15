@@ -50,9 +50,9 @@ try:
     panic_volume_rate_max = 3 #2배
     panic_volume_rate_max_more = 4.5 #3배
 
-    greed_volume_rate = 1.5 #2배
-    greed_volume_rate_max = 3 #3배
-    greed_volume_rate_max_more = 4.5 #4배
+    greed_volume_rate = 2 #2배
+    greed_volume_rate_max = 4 #3배
+    greed_volume_rate_max_more = 6 #4배
     
     # 매수
     allotment_budget = 1500000
@@ -127,7 +127,7 @@ try:
             
             message_list = f"\n>>> 코인거래 10분봉 갱신합니다 <<< ({last_min}분)\n"
             send_message(message_list)
-            
+
             message_list = "\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
             message_list += "\n"
 
