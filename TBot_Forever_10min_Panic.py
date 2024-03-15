@@ -137,7 +137,7 @@ try:
             message_list += "-----------\n\n"
 
             send_message(message_list)
-            message_list = ""
+            message_list = "\n"
             
             for sym in symbol_list: # 초기화
 
@@ -337,6 +337,8 @@ try:
                 total += symbol_list[sym]['total']
                 message_list += "\n-----------------------------------------------\n\n"
             
+            send_message(message_list)
+            message_list = "\n"
 
             total_cash = get_balance("KRW") # 현금잔고 조회
 
