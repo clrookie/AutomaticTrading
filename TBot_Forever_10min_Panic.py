@@ -137,7 +137,7 @@ try:
             message_list += "-----------\n\n"
 
             send_message(message_list)
-            message_list = "\n"
+            message_list = "\n-----------------------------------------------\n\n"
             
             for sym in symbol_list: # 초기화
 
@@ -275,7 +275,7 @@ try:
 
                                 symbol_list[sym]['total'] = current_price * qty
                                 formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
-                                message_list += f"공포 예치 변화 : {symbol_list[sym]['공포적립']+count} -> {symbol_list[sym]['공포적립']}개\n"
+                                # message_list += f"공포 예치 변화 : {symbol_list[sym]['공포적립']+count} -> {symbol_list[sym]['공포적립']}개\n"
                                 message_list += f"갱신 보유 잔고: {formatted_amount}\n"
                             else:
                                 message_list += f"탐욕 매도 실패 ({sell_result})\n"
@@ -322,7 +322,7 @@ try:
 
                                 symbol_list[sym]['total'] = current_price * qty
                                 formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
-                                message_list += f"공포 예치 변화 : {symbol_list[sym]['공포적립']-count} -> {symbol_list[sym]['공포적립']}개\n"   
+                                # message_list += f"공포 예치 변화 : {symbol_list[sym]['공포적립']-count} -> {symbol_list[sym]['공포적립']}개\n"   
                                 message_list += f"갱신 보유 잔고: {formatted_amount}\n"                      
 
                             else:
@@ -338,7 +338,8 @@ try:
                 message_list += "\n-----------------------------------------------\n\n"
             
             send_message(message_list)
-            message_list = "\n"
+            
+            message_list = "\n======================\n"
 
             total_cash = get_balance("KRW") # 현금잔고 조회
 
@@ -358,6 +359,7 @@ try:
             formatted_amount2 = "{:,.2f}%".format(result_rate)
             message_list += f"수익율: {formatted_amount1} ({formatted_amount2})"
 
+            message_list = "\n======================\n"
             send_message(message_list)
                           
         # for문 끝 라인..
