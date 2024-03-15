@@ -120,12 +120,15 @@ try:
 
         if df.index[0].minute != last_min:    # 10분 캔들 갱신
 
-            time.sleep(0.02) # 데이터 갱신 보정
+            time.sleep(0.1) # 데이터 갱신 보정
 
             last_min = df.index[0].minute
 
+            
+            message_list = f"\n>>> 코인거래 10분봉 갱신합니다 <<< ({last_min}분)\n"
+            send_message(message_list)
+            
             message_list = "\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-            message_list += f"\n>>> 코인거래 10분봉 갱신합니다 <<< ({last_min}분)\n"
             message_list += "\n"
 
             total = 0
@@ -137,12 +140,10 @@ try:
             message_list += f"탐욕 거래량: {greed_volume_rate}배 / {greed_volume_rate_max}배 / {greed_volume_rate_max_more}배 \n"
             message_list += "-----------\n\n"
 
-            send_message(message_list)
-            message_list = "\n-----------------------------------------------\n\n"
             
             for sym in symbol_list: # 초기화
 
-                message_list = f"[{symbol_list[sym]['종목명']}]\n"
+                message_list += f"[{symbol_list[sym]['종목명']}]\n"
                 
                 current_price = get_current_price(sym)
                 
@@ -242,7 +243,7 @@ try:
                     # 거래량 변동성 신호
                     if last_volume > (average_volume*greed_volume_rate):
                     
-                        message_list += "\n\n(--- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 ---)\n"
+                        message_list += "\n\n(--- 탐욕 지급 ---)\n"
 
                         # 양봉이니?
                         if last_open < last_close:
@@ -252,11 +253,11 @@ try:
                             # 과탐욕 상태니?
                             if last_volume > (average_volume*greed_volume_rate_max_more) and symbol_list[sym]['공포적립'] >= 3:
                                 sell_qty = (qty / symbol_list[sym]['공포적립']) * 3
-                                message_list += "!!! --- 극탐욕 x3x3x3x3x3x3 지급 --- !!! \n"
+                                message_list += "!!! --- 극탐욕 x3 지급 --- !!! \n"
                                 count = 3
                             elif last_volume > (average_volume*greed_volume_rate_max) and symbol_list[sym]['공포적립'] >= 2:
                                 sell_qty = (qty / symbol_list[sym]['공포적립']) * 2
-                                message_list += "!!! 과탐욕 x2x2x2 지급 !!! \n"
+                                message_list += "!!! 과탐욕 x2 지급 !!! \n"
                                 count = 2
                             else:                                
                                 sell_qty = qty / symbol_list[sym]['공포적립']
@@ -277,8 +278,8 @@ try:
 
                                 symbol_list[sym]['total'] = current_price * qty
                                 formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
-                                # message_list += f"공포 예치 변화 : {symbol_list[sym]['공포적립']+count} -> {symbol_list[sym]['공포적립']}개\n"
-                                message_list += f"갱신 보유 잔고: {formatted_amount}\n"
+                                message_list += f"공포 변화 : {symbol_list[sym]['공포적립']+count} -> {symbol_list[sym]['공포적립']}개\n"
+                                message_list += f"갱신 잔고: {formatted_amount}\n"
                             else:
                                 message_list += f"탐욕 매도 실패 ({sell_result})\n"
 
@@ -293,7 +294,7 @@ try:
                     # 거래량 변동성 신호
                     if last_volume > (average_volume*panic_volume_rate):
                     
-                        message_list += "\n\n(+++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++ )\n"
+                        message_list += "\n\n(+++ 공포 예치 +++)\n"
 
                         # 음봉이니?
                         if last_open > last_close: 
@@ -303,11 +304,11 @@ try:
                             # 과공포 상태니?
                             if last_volume > (average_volume*panic_volume_rate_max_more) and symbol_list[sym]['잔여예산'] >= buy_rate * 3:
                                 price = buy_rate * 3
-                                message_list += "!!! +++ 극공포 x3x3x3x3x3x3 예치 +++ !!! \n"
+                                message_list += "!!! +++ 극공포 x3 예치 +++ !!! \n"
                                 count = 3
                             elif last_volume > (average_volume*panic_volume_rate_max) and symbol_list[sym]['잔여예산'] >= buy_rate * 2:
                                 price = buy_rate * 2
-                                message_list += "!!! 과공포 x2x2x2 예치 !!! \n"
+                                message_list += "!!! 과공포 x2 예치 !!! \n"
                                 count = 2
                             else:
                                 price = buy_rate  
@@ -323,8 +324,8 @@ try:
 
                                 symbol_list[sym]['total'] = current_price * qty
                                 formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
-                                message_list += f"공포 예치 변화 : {symbol_list[sym]['공포적립']-count} -> {symbol_list[sym]['공포적립']}개\n"   
-                                message_list += f"갱신 보유 잔고: {formatted_amount}\n"                      
+                                message_list += f"공포 변화 : {symbol_list[sym]['공포적립']-count} -> {symbol_list[sym]['공포적립']}개\n"   
+                                message_list += f"갱신 잔고: {formatted_amount}\n"                      
 
                             else:
                                 message_list += f"공포 매수 실패 ({buy_result})\n"
@@ -336,16 +337,15 @@ try:
 
 
                 total += symbol_list[sym]['total']
-                message_list += "\n-----------------------------------------------\n\n"
-                send_message(message_list)
+                message_list += "\n-------------------------------\n\n"
             
             
-            message_list = "\n======================\n"
+            message_list += "\n======================\n"
 
             total_cash = get_balance("KRW") # 현금잔고 조회
 
             formatted_amount = "{:,.2f}%".format(total/(total_cash+total)*100)
-            message_list += f"주식 비중: {formatted_amount}\n"
+            message_list += f"코인 비중: {formatted_amount}\n"
 
             formatted_amount = "{:,.0f}원".format(total_cash+total)
             message_list += f"총 잔고: {formatted_amount} "
@@ -353,14 +353,14 @@ try:
             formatted_amount = "{:,.0f}원".format(total_cash)
             message_list += f"(현금 {formatted_amount}, "
             formatted_amount = "{:,.0f}원".format(total)
-            message_list += f"주식 {formatted_amount})\n"
+            message_list += f"코인 {formatted_amount})\n"
 
             result_rate = ((total_cash+total) / principal * 100) - 100
             formatted_amount1 = "{:,.0f}원".format((total_cash+total)-principal)
             formatted_amount2 = "{:,.2f}%".format(result_rate)
             message_list += f"수익율: {formatted_amount1} ({formatted_amount2})"
 
-            message_list = "\n======================\n"
+            message_list += "\n======================\n"
             send_message(message_list)
                           
         # for문 끝 라인..
