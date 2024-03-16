@@ -140,8 +140,10 @@ try:
             message_list += f"탐욕 거래량: {greed_volume_rate}배 / {greed_volume_rate_max}배 / {greed_volume_rate_max_more}배 \n"
             message_list += "-----------\n\n"
 
-            
+            forcount = 0
             for sym in symbol_list: # 초기화
+                
+                forcount += 1
 
                 message_list += f"[{symbol_list[sym]['종목명']}]\n"
                 
@@ -337,7 +339,12 @@ try:
 
 
                 total += symbol_list[sym]['total']
-                message_list += "\n--------------------\n"
+                message_list += "\n------------------------------------------\n"
+                
+                if forcount == 5:
+                    send_message(message_list)                    
+                    message_list = "\n>>> "
+                
             
             
             message_list += "\n======================\n"
