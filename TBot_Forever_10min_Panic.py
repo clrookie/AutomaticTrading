@@ -129,13 +129,13 @@ try:
             send_message(message_list)
 
             message_list = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-            message_list += "\n>>>\n"
+            message_list += "\n>>> "
 
             total = 0
             
             formatted_amount = "{:,.0f}원".format(allotment_budget)
             formatted_amount1 = "{:,.0f}원".format(buy_rate)
-            message_list += f"배분 예산: {formatted_amount} (분할 {formatted_amount1}) \n"
+            message_list += f"배분 예산: {formatted_amount} (분할 {division}개, {formatted_amount1}) \n"
             message_list += f"공포 거래량: {panic_volume_rate}배 / {panic_volume_rate_max}배 / {panic_volume_rate_max_more}배 \n"
             message_list += f"탐욕 거래량: {greed_volume_rate}배 / {greed_volume_rate_max}배 / {greed_volume_rate_max_more}배 \n"
             message_list += "-----------\n\n"
@@ -168,15 +168,15 @@ try:
                     message_list += f"평단: {formatted_amount} ({formatted_amount1})\n"
                     
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
-                    message_list += f"보유 잔고: {formatted_amount}\n"
+                    message_list += f"보유: {formatted_amount}\n"
 
                 else:
                     symbol_list[sym]['공포적립'] = 0
                     symbol_list[sym]['잔여예산'] = allotment_budget
 
-                message_list += f"공포 적립: {symbol_list[sym]['공포적립']}개"
+                message_list += f"적립: {symbol_list[sym]['공포적립']}개"
                 formatted_amount = "{:,.0f}원".format(symbol_list[sym]['잔여예산'])
-                message_list += f" (예산: {formatted_amount})\n\n"
+                message_list += f" (잔여: {formatted_amount})\n\n"
 
                 
                 average_price_20 = 0
@@ -253,11 +253,11 @@ try:
                             # 과탐욕 상태니?
                             if last_volume > (average_volume*greed_volume_rate_max_more) and symbol_list[sym]['공포적립'] >= 3:
                                 sell_qty = (qty / symbol_list[sym]['공포적립']) * 3
-                                message_list += "!!! --- 극탐욕 x3 지급 --- !!! \n"
+                                message_list += "극탐욕 x3 지급 (---) \n"
                                 count = 3
                             elif last_volume > (average_volume*greed_volume_rate_max) and symbol_list[sym]['공포적립'] >= 2:
                                 sell_qty = (qty / symbol_list[sym]['공포적립']) * 2
-                                message_list += "!!! 과탐욕 x2 지급 !!! \n"
+                                message_list += "과탐욕 x2 지급 (--) \n"
                                 count = 2
                             else:                                
                                 sell_qty = qty / symbol_list[sym]['공포적립']
@@ -278,13 +278,13 @@ try:
 
                                 symbol_list[sym]['total'] = current_price * qty
                                 formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
-                                message_list += f"공포 변화 : {symbol_list[sym]['공포적립']+count} -> {symbol_list[sym]['공포적립']}개\n"
-                                message_list += f"갱신 잔고: {formatted_amount}\n"
+                                message_list += f"변화 : {symbol_list[sym]['공포적립']+count} -> {symbol_list[sym]['공포적립']}개\n"
+                                message_list += f"갱신: {formatted_amount}\n"
                             else:
                                 message_list += f"탐욕 매도 실패 ({sell_result})\n"
 
                         else: # 음봉
-                            message_list += "20 60 120 위 ↑↑↑↑ '음봉' 나가리~\n"
+                            message_list += "20 60 120 ↑↑↑↑ '음봉' 나가리~\n"
                     else: # 변동성 조건 미달
                             message_list += " - 탐욕구간\n"
 
@@ -304,11 +304,11 @@ try:
                             # 과공포 상태니?
                             if last_volume > (average_volume*panic_volume_rate_max_more) and symbol_list[sym]['잔여예산'] >= buy_rate * 3:
                                 price = buy_rate * 3
-                                message_list += "!!! +++ 극공포 x3 예치 +++ !!! \n"
+                                message_list += "극공포 x3 예치 (+++) \n"
                                 count = 3
                             elif last_volume > (average_volume*panic_volume_rate_max) and symbol_list[sym]['잔여예산'] >= buy_rate * 2:
                                 price = buy_rate * 2
-                                message_list += "!!! 과공포 x2 예치 !!! \n"
+                                message_list += "과공포 x2 예치 (++) \n"
                                 count = 2
                             else:
                                 price = buy_rate  
@@ -324,20 +324,20 @@ try:
 
                                 symbol_list[sym]['total'] = current_price * qty
                                 formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
-                                message_list += f"공포 변화 : {symbol_list[sym]['공포적립']-count} -> {symbol_list[sym]['공포적립']}개\n"   
-                                message_list += f"갱신 잔고: {formatted_amount}\n"                      
+                                message_list += f"변화 : {symbol_list[sym]['공포적립']-count} -> {symbol_list[sym]['공포적립']}개\n"   
+                                message_list += f"갱신: {formatted_amount}\n"                      
 
                             else:
                                 message_list += f"공포 매수 실패 ({buy_result})\n"
 
                         else: # 양봉
-                            message_list += "20 60 120 아래 ↓↓↓↓ '양봉' 나가리~\n"
+                            message_list += "20 60 120 ↓↓↓↓ '양봉' 나가리~\n"
                     else: # 변동성 조건 미달
                             message_list += " - 공포구간\n"
 
 
                 total += symbol_list[sym]['total']
-                message_list += "\n-------------------------------\n"
+                message_list += "\n--------------------\n"
             
             
             message_list += "\n======================\n"
