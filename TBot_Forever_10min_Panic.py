@@ -125,10 +125,9 @@ try:
             last_min = df.index[0].minute
 
             
-            message_list = f"<<<< 코인거래 10분봉 갱신합니다 >>>> ({last_min}분)\n"
-            send_message(message_list)
 
             message_list = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+            message_list += f"<<<< 코인거래 10분봉 갱신합니다 >>>> ({last_min}분)\n"
             message_list += "\n>>> "
 
             total = 0
@@ -245,7 +244,7 @@ try:
                     # 거래량 변동성 신호
                     if last_volume > (average_volume*greed_volume_rate):
                     
-                        message_list += "\n\n(--- 탐욕 지급 ---)\n"
+                        message_list += "\n\n(--- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 ---)\n"
 
                         # 양봉이니?
                         if last_open < last_close:
@@ -255,11 +254,11 @@ try:
                             # 과탐욕 상태니?
                             if last_volume > (average_volume*greed_volume_rate_max_more) and symbol_list[sym]['공포적립'] >= 3:
                                 sell_qty = (qty / symbol_list[sym]['공포적립']) * 3
-                                message_list += "극탐욕 x3 지급 (---) \n"
+                                message_list += "!!! 극탐욕 x3x3x3 지급 !!! \n"
                                 count = 3
                             elif last_volume > (average_volume*greed_volume_rate_max) and symbol_list[sym]['공포적립'] >= 2:
                                 sell_qty = (qty / symbol_list[sym]['공포적립']) * 2
-                                message_list += "과탐욕 x2 지급 (--) \n"
+                                message_list += "!! 과탐욕 x2x2 지급 !! \n"
                                 count = 2
                             else:                                
                                 sell_qty = qty / symbol_list[sym]['공포적립']
@@ -296,7 +295,7 @@ try:
                     # 거래량 변동성 신호
                     if last_volume > (average_volume*panic_volume_rate):
                     
-                        message_list += "\n\n(+++ 공포 예치 +++)\n"
+                        message_list += "\n\n(+++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++)\n"
 
                         # 음봉이니?
                         if last_open > last_close: 
@@ -306,11 +305,11 @@ try:
                             # 과공포 상태니?
                             if last_volume > (average_volume*panic_volume_rate_max_more) and symbol_list[sym]['잔여예산'] >= buy_rate * 3:
                                 price = buy_rate * 3
-                                message_list += "극공포 x3 예치 (+++) \n"
+                                message_list += "!!! 극공포 x3x3x3 예치 !!! \n"
                                 count = 3
                             elif last_volume > (average_volume*panic_volume_rate_max) and symbol_list[sym]['잔여예산'] >= buy_rate * 2:
                                 price = buy_rate * 2
-                                message_list += "과공포 x2 예치 (++) \n"
+                                message_list += "!! 과공포 x2x2 예치 !! \n"
                                 count = 2
                             else:
                                 price = buy_rate  
