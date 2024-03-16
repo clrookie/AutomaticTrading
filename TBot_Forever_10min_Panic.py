@@ -46,7 +46,7 @@ try:
     principal = 15000000
     
     # 기준 거래량 비율
-    panic_volume_rate = 1.5 #1배
+    panic_volume_rate = 2 #1배
     panic_volume_rate_max = 3 #2배
     panic_volume_rate_max_more = 4.5 #3배
 
