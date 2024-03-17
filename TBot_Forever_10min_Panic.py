@@ -58,7 +58,7 @@ try:
     
     # 매수
     allotment_budget = 1500000
-    division = 60
+    division = 50
     buy_rate = allotment_budget / division
 
 
