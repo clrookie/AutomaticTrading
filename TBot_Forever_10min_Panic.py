@@ -261,7 +261,7 @@ try:
                                 message_list += "!+! 약한 청산탐욕 '1/3' 지급 !+! \n"
                             elif last_volume > (average_volume*greed_volume_rate_max_more) and symbol_list[sym]['공포적립'] >= 4:
                                 sell_qty = (qty / symbol_list[sym]['공포적립']) * 4
-                                message_list += "!! 극탐욕 x4x4 지급 !! \n"
+                                message_list += "!! 극탐욕 x4x4x4x4 지급 !! \n"
                             elif last_volume > (average_volume*greed_volume_rate_max) and symbol_list[sym]['공포적립'] >= 2:
                                 sell_qty = (qty / symbol_list[sym]['공포적립']) * 2
                                 message_list += "!! 과탐욕 x2x2 지급 !! \n"
