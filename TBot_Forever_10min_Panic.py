@@ -50,10 +50,11 @@ try:
     panic_volume_rate_max = 3 #2배
     panic_volume_rate_max_more = 4.5 #3배
 
-    greed_volume_rate = 1.2 #1배
-    greed_volume_rate_max = 1.7 #2배
-    greed_volume_rate_max_more = 2.2 #3배
-    greed_volume_rate_half = 3 #3배
+    greed_volume_rate = 1.2
+    greed_volume_rate_max = 1.7
+    greed_volume_rate_max_more = 2.2
+    greed_volume_rate_1_3 = 2.7 # 1/3 청산
+    greed_volume_rate_1_2 = 3.2 # 1/2 청산
     
     # 매수
     allotment_budget = 1500000
@@ -137,7 +138,7 @@ try:
             formatted_amount1 = "{:,.0f}원".format(buy_rate)
             message_list += f"배분 예산: {formatted_amount} (분할 {division}개, {formatted_amount1}) \n"
             message_list += f"공포 거래량: {panic_volume_rate}배 / {panic_volume_rate_max}배 / {panic_volume_rate_max_more}배 \n"
-            message_list += f"탐욕 거래량: {greed_volume_rate}배 / {greed_volume_rate_max}배 / {greed_volume_rate_max_more}배 / {greed_volume_rate_half}배(절반)  \n"
+            message_list += f"탐욕 거래량: {greed_volume_rate}배 / {greed_volume_rate_max}배 / {greed_volume_rate_max_more}배 / {greed_volume_rate_1_3}배(1/3) / {greed_volume_rate_1_2}배(1/2)  \n"
             message_list += "-----------\n\n"
 
             forcount = 0
@@ -252,12 +253,15 @@ try:
 
                             sell_qty = 0
                             # 과탐욕 상태니?
-                            if last_volume > (average_volume*greed_volume_rate_half):
+                            if last_volume > (average_volume*greed_volume_rate_1_2):
                                 sell_qty = qty / 2
-                                message_list += "!!! 청산탐욕 '절반' 지급 !!! \n"
+                                message_list += "!+!+! 강한 청산탐욕 '1/2' 지급 !+!+! \n"
+                            elif last_volume > (average_volume*greed_volume_rate_1_3):
+                                sell_qty = qty / 3
+                                message_list += "!+! 약한 청산탐욕 '1/3' 지급 !+! \n"
                             elif last_volume > (average_volume*greed_volume_rate_max_more) and symbol_list[sym]['공포적립'] >= 4:
                                 sell_qty = (qty / symbol_list[sym]['공포적립']) * 4
-                                message_list += "!! 과탐욕 x4x4 지급 !! \n"
+                                message_list += "!! 극탐욕 x4x4 지급 !! \n"
                             elif last_volume > (average_volume*greed_volume_rate_max) and symbol_list[sym]['공포적립'] >= 2:
                                 sell_qty = (qty / symbol_list[sym]['공포적립']) * 2
                                 message_list += "!! 과탐욕 x2x2 지급 !! \n"
