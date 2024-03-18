@@ -106,8 +106,8 @@ try:
     '매도티커':'DOT',
     **common_data},
     
-    'KRW-MATIC':{'종목명':'폴리곤 #9', 
-    '매도티커':'MATIC',
+    'KRW-LINK':{'종목명':'체인링크 #9', 
+    '매도티커':'LINK',
     **common_data},
 
     'KRW-EOS':{'종목명':'이오스 #10', 
