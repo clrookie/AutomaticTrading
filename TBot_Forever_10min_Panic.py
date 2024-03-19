@@ -58,7 +58,7 @@ try:
     
     # 매수
     allotment_budget = 1500000
-    division = 50
+    division = 150
     buy_rate = allotment_budget / division
 
 
@@ -243,6 +243,8 @@ try:
                 # 시가 120 이평선 위에
                 if symbol_list[sym]['공포적립'] > 0 and last_open > average_price_20 and last_open > average_price_60 and last_open > average_price_120:
 
+                    symbol_list[sym]['공포에너지'] = 0
+
                     # 거래량 변동성 신호
                     if last_volume > (average_volume*greed_volume_rate):
                     
@@ -251,23 +253,16 @@ try:
                         sell_qty = 0
 
                         # 양봉이니?
-                        if last_open < last_close:
+                        if last_open <= last_close:
 
-                            # 과탐욕 상태니?
-                            if last_volume > (average_volume*greed_volume_rate_1_2):
-                                sell_qty = qty / 2
-                                message_list += "!+!+! 강한 청산탐욕 '1/2' 지급 !+!+! \n"
-                            elif last_volume > (average_volume*greed_volume_rate_1_3):
-                                sell_qty = qty / 3
-                                message_list += "!+! 약한 청산탐욕 '1/3' 지급 !+! \n"
-                            elif last_volume > (average_volume*greed_volume_rate_max_more) and symbol_list[sym]['공포적립'] >= 4:
-                                sell_qty = (qty / symbol_list[sym]['공포적립']) * 4
-                                message_list += "!! 극탐욕 x4x4x4x4 지급 !! \n"
-                            elif last_volume > (average_volume*greed_volume_rate_max) and symbol_list[sym]['공포적립'] >= 2:
-                                sell_qty = (qty / symbol_list[sym]['공포적립']) * 2
-                                message_list += "!! 과탐욕 x2x2 지급 !! \n"
-                            else:                                
-                                sell_qty = qty / symbol_list[sym]['공포적립']
+                            if symbol_list[sym]['탐욕에너지'] < 10:
+                                symbol_list[sym]['탐욕에너지'] += 1
+
+                            if symbol_list[sym]['공포적립'] > symbol_list[sym]['탐욕에너지']:
+                                sell_qty = (qty / symbol_list[sym]['공포적립']) * symbol_list[sym]['탐욕에너지']
+                                message_list += f"!! 탐욕 +{symbol_list[sym]['탐욕에너지']} 지급 !! \n"
+                            else:
+                                sell_qty = qty # 전량 지급
 
             
                             time.sleep(0.02)
@@ -291,10 +286,12 @@ try:
                         else: # 음봉
                             message_list += "20 60 120 ↑↑↑↑ '음봉' 나가리~\n"
                     else: # 변동성 조건 미달
-                            message_list += " - 탐욕구간\n"
+                            message_list += f" - 탐욕구간 (에너지:{symbol_list[sym]['탐욕에너지']})\n"
 
                 # 저가 120 이평선 아래        
                 elif symbol_list[sym]['잔여예산'] >= buy_rate and last_open < average_price_20 and last_open < average_price_60 and last_open < average_price_120:
+
+                    symbol_list[sym]['탐욕에너지'] = 0
 
                     # 거래량 변동성 신호
                     if last_volume > (average_volume*panic_volume_rate):
@@ -304,36 +301,36 @@ try:
                         price = 0
 
                         # 음봉이니?
-                        if last_open > last_close: 
-                            
-                            # 과공포 상태니?
-                            if last_volume > (average_volume*panic_volume_rate_max_more) and symbol_list[sym]['잔여예산'] >= buy_rate * 3:
-                                price = buy_rate * 3
-                                message_list += "!!! 극공포 x3x3x3 예치 !!! \n"
-                            elif last_volume > (average_volume*panic_volume_rate_max) and symbol_list[sym]['잔여예산'] >= buy_rate * 2:
-                                price = buy_rate * 2
-                                message_list += "!! 과공포 x2x2 예치 !! \n"
-                            else:
-                                price = buy_rate  
+                        if last_open >= last_close: 
 
-                            # 공포 매수
-                            buy_result = upbit.buy_market_order(sym, price) # 현금
-                            if buy_result is not None:          
+                            if symbol_list[sym]['공포에너지'] < 10:
+                                symbol_list[sym]['공포에너지'] += 1
+
+                            if symbol_list[sym]['잔여예산'] >= buy_rate * symbol_list[sym]['공포에너지']:
                                 
-                                time.sleep(0.02)                                    
-                                qty = get_balance(symbol_list[sym]['매도티커'])
+                                price = buy_rate * symbol_list[sym]['공포에너지']
+                                message_list += f"!! 공포 +{symbol_list[sym]['공포에너지']} 예치 !! \n"
 
-                                symbol_list[sym]['total'] = current_price * qty
-                                formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total']) 
-                                message_list += f"갱신: {formatted_amount}\n"                      
+                                # 공포 매수
+                                buy_result = upbit.buy_market_order(sym, price) # 현금
+                                if buy_result is not None:          
+                                    
+                                    time.sleep(0.02)                                    
+                                    qty = get_balance(symbol_list[sym]['매도티커'])
 
+                                    symbol_list[sym]['total'] = current_price * qty
+                                    formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total']) 
+                                    message_list += f"갱신: {formatted_amount}\n"                      
+
+                                else:
+                                    message_list += f"공포 매수 실패 ({buy_result})\n"
                             else:
-                                message_list += f"공포 매수 실패 ({buy_result})\n"
+                                message_list += f"잔여 예산 부족~ \n"
 
                         else: # 양봉
                             message_list += "20 60 120 ↓↓↓↓ '양봉' 나가리~\n"
                     else: # 변동성 조건 미달
-                            message_list += " - 공포구간\n"
+                            message_list += f" - 공포구간 (에너지:{symbol_list[sym]['공포에너지']})\n"
 
 
                 total += symbol_list[sym]['total']
