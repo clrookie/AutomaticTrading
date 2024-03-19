@@ -303,10 +303,15 @@ try:
                         # 음봉이니?
                         if last_open >= last_close: 
 
+                            buy = False
                             if symbol_list[sym]['공포에너지'] < 10:
                                 symbol_list[sym]['공포에너지'] += 1
+                                buy = True
+                            else:
+                                if last_volume > (average_volume*panic_volume_rate_max_more): buy = True
 
-                            if symbol_list[sym]['잔여예산'] >= buy_rate * symbol_list[sym]['공포에너지']:
+
+                            if buy == True and symbol_list[sym]['잔여예산'] >= buy_rate * symbol_list[sym]['공포에너지']:
                                 
                                 price = buy_rate * symbol_list[sym]['공포에너지']
                                 message_list += f"!! 공포 +{symbol_list[sym]['공포에너지']} 예치 !! \n"
@@ -325,7 +330,7 @@ try:
                                 else:
                                     message_list += f"공포 매수 실패 ({buy_result})\n"
                             else:
-                                message_list += f"잔여 예산 부족~ \n"
+                                message_list += f"잔여 예산 or 거래량 부족~ \n"
 
                         else: # 양봉
                             message_list += "20 60 120 ↓↓↓↓ '양봉' 나가리~\n"
