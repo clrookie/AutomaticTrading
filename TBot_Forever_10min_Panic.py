@@ -43,7 +43,7 @@ try:
     last_min = 77
     
     #원금
-    principal = 15000000
+    principal = 14000000
     
     # 기준 거래량 비율
     panic_volume_rate = 2 #1배
