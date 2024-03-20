@@ -248,14 +248,14 @@ try:
                     # 거래량 변동성 신호
                     if last_volume > (average_volume*greed_volume_rate):
                     
-                        message_list += "\n\n(--- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 ---)\n"
+                        message_list += "\n\n--- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 ---\n"
                         
                         sell_qty = 0
 
                         # 양봉이니?
                         if last_open <= last_close:
 
-                            if symbol_list[sym]['탐욕에너지'] < 19:
+                            if symbol_list[sym]['탐욕에너지'] < 9:
                                 symbol_list[sym]['탐욕에너지'] += 2
 
                             if symbol_list[sym]['공포적립'] > symbol_list[sym]['탐욕에너지']:
@@ -296,7 +296,7 @@ try:
                     # 거래량 변동성 신호
                     if last_volume > (average_volume*panic_volume_rate):
                     
-                        message_list += "\n\n(+++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++)\n"
+                        message_list += "\n\n+++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++\n"
 
                         price = 0
 
@@ -330,7 +330,7 @@ try:
                                 else:
                                     message_list += f"공포 매수 실패 ({buy_result})\n"
                             else:
-                                message_list += f"잔여 예산 or 거래량 부족~ \n"
+                                message_list += f"거래량 or 예산 부족 ~ \n"
 
                         else: # 양봉
                             message_list += "20 60 120 ↓↓↓↓ '양봉' 나가리~\n"
