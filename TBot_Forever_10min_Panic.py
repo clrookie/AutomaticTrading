@@ -137,7 +137,7 @@ try:
             formatted_amount = "{:,.0f}원".format(allotment_budget)
             formatted_amount1 = "{:,.0f}원".format(buy_rate)
             message_list += f"배분 예산: {formatted_amount} (분할 {division}개, {formatted_amount1}) \n"
-            message_list += f"공포 거래량: {panic_volume_rate}배 \n"
+            message_list += f"공포 거래량: {panic_volume_rate_max}배 \n"
             message_list += f"탐욕 거래량: {greed_volume_rate}배 \n"
             message_list += "-----------\n\n"
 
@@ -294,7 +294,7 @@ try:
                     symbol_list[sym]['탐욕에너지'] = 0
 
                     # 거래량 변동성 신호
-                    if last_volume > (average_volume*panic_volume_rate):
+                    if last_volume > (average_volume*panic_volume_rate_max):
                     
                         message_list += "\n\n+++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++\n"
 
