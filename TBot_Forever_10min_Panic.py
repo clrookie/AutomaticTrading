@@ -50,7 +50,7 @@ try:
     panic_volume_rate_max = 3 #2배
     panic_volume_rate_max_more = 4.5 #3배
 
-    greed_volume_rate = 1.2
+    greed_volume_rate = 1
     greed_volume_rate_max = 1.7
     greed_volume_rate_max_more = 2.2
     greed_volume_rate_1_3 = 2.7 # 1/3 청산
@@ -255,8 +255,8 @@ try:
                         # 양봉이니?
                         if last_open <= last_close:
 
-                            if symbol_list[sym]['탐욕에너지'] < 10:
-                                symbol_list[sym]['탐욕에너지'] += 1
+                            if symbol_list[sym]['탐욕에너지'] < 19:
+                                symbol_list[sym]['탐욕에너지'] += 2
 
                             if symbol_list[sym]['공포적립'] > symbol_list[sym]['탐욕에너지']:
                                 sell_qty = (qty / symbol_list[sym]['공포적립']) * symbol_list[sym]['탐욕에너지']
