@@ -94,13 +94,13 @@ try:
     **common_data},
 
     # ----
-    # 'KRW-DOGE':{'종목명':'도지코인 #6', 
-    # '매도티커':'DOGE',
-    # **common_data},
+    'KRW-DOGE':{'종목명':'도지코인 #6', 
+    '매도티커':'DOGE',
+    **common_data},
 
-    # 'KRW-AVAX':{'종목명':'아발란체 #7', 
-    # '매도티커':'AVAX',
-    # **common_data},
+    'KRW-AVAX':{'종목명':'아발란체 #7', 
+    '매도티커':'AVAX',
+    **common_data},
     
     # 'KRW-DOT':{'종목명':'폴카닷 #8', 
     # '매도티커':'DOT',
