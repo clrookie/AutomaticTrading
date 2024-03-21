@@ -94,25 +94,25 @@ try:
     **common_data},
 
     # ----
-    'KRW-DOGE':{'종목명':'도지코인 #6', 
-    '매도티커':'DOGE',
-    **common_data},
+    # 'KRW-DOGE':{'종목명':'도지코인 #6', 
+    # '매도티커':'DOGE',
+    # **common_data},
 
-    'KRW-AVAX':{'종목명':'아발란체 #7', 
-    '매도티커':'AVAX',
-    **common_data},
+    # 'KRW-AVAX':{'종목명':'아발란체 #7', 
+    # '매도티커':'AVAX',
+    # **common_data},
     
-    'KRW-DOT':{'종목명':'폴카닷 #8', 
-    '매도티커':'DOT',
-    **common_data},
+    # 'KRW-DOT':{'종목명':'폴카닷 #8', 
+    # '매도티커':'DOT',
+    # **common_data},
     
-    'KRW-LINK':{'종목명':'체인링크 #9', 
-    '매도티커':'LINK',
-    **common_data},
+    # 'KRW-LINK':{'종목명':'체인링크 #9', 
+    # '매도티커':'LINK',
+    # **common_data},
 
-    'KRW-EOS':{'종목명':'이오스 #10', 
-    '매도티커':'EOS',
-    **common_data},
+    # 'KRW-EOS':{'종목명':'이오스 #10', 
+    # '매도티커':'EOS',
+    # **common_data},
     }
 
 
@@ -122,7 +122,7 @@ try:
 
         if df.index[0].minute != last_min:    # 10분 캔들 갱신
 
-            time.sleep(5) # 데이터 갱신 보정
+            time.sleep(0.5) # 데이터 갱신 보정
 
             last_min = df.index[0].minute
 
@@ -137,7 +137,7 @@ try:
             formatted_amount = "{:,.0f}원".format(allotment_budget)
             formatted_amount1 = "{:,.0f}원".format(buy_rate)
             message_list += f"배분 예산: {formatted_amount} (분할 {division}개, {formatted_amount1}) \n"
-            message_list += f"공포 거래량: {panic_volume_rate_max}배 \n"
+            message_list += f"공포 거래량: {panic_volume_rate}배 \n"
             message_list += f"탐욕 거래량: {greed_volume_rate}배 \n"
             message_list += "----------- 1/2 ----------\n\n"
 
@@ -255,8 +255,8 @@ try:
                         # 양봉이니?
                         if last_open <= last_close:
 
-                            if symbol_list[sym]['탐욕에너지'] < 9:
-                                symbol_list[sym]['탐욕에너지'] += 2
+                            if symbol_list[sym]['탐욕에너지'] < 10:
+                                symbol_list[sym]['탐욕에너지'] += 1
 
                             if symbol_list[sym]['공포적립'] > symbol_list[sym]['탐욕에너지']:
                                 sell_qty = (qty / symbol_list[sym]['공포적립']) * symbol_list[sym]['탐욕에너지']
@@ -294,7 +294,7 @@ try:
                     symbol_list[sym]['탐욕에너지'] = 0
 
                     # 거래량 변동성 신호
-                    if last_volume > (average_volume*panic_volume_rate_max):
+                    if last_volume > (average_volume*panic_volume_rate):
                     
                         message_list += "\n\n+++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++\n"
 
@@ -308,7 +308,7 @@ try:
                                 symbol_list[sym]['공포에너지'] += 1
                                 buy = True
                             else:
-                                if last_volume > (average_volume*panic_volume_rate_max_more): buy = True
+                                if last_volume > (average_volume*panic_volume_rate_max): buy = True
 
 
                             if buy == True and symbol_list[sym]['잔여예산'] >= buy_rate * symbol_list[sym]['공포에너지']:
