@@ -139,7 +139,7 @@ try:
             message_list += f"배분 예산: {formatted_amount} (분할 {division}개, {formatted_amount1}) \n"
             message_list += f"공포 거래량: {panic_volume_rate}배 \n"
             message_list += f"탐욕 거래량: {greed_volume_rate}배 \n"
-            message_list += "----------- 1/2 ----------\n\n"
+            # message_list += "----------- 1/2 ----------\n\n"
 
             forcount = 0
             for sym in symbol_list: # 초기화
@@ -341,9 +341,9 @@ try:
                 total += symbol_list[sym]['total']
                 message_list += "\n------------------------------------------\n"
                 
-                if forcount == 5:
-                    send_message(message_list)                    
-                    message_list = "----------- 2/2 ---------\n>>> "
+                # if forcount == 5:
+                #     send_message(message_list)                    
+                #     message_list = "----------- 2/2 ---------\n>>> "
                 
             
             
