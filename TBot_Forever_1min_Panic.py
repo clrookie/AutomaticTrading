@@ -306,6 +306,7 @@ try:
                         if last_open >= last_close: 
 
                             buy = False
+                            double = False
                             if symbol_list[sym]['공포에너지'] < 10:
                                 
                                 symbol_list[sym]['공포에너지'] += 1
@@ -313,29 +314,59 @@ try:
                                     buy = True
 
                             else:
-                                if last_volume > (average_volume*panic_volume_rate_max): buy = True
+                                if last_volume > (average_volume*panic_volume_rate_max):
+                                    buy = True
+                                    if last_volume > (average_volume*panic_volume_rate_max_more):
+                                        double = True
 
 
-                            if buy == True and symbol_list[sym]['잔여예산'] >= buy_rate * symbol_list[sym]['공포에너지']:
+                            if buy == True:
                                 
-                                price = buy_rate * symbol_list[sym]['공포에너지']
-                                message_list += f"!! 공포 +{symbol_list[sym]['공포에너지']} 예치 !! \n"
-
-                                # 공포 매수
-                                buy_result = upbit.buy_market_order(sym, price) # 현금
-                                if buy_result is not None:          
+                                if double == True:
+                                    if symbol_list[sym]['잔여예산'] >= buy_rate * symbol_list[sym]['공포에너지'] * 2:
                                     
-                                    time.sleep(0.02)                                    
-                                    qty = get_balance(symbol_list[sym]['매도티커'])
+                                        price = buy_rate * symbol_list[sym]['공포에너지']
+                                        message_list += f"!! 극공포 +{symbol_list[sym]['공포에너지']} 2배 예치 !! \n"
 
-                                    symbol_list[sym]['total'] = current_price * qty
-                                    formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total']) 
-                                    message_list += f"갱신: {formatted_amount}\n"                      
+                                        # 공포 매수
+                                        buy_result = upbit.buy_market_order(sym, price) # 현금
+                                        if buy_result is not None:          
+                                            
+                                            time.sleep(0.02)                                    
+                                            qty = get_balance(symbol_list[sym]['매도티커'])
+
+                                            symbol_list[sym]['total'] = current_price * qty
+                                            formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total']) 
+                                            message_list += f"갱신: {formatted_amount}\n"                      
+
+                                        else:
+                                            message_list += f"공포 매수 실패 ({buy_result})\n"
+                                    else:
+                                        message_list += f"극공포 2배 예치 잔여예산 부족 ~ \n"
 
                                 else:
-                                    message_list += f"공포 매수 실패 ({buy_result})\n"
+                                    if symbol_list[sym]['잔여예산'] >= buy_rate * symbol_list[sym]['공포에너지']:
+                                    
+                                        price = buy_rate * symbol_list[sym]['공포에너지']
+                                        message_list += f"!! 공포 +{symbol_list[sym]['공포에너지']} 예치 !! \n"
+
+                                        # 공포 매수
+                                        buy_result = upbit.buy_market_order(sym, price) # 현금
+                                        if buy_result is not None:          
+                                            
+                                            time.sleep(0.02)                                    
+                                            qty = get_balance(symbol_list[sym]['매도티커'])
+
+                                            symbol_list[sym]['total'] = current_price * qty
+                                            formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total']) 
+                                            message_list += f"갱신: {formatted_amount}\n"                      
+
+                                        else:
+                                            message_list += f"공포 매수 실패 ({buy_result})\n"
+                                    else:
+                                        message_list += f"공포 잔여예산 부족 ~ \n"
                             else:
-                                message_list += f"거래량 or 예산 부족 ~ \n"
+                                message_list += f"극공포 거래량 부족 ~ \n"
 
                         else: # 양봉
                             message_list += "20 60 120 ↓↓↓↓ '양봉' 나가리~\n"
