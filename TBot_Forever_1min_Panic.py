@@ -50,15 +50,15 @@ try:
     panic_volume_rate_max = 3 #2배
     panic_volume_rate_max_more = 4.5 #3배
 
-    greed_volume_rate = 1
+    greed_volume_rate = 1.2
     greed_volume_rate_max = 1.7
     greed_volume_rate_max_more = 2.2
     greed_volume_rate_1_3 = 2.7 # 1/3 청산
     greed_volume_rate_1_2 = 3.2 # 1/2 청산
     
     # 매수
-    allotment_budget = 1500000
-    division = 150
+    allotment_budget = 2000000
+    division = 200
     buy_rate = allotment_budget / division
 
 
@@ -89,9 +89,9 @@ try:
     '매도티커':'XRP',
     **common_data},
 
-    'KRW-ADA':{'종목명':'에이다 #5', 
-    '매도티커':'ADA',
-    **common_data},
+    # 'KRW-ADA':{'종목명':'에이다 #5', 
+    # '매도티커':'ADA',
+    # **common_data},
 
     # ----
     'KRW-DOGE':{'종목명':'도지코인 #6', 
@@ -102,9 +102,9 @@ try:
     '매도티커':'AVAX',
     **common_data},
     
-    # 'KRW-DOT':{'종목명':'폴카닷 #8', 
-    # '매도티커':'DOT',
-    # **common_data},
+    'KRW-ID':{'종목명':'스페이스아이디#8', 
+    '매도티커':'ID',
+    **common_data},
     
     # 'KRW-LINK':{'종목명':'체인링크 #9', 
     # '매도티커':'LINK',
@@ -129,7 +129,7 @@ try:
             
 
             message_list = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n"
-            message_list += f"<<<< 코인거래 10분봉 갱신합니다 >>>> ({last_min}분)\n"
+            message_list += f"(<< 1분봉 갱신합니다 >> ({last_min}분) ({last_min}분) ({last_min}분) ({last_min}분) ({last_min}분)\n"
             message_list += "\n>>> "
 
             total = 0
