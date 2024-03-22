@@ -129,7 +129,7 @@ try:
             
 
             message_list = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n"
-            message_list += f"(<< 1분봉 갱신합니다 >> ({last_min}분) ({last_min}분) ({last_min}분) ({last_min}분) ({last_min}분)\n"
+            message_list += f"<< 1분봉 갱신합니다 >> ({last_min}분) ({last_min}분) ({last_min}분) ({last_min}분) ({last_min}분)\n"
             message_list += "\n>>> "
 
             total = 0
@@ -137,7 +137,7 @@ try:
             formatted_amount = "{:,.0f}원".format(allotment_budget)
             formatted_amount1 = "{:,.0f}원".format(buy_rate)
             message_list += f"배분 예산: {formatted_amount} (분할 {division}개, {formatted_amount1}) \n"
-            message_list += f"공포 거래량: {panic_volume_rate}배 / "
+            message_list += f"공포 거래량: {panic_volume_rate}배(극공포 {panic_volume_rate_max}) / "
             message_list += f"탐욕 거래량: {greed_volume_rate}배 \n\n"
             message_list += "------------------------------------------\n"
 
@@ -243,7 +243,6 @@ try:
                 # 시가 120 이평선 위에
                 if symbol_list[sym]['공포적립'] > 0 and last_open > average_price_20 and last_open > average_price_60 and last_open > average_price_120:
 
-                    symbol_list[sym]['공포에너지'] = 0
 
                     # 거래량 변동성 신호
                     if last_volume > (average_volume*greed_volume_rate):
@@ -256,7 +255,10 @@ try:
                         if last_open <= last_close:
 
                             if symbol_list[sym]['탐욕에너지'] < 7:
+                                
                                 symbol_list[sym]['탐욕에너지'] += 1
+                                if symbol_list[sym]['공포에너지'] > -10:
+                                    symbol_list[sym]['공포에너지'] -= 1
 
                             if symbol_list[sym]['공포적립'] > symbol_list[sym]['탐욕에너지']:
                                 sell_qty = (qty / symbol_list[sym]['공포적립']) * symbol_list[sym]['탐욕에너지']
@@ -305,8 +307,11 @@ try:
 
                             buy = False
                             if symbol_list[sym]['공포에너지'] < 10:
+                                
                                 symbol_list[sym]['공포에너지'] += 1
-                                buy = True
+                                if symbol_list[sym]['공포에너지'] > 0:
+                                    buy = True
+
                             else:
                                 if last_volume > (average_volume*panic_volume_rate_max): buy = True
 
