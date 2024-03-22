@@ -53,6 +53,7 @@ def aaa():
     aa = 34790.0000
     return int(aa) 
 
+print(f"### total_cash ###")
 
 # try:
       # # 코스피(KOSPI) 종목 코드
