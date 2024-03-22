@@ -129,7 +129,7 @@ try:
             
 
             message_list = "\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n"
-            message_list += f">>> 1분봉 갱신합니다 <<< ({last_min}분) ({last_min}분) ({last_min}분) ({last_min}분) ({last_min}분) ({last_min}분) ({last_min}분)\n"
+            message_list += f">>> 1분봉 갱신합니다 <<< ({last_min}분) ({last_min}분) ({last_min}분) ({last_min}분) ({last_min}분)\n"
             message_list += "\n>>> "
 
             total = 0
