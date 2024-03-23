@@ -169,16 +169,16 @@ try:
 
                     formatted_amount = "{:,.1f}원".format(avg_price)
                     formatted_amount1 = "{:,.1f}%".format(current_price/avg_price*100)
-                    message_list += f"평단: {formatted_amount} ({formatted_amount1}) | "
+                    message_list += f"평단: {formatted_amount} ({formatted_amount1})  |  "
                     
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
-                    message_list += f"보유: {formatted_amount}"
+                    message_list += f"보유: {formatted_amount}\n\n"
 
                 else:
                     symbol_list[sym]['공포적립'] = 0
                     symbol_list[sym]['잔여예산'] = allotment_budget
 
-                message_list += f"(적립: {symbol_list[sym]['공포적립']}개)\n\n"
+                # message_list += f"(적립: {symbol_list[sym]['공포적립']}개)\n\n"
                 # formatted_amount = "{:,.0f}원".format(symbol_list[sym]['잔여예산'])
                 # message_list += f" (잔여: {formatted_amount})\n\n"
 
