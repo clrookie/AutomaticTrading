@@ -90,17 +90,16 @@ try:
     '매도티커':'XRP',
     **common_data},
 
-    # 'KRW-ADA':{'종목명':'에이다 #5', 
-    # '매도티커':'ADA',
-    # **common_data},
-
-    # ----
-    'KRW-DOGE':{'종목명':'도지코인 #6', 
+    'KRW-DOGE':{'종목명':'도지코인 #5', 
     '매도티커':'DOGE',
     **common_data},
 
-    'KRW-AVAX':{'종목명':'아발란체 #7', 
+    'KRW-AVAX':{'종목명':'아발란체 #6', 
     '매도티커':'AVAX',
+    **common_data},
+    
+    'KRW-SHIB':{'종목명':'시바이누 #7', 
+    '매도티커':'SHIB',
     **common_data},
     
     'KRW-ID':{'종목명':'스페이스아이디 #8', 
@@ -167,7 +166,7 @@ try:
                     time.sleep(0.02)
                     avg_price = upbit.get_avg_buy_price(sym)
 
-                    formatted_amount = "{:,.1f}원".format(avg_price)
+                    formatted_amount = "{:,.5f}원".format(avg_price)
                     formatted_amount1 = "{:,.1f}%".format(current_price/avg_price*100)
                     message_list += f"평단: {formatted_amount} ({formatted_amount1})  |  "
                     
@@ -272,7 +271,7 @@ try:
                             sell_result = upbit.sell_market_order(sym, sell_qty)
                             if sell_result is not None:
                                 
-                                message_list += f"{round(current_price/avg_price,4)}% 탐욕 매도합니다 ^^ ({sell_qty}개)\n"
+                                message_list += f"{round(current_price/avg_price,6)}% 탐욕 매도합니다 ^^ ({sell_qty}개)\n"
 
                                 time.sleep(0.02)
                                 qty = get_balance(symbol_list[sym]['매도티커'])
