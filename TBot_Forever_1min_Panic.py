@@ -41,6 +41,7 @@ try:
     send_message("======================")
 
     last_min = 77
+    last_result = 0
     
     #원금
     principal = 14000000
@@ -348,7 +349,7 @@ try:
                 
             
             
-            message_list += "\n======================\n"
+            message_list += "\n===========({last_min}분)===========\n"
 
             total_cash = get_balance("KRW") # 현금잔고 조회
 
@@ -364,11 +365,15 @@ try:
             message_list += f"코인 {formatted_amount})\n"
 
             result_rate = ((total_cash+total) / principal * 100) - 100
-            formatted_amount1 = "{:,.0f}원".format((total_cash+total)-principal)
-            formatted_amount2 = "{:,.2f}%".format(result_rate)
-            message_list += f"수익율: {formatted_amount1} ({formatted_amount2})"
 
-            message_list += f"\n====================== ({last_min}분)\n\n\n"
+            formatted_amount1 = "{:,.0f}원".format((total_cash+total)-principal)
+            formatted_amount2 = "{:,.2f}%".format(last_result)
+            formatted_amount3 = "{:,.2f}%".format(result_rate)
+            message_list += f"수익율: {formatted_amount1} ({formatted_amount2} -> {formatted_amount3})"
+            
+            last_result = result_rate
+
+            message_list += f"\n===========({last_min}분)===========\n\n\n"
             send_message(message_list)
                           
         # for문 끝 라인..
