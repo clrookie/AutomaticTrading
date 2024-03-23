@@ -146,7 +146,7 @@ try:
                 
                 forcount += 1
 
-                message_list += f"[{symbol_list[sym]['종목명']}] 공포에너지 >> {symbol_list[sym]['공포에너지']}\n"
+                message_list += f"[{symbol_list[sym]['종목명']}] 공포 {symbol_list[sym]['공포에너지']}, 탐욕 {symbol_list[sym]['탐욕에너지']}\n"
                 
                 current_price = get_current_price(sym)
                 
