@@ -166,9 +166,9 @@ try:
                     time.sleep(0.02)
                     avg_price = upbit.get_avg_buy_price(sym)
 
-                    formatted_amount = "{:,.5f}원".format(avg_price)
+                    # formatted_amount = "{:,.5f}원".format(avg_price)
                     formatted_amount1 = "{:,.1f}%".format(current_price/avg_price*100)
-                    message_list += f"평단가: {formatted_amount} ({formatted_amount1})  |  "
+                    message_list += f"수익율: {formatted_amount} ({formatted_amount1})  |  "
                     
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
                     message_list += f"보유: {formatted_amount}\n\n"
@@ -368,7 +368,7 @@ try:
             formatted_amount1 = "{:,.0f}원".format((total_cash+total)-principal)
             formatted_amount2 = "{:,.2f}%".format(last_result)
             formatted_amount3 = "{:,.2f}%".format(result_rate)
-            message_list += f"수익율: {formatted_amount1} ({formatted_amount2} -> {formatted_amount3})"
+            message_list += f"총 수익율: {formatted_amount1} ({formatted_amount2} -> {formatted_amount3})"
             
             last_result = result_rate
 
