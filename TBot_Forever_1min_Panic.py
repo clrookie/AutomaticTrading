@@ -137,7 +137,7 @@ try:
             
             formatted_amount = "{:,.0f}원".format(allotment_budget)
             formatted_amount1 = "{:,.0f}원".format(buy_rate)
-            message_list += f"배분 예산: {formatted_amount} (최대적립 {division}개, {formatted_amount1}) \n"
+            message_list += f"배분 예산: {formatted_amount} (적립단위 {formatted_amount1}) \n"
             message_list += f"공포 거래량: {panic_volume_rate}배({panic_volume_rate_max}배,{panic_volume_rate_max_more}배) / "
             message_list += f"탐욕 거래량: {greed_volume_rate}배 \n\n"
             message_list += "------------------------------------------\n"
@@ -349,7 +349,7 @@ try:
                 
             
             
-            message_list += "\n===========({last_min}분)===========\n"
+            message_list += f"\n===========({last_min}분)===========\n"
 
             total_cash = get_balance("KRW") # 현금잔고 조회
 
