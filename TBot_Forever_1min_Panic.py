@@ -150,8 +150,8 @@ try:
                 
                 current_price = get_current_price(sym)
                 
-                formatted_amount = "{:,.0f}원".format(current_price)
-                message_list += f"현재: {formatted_amount} / "
+                # formatted_amount = "{:,.0f}원".format(current_price)
+                # message_list += f"현재: {formatted_amount} / "
 
                 qty = get_balance(symbol_list[sym]['매도티커'])
                 symbol_list[sym]['total'] = current_price * qty
@@ -168,10 +168,10 @@ try:
 
                     formatted_amount = "{:,.1f}원".format(avg_price)
                     formatted_amount1 = "{:,.1f}%".format(current_price/avg_price*100)
-                    message_list += f"평단: {formatted_amount} ({formatted_amount1})\n"
+                    message_list += f"평단: {formatted_amount} ({formatted_amount1}) | "
                     
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
-                    message_list += f"보유: {formatted_amount}\n"
+                    message_list += f"보유: {formatted_amount} | "
 
                 else:
                     symbol_list[sym]['공포적립'] = 0
@@ -366,7 +366,7 @@ try:
                                     else:
                                         message_list += f"공포 잔여예산 부족 ~ \n"
                             else:
-                                message_list += f"공포 거래량 부족 ~ \n"
+                                message_list += f"공포 에너지 or 거래량 부족 ~ \n"
 
                         else: # 양봉
                             message_list += "20 60 120 ↓↓↓↓ '양봉' 나가리~\n"
