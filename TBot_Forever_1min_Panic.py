@@ -146,7 +146,7 @@ try:
                 
                 forcount += 1
 
-                message_list += f"[{symbol_list[sym]['종목명']}]\n"
+                message_list += f"[{symbol_list[sym]['종목명']}] 공포에너지 >> {symbol_list[sym]['공포에너지']}\n"
                 
                 current_price = get_current_price(sym)
                 
@@ -326,7 +326,7 @@ try:
                                     if symbol_list[sym]['잔여예산'] >= buy_rate * symbol_list[sym]['공포에너지'] * 2:
                                     
                                         price = buy_rate * symbol_list[sym]['공포에너지']
-                                        message_list += f"!! 극공포 +{symbol_list[sym]['공포에너지']} 2배 예치 !! \n"
+                                        message_list += f"!! 극공포 2배 예치 !! \n"
 
                                         # 공포 매수
                                         buy_result = upbit.buy_market_order(sym, price) # 현금
@@ -348,7 +348,7 @@ try:
                                     if symbol_list[sym]['잔여예산'] >= buy_rate * symbol_list[sym]['공포에너지']:
                                     
                                         price = buy_rate * symbol_list[sym]['공포에너지']
-                                        message_list += f"!! 공포 +{symbol_list[sym]['공포에너지']} 예치 !! \n"
+                                        message_list += f"!! 공포 예치 !! \n"
 
                                         # 공포 매수
                                         buy_result = upbit.buy_market_order(sym, price) # 현금
@@ -371,7 +371,7 @@ try:
                         else: # 양봉
                             message_list += "20 60 120 ↓↓↓↓ '양봉' 나가리~\n"
                     else: # 변동성 조건 미달
-                            message_list += f" - 공포구간 (에너지:{symbol_list[sym]['공포에너지']})"
+                            message_list += f" - 공포구간"
 
 
                 total += symbol_list[sym]['total']
