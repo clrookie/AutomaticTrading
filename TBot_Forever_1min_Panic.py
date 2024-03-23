@@ -403,7 +403,7 @@ try:
             formatted_amount2 = "{:,.2f}%".format(result_rate)
             message_list += f"수익율: {formatted_amount1} ({formatted_amount2})"
 
-            message_list += "\n======================\n\n\n"
+            message_list += f"\n====================== ({last_min}분)\n\n\n"
             send_message(message_list)
                           
         # for문 끝 라인..
