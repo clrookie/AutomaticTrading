@@ -177,7 +177,7 @@ try:
                     symbol_list[sym]['공포적립'] = 0
                     symbol_list[sym]['잔여예산'] = allotment_budget
 
-                message_list += f"적립: {symbol_list[sym]['공포적립']}개"
+                message_list += f"적립: {symbol_list[sym]['공포적립']}개\n\n"
                 # formatted_amount = "{:,.0f}원".format(symbol_list[sym]['잔여예산'])
                 # message_list += f" (잔여: {formatted_amount})\n\n"
 
