@@ -305,16 +305,15 @@ try:
 
                             if last_volume > (average_volume*panic_volume_rate_max):
                                 rate = panic_max_betting
-                                message_list += f"!! 극공포 {rate}개 {rate}개 {rate}개 예치 !! \n"
-
-                                if symbol_list[sym]['매도티커'] == 'BTC':
-                                    BTC_panic_max = True
-
+                                message_list += f"!! 과공포 {rate}개 {rate}개 {rate}개 예치 !! \n"
                             else:
                                 rate = panic_betting
                                 message_list += f"!! 공포 {rate}개 예치 !! \n"
 
-
+                            if symbol_list[sym]['매도티커'] == 'BTC'and last_volume >= 20: # 비트코인 과매도
+                                rate *= 2 # 더블
+                                BTC_panic_max = True
+                                message_list += f"!! 비트코인 극공폭 x2배 예치 !! \n"
                             
                             if symbol_list[sym]['잔여예산'] >= buy_rate * rate:
                                 
