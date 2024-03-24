@@ -152,7 +152,7 @@ try:
             difference = 0
             for sym in symbol_list: # 초기화
                 
-                message_list += f"[{symbol_list[sym]['종목명']}]\n"
+                message_list += f"[{symbol_list[sym]['종목명']}]"
                 
                 current_price = get_current_price(sym)
 
