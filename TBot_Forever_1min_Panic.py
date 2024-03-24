@@ -42,6 +42,7 @@ try:
 
     last_min = 77
     last_result = 0
+    more_last_result = 0
     
     #원금
     principal = 14000000
@@ -370,11 +371,13 @@ try:
 
             result_rate = ((total_cash+total) / principal * 100) - 100
 
-            formatted_amount1 = "{:,.0f}원".format((total_cash+total)-principal)
+            formatted_amount0 = "{:,.0f}원".format((total_cash+total)-principal)
+            formatted_amount1 = "{:,.2f}%".format(more_last_result)
             formatted_amount2 = "{:,.2f}%".format(last_result)
             formatted_amount3 = "{:,.2f}%".format(result_rate)
-            message_list += f"총 수익율: {formatted_amount1} ({formatted_amount2} -> {formatted_amount3})"
+            message_list += f"총 수익율: {formatted_amount0} ({formatted_amount1} > {formatted_amount2} > '{formatted_amount3}')"
             
+            more_last_result = last_result
             last_result = result_rate
 
             message_list += f"\n===========({last_min}분)===========\n\n\n"
