@@ -175,7 +175,7 @@ try:
                     # formatted_amount = "{:,.5f}원".format(avg_price)
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
                     formatted_amount1 = "{:,.1f}%".format(current_price/avg_price*100)
-                    message_list += f"- 보유: {formatted_amount} ({formatted_amount1})"
+                    message_list += f" {formatted_amount} ({formatted_amount1})"
 
                 else:
                     symbol_list[sym]['공포적립'] = 0
