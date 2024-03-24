@@ -45,11 +45,16 @@ try:
     
     #원금
     principal = 14000000
+
+    #비트코인 동조화 비교금
+    comparative_amount = 50000
     
     # 기준 거래량 비율
-    panic_volume_rate = 2 #1배
-    panic_volume_rate_max = 3 #2배
-    panic_volume_rate_max_more = 4.5 #3배
+    panic_volume_rate = 3 #1배
+    panic_volume_rate_max = 4.5 #2배
+
+    panic_betting = 3
+    panic_max_betting = 15
 
     greed_volume_rate = 1.2
     greed_volume_rate_max = 1.7
@@ -137,24 +142,24 @@ try:
             formatted_amount = "{:,.0f}원".format(allotment_budget)
             formatted_amount1 = "{:,.0f}원".format(buy_rate)
             message_list += f"배분: {formatted_amount} (단위 {formatted_amount1}) \n"
-            message_list += f"공포 거래량: {panic_volume_rate}배({panic_volume_rate_max}배,{panic_volume_rate_max_more}배) / "
+            message_list += f"공포 거래량: {panic_volume_rate}배({panic_volume_rate_max}배) / "
             message_list += f"탐욕 거래량: {greed_volume_rate}배 \n\n"
             message_list += "------------------------------------------\n"
 
-            forcount = 0
+            BTC_price = 0
+            BTC_panic_max = False
+            difference = 0
             for sym in symbol_list: # 초기화
                 
-                forcount += 1
-
                 message_list += f"[{symbol_list[sym]['종목명']}]\n"
                 
                 current_price = get_current_price(sym)
-                
-                # formatted_amount = "{:,.0f}원".format(current_price)
-                # message_list += f"현재: {formatted_amount} / "
 
                 qty = get_balance(symbol_list[sym]['매도티커'])
                 symbol_list[sym]['total'] = current_price * qty
+                
+                if symbol_list[sym]['매도티커'] == 'BTC': # 비트코인 보유량 저장
+                    BTC_price = symbol_list[sym]['total']
 
                 if symbol_list[sym]['total'] >= 5000: # 최소 주문 가격 이상일 때
 
@@ -174,10 +179,6 @@ try:
                 else:
                     symbol_list[sym]['공포적립'] = 0
                     symbol_list[sym]['잔여예산'] = allotment_budget
-
-                # message_list += f"(적립: {symbol_list[sym]['공포적립']}개)\n\n"
-                # formatted_amount = "{:,.0f}원".format(symbol_list[sym]['잔여예산'])
-                # message_list += f" (잔여: {formatted_amount})\n\n"
 
                 
                 average_price_20 = 0
@@ -301,21 +302,31 @@ try:
                         # 음봉이니?
                         if last_open >= last_close: 
 
-                            if last_volume > (average_volume*panic_volume_rate_max_more):
-                                rate = 10
-                                message_list += f"!! 패닉 {rate}개 {rate}개 {rate}개 예치 !! \n"
+                            if last_volume > (average_volume*panic_volume_rate_max):
+                                rate = panic_max_betting
+                                message_list += f"!! 극공포 {rate}개 {rate}개 {rate}개 예치 !! \n"
 
-                            elif last_volume > (average_volume*panic_volume_rate_max):
-                                rate = 3
-                                message_list += f"!! 극공포 {rate}개 {rate}개 예치 !! \n"
+                                if symbol_list[sym]['매도티커'] == 'BTC':
+                                    BTC_panic_max = True
+
                             else:
-                                rate = 1
+                                rate = panic_betting
                                 message_list += f"!! 공포 {rate}개 예치 !! \n"
-                            
 
+
+                            
                             if symbol_list[sym]['잔여예산'] >= buy_rate * rate:
                                 
                                 price = buy_rate * rate
+
+                                # 비트코인이 아니고 
+                                if BTC_panic_max and symbol_list[sym]['매도티커'] != 'BTC' and symbol_list[sym]['total'] + comparative_amount < BTC_price:
+                                                       
+                                    difference = BTC_price - symbol_list[sym]['total'] + comparative_amount
+                                    price += difference # 비트코인 동조화
+
+                                    formatted_amount = "{:,.0f}원".format(difference)
+                                    message_list += f"!! 비트코인 동조화 {formatted_amount} 추가 예치 !! \n"
 
                                 # 공포 매수
                                 buy_result = upbit.buy_market_order(sym, price) # 현금
@@ -339,10 +350,6 @@ try:
 
                 total += symbol_list[sym]['total']
                 message_list += "\n\n------------------------------------------\n"
-                
-                # if forcount == 5:
-                #     send_message(message_list)                    
-                #     message_list = "----------- 2/2 ---------\n>>> "
                 
             
             
