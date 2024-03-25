@@ -302,7 +302,7 @@ try:
                         message_list += f" - 공포구간({symbol_list[sym]['공포에너지']})"
 
                         # 거래량 변동성 신호
-                        if symbol_list[sym]['공포에너지'] >= 10 and last_volume > (average_volume*panic_volume_rate): 
+                        if symbol_list[sym]['공포에너지'] >= 3 and last_volume > (average_volume*panic_volume_rate): 
 
                             message_list += "\n\n+++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++\n"
 
@@ -344,7 +344,6 @@ try:
                             else:
                                 message_list += f"예산 부족 ~ \n"
                     else: # 양봉
-                        symbol_list[sym]['공포에너지'] -= 1
                         message_list += "\n\n공포구간 '양봉'\n"
 
 
