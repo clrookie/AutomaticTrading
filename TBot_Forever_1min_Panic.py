@@ -53,8 +53,8 @@ try:
     comparative_amount = 50000
     
     # 기준 거래량 비율
-    panic_volume_rate = 2.5 #1배
-    panic_volume_rate_max = 4 #2배
+    panic_volume_rate = 3 #1배
+    panic_volume_rate_max = 4.5 #2배
 
     panic_betting = 3
     panic_max_betting = 15
@@ -298,6 +298,8 @@ try:
                     if last_open >= last_close:
                     
                         symbol_list[sym]['공포에너지'] += 1
+                        
+                        message_list += f" - 공포구간({symbol_list[sym]['공포에너지']})"
 
                         # 거래량 변동성 신호
                         if symbol_list[sym]['공포에너지'] >= 10 and last_volume > (average_volume*panic_volume_rate): 
@@ -319,7 +321,7 @@ try:
                                 morebetting = last_volume
                                 if morebetting > 100 : morebetting = 100
 
-                                rate += morebetting # 더블
+                                rate += morebetting #
                                 BTC_panic_max = True
                                 message_list += f"!! 비트코인 극공포 {morebetting}만원 추가 예치 !! \n"
                             
@@ -341,10 +343,9 @@ try:
                                     message_list += f"공포 매수 실패 ({buy_result})\n"
                             else:
                                 message_list += f"예산 부족 ~ \n"
-                        else: # 변동성 조건 미달
-                            message_list += f" - 공포구간({symbol_list[sym]['공포에너지']})"
                     else: # 양봉
-                            message_list += "20 60 120 ↓↓↓↓ '양봉' 나가리~\n"
+                        symbol_list[sym]['공포에너지'] -= 1
+                        message_list += "\n\n공포구간 '양봉'\n"
 
 
                 # 비트코인 과매도 -> 알트코인 동조화 ####################################
