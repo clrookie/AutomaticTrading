@@ -53,8 +53,8 @@ try:
     comparative_amount = 50000
     
     # 기준 거래량 비율
-    panic_volume_rate = 3 #1배
-    panic_volume_rate_max = 4.5 #2배
+    panic_volume_rate = 2.5 #1배
+    panic_volume_rate_max = 4 #2배
 
     panic_betting = 3
     panic_max_betting = 15
