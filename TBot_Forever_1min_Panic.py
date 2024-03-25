@@ -59,7 +59,7 @@ try:
     panic_betting = 3
     panic_max_betting = 15
 
-    greed_volume_rate = 1.2
+    greed_volume_rate = 1
     greed_volume_rate_max = 1.7
     greed_volume_rate_max_more = 2.2
     greed_volume_rate_1_3 = 2.7 # 1/3 청산
