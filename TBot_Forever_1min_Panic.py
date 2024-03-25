@@ -46,6 +46,8 @@ try:
     
     #원금
     principal = 14000000
+    result_rate = 0
+    lostcut = -7
 
     #비트코인 동조화 비교금
     comparative_amount = 50000
@@ -254,7 +256,7 @@ try:
                         # 양봉이니?
                         if last_open <= last_close:
 
-                            if symbol_list[sym]['탐욕에너지'] < 5:
+                            if symbol_list[sym]['탐욕에너지'] < 3:
                                 symbol_list[sym]['탐욕에너지'] += 1
 
                             if symbol_list[sym]['공포적립'] > symbol_list[sym]['탐욕에너지']:
@@ -310,16 +312,20 @@ try:
                                 rate = panic_betting
                                 message_list += f"!! 공포 {rate}개 예치 !! \n"
 
-                            if symbol_list[sym]['매도티커'] == 'BTC'and last_volume >= 20: # 비트코인 과매도
-                                rate *= 2 # 더블
+                            if symbol_list[sym]['매도티커'] == 'BTC'and last_volume >= 10: # 비트코인 과매도
+                                
+                                morebetting = last_volume
+                                if morebetting > 100 : morebetting = 100
+
+                                rate += morebetting # 더블
                                 BTC_panic_max = True
-                                message_list += f"!! 비트코인 극공폭 x2배 예치 !! \n"
+                                message_list += f"!! 비트코인 극공포 x2배 예치 !! \n"
                             
                             if symbol_list[sym]['잔여예산'] >= buy_rate * rate:
                                 
                                 price = buy_rate * rate
 
-                                # 비트코인이 아니고 
+                                # 비트코인 과매도 -> 알트코인 동조화
                                 if BTC_panic_max and symbol_list[sym]['매도티커'] != 'BTC' and symbol_list[sym]['total'] + comparative_amount < BTC_price:
                                                        
                                     difference = BTC_price - symbol_list[sym]['total'] + comparative_amount
@@ -384,6 +390,21 @@ try:
                           
         # for문 끝 라인..
         
+        if result_rate < lostcut: #사이드브레이크
+            
+            for sym in symbol_list: # 있으면 일괄 매도
+                coin = get_balance(symbol_list[sym]['매도티커'])  # 보유량
+                if coin > 0: # 있다면 매도
+                    sell_result = upbit.sell_market_order(sym, coin)
+                    if sell_result is not None:
+                        send_message(f"[{symbol_list[sym]['종목명']}] {coin} 전량 매도했습니다~")
+                    else:
+                        send_message(f"[{symbol_list[sym]['매도티커']}] 매도실패 ({sell_result})")
+            
+            formatted_amount = "{:,.2f}%".format(result_rate)
+            send_message(f"총 수익율 {formatted_amount} 도달로 자동매매를 중지합니다ㅠ")
+            break
+
         time.sleep(1) # 없거나 짧으면 -> [오류 발생]'NoneType' object has no attribute 'index'
 
 except Exception as e:
