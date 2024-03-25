@@ -245,12 +245,11 @@ try:
                 # 시가 120 이평선 위에
                 if symbol_list[sym]['공포적립'] > 0 and last_open > average_price_20 and last_open > average_price_60 and last_open > average_price_120:
 
+                    symbol_list[sym]['공포에너지'] = 0
 
                     # 거래량 변동성 신호
                     if last_volume > (average_volume*greed_volume_rate):
                     
-                        symbol_list[sym]['공포에너지'] = 0
-
                         message_list += "\n\n--- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 ---\n"
                         
                         sell_qty = 0
@@ -290,29 +289,23 @@ try:
                             message_list += "20 60 120 ↑↑↑↑ '음봉' 나가리~\n"
                     else: # 변동성 조건 미달
                             # message_list += f" - 탐욕구간 (에너지:{symbol_list[sym]['탐욕에너지']})"
-                            message_list += f" - 탐욕구간"
+                            message_list += " - 탐욕구간"
 
                 # 저가 120 이평선 아래        
                 elif symbol_list[sym]['잔여예산'] >= buy_rate and last_open < average_price_20 and last_open < average_price_60 and last_open < average_price_120:
 
-                    symbol_list[sym]['탐욕에너지'] = 0
-
-                    # 거래량 변동성 신호
-                    if last_volume > (average_volume*panic_volume_rate):
+                    # 음봉이니?
+                    if last_open >= last_close:
                     
-                        message_list += "\n\n+++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++\n"
+                        symbol_list[sym]['공포에너지'] += 1
 
-                        price = 0
-                        rate = 0
+                        # 거래량 변동성 신호
+                        if symbol_list[sym]['공포에너지'] >= 10 and last_volume > (average_volume*panic_volume_rate): 
 
-                        # 음봉이니?
-                        if last_open >= last_close: 
+                            message_list += "\n\n+++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++\n"
 
-                            if symbol_list[sym]['공포에너지'] < 3:
-                                symbol_list[sym]['공포에너지'] += 1
-
-                                if symbol_list[sym]['공포에너지'] < 3:
-                                    continue
+                            price = 0
+                            rate = 0
 
                             if last_volume > (average_volume*panic_volume_rate_max):
                                 rate = panic_max_betting
@@ -348,10 +341,10 @@ try:
                                     message_list += f"공포 매수 실패 ({buy_result})\n"
                             else:
                                 message_list += f"예산 부족 ~ \n"
-                        else: # 양봉
-                            message_list += "20 60 120 ↓↓↓↓ '양봉' 나가리~\n"
-                    else: # 변동성 조건 미달
+                        else: # 변동성 조건 미달
                             message_list += f" - 공포구간({symbol_list[sym]['공포에너지']})"
+                    else: # 양봉
+                            message_list += "20 60 120 ↓↓↓↓ '양봉' 나가리~\n"
 
 
                 # 비트코인 과매도 -> 알트코인 동조화 ####################################
