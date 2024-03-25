@@ -76,7 +76,7 @@ try:
     '잔여예산': 0,
     '공포적립': 0,
     'total': 0,
-    '공포에너지': -10,
+    '공포에너지': 0,
     '탐욕에너지': 0,
     }
 
@@ -249,6 +249,8 @@ try:
                     # 거래량 변동성 신호
                     if last_volume > (average_volume*greed_volume_rate):
                     
+                        symbol_list[sym]['공포에너지'] = 0
+
                         message_list += "\n\n--- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 ---\n"
                         
                         sell_qty = 0
@@ -306,6 +308,12 @@ try:
                         # 음봉이니?
                         if last_open >= last_close: 
 
+                            if symbol_list[sym]['공포에너지'] < 3:
+                                symbol_list[sym]['공포에너지'] += 1
+
+                                if symbol_list[sym]['공포에너지'] < 3:
+                                    continue
+
                             if last_volume > (average_volume*panic_volume_rate_max):
                                 rate = panic_max_betting
                                 message_list += f"!! 과공포 {rate}개 {rate}개 {rate}개 예치 !! \n"
@@ -320,20 +328,11 @@ try:
 
                                 rate += morebetting # 더블
                                 BTC_panic_max = True
-                                message_list += f"!! 비트코인 극공포 x2배 예치 !! \n"
+                                message_list += f"!! 비트코인 극공포 {morebetting}만원 추가 예치 !! \n"
                             
                             if symbol_list[sym]['잔여예산'] >= buy_rate * rate:
                                 
                                 price = buy_rate * rate
-
-                                # 비트코인 과매도 -> 알트코인 동조화
-                                if BTC_panic_max and symbol_list[sym]['매도티커'] != 'BTC' and symbol_list[sym]['total'] + comparative_amount < BTC_price:
-                                                       
-                                    difference = BTC_price - symbol_list[sym]['total'] + comparative_amount
-                                    price += difference # 비트코인 동조화
-
-                                    formatted_amount = "{:,.0f}원".format(difference)
-                                    message_list += f"!! 비트코인 동조화 {formatted_amount} 추가 예치 !! \n"
 
                                 # 공포 매수
                                 buy_result = upbit.buy_market_order(sym, price) # 현금
@@ -352,8 +351,31 @@ try:
                         else: # 양봉
                             message_list += "20 60 120 ↓↓↓↓ '양봉' 나가리~\n"
                     else: # 변동성 조건 미달
-                            message_list += f" - 공포구간"
+                            message_list += f" - 공포구간({symbol_list[sym]['공포에너지']})"
 
+
+                # 비트코인 과매도 -> 알트코인 동조화 ####################################
+                if symbol_list[sym]['매도티커'] != 'BTC' and BTC_panic_max and (symbol_list[sym]['total'] + comparative_amount) < BTC_price:
+                                        
+                    difference = BTC_price - symbol_list[sym]['total'] + comparative_amount
+                    difference # 비트코인 동조화
+
+                    formatted_amount = "{:,.0f}원".format(difference)
+                    message_list += f"!! 비트코인 동조화 {formatted_amount} 추가 예치 !! \n"
+
+                     # 공포 매수
+                    buy_result = upbit.buy_market_order(sym, difference) # 현금
+                    if buy_result is not None:          
+                        
+                        time.sleep(0.02)                                    
+                        qty = get_balance(symbol_list[sym]['매도티커'])
+
+                        symbol_list[sym]['total'] = current_price * qty
+                        formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total']) 
+                        message_list += f"갱신: {formatted_amount}\n"                      
+                    else:
+                        message_list += f"공포 매수 실패 ({buy_result})\n"
+                # 비트코인 과매도 -> 알트코인 동조화 ####################################
 
                 total += symbol_list[sym]['total']
                 message_list += "\n\n------------------------------------------\n"
