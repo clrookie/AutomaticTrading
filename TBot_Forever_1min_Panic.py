@@ -287,7 +287,8 @@ try:
                         else: # 음봉
                             message_list += "20 60 120 ↑↑↑↑ '음봉' 나가리~\n"
                     else: # 변동성 조건 미달
-                            message_list += f" - 탐욕구간 (에너지:{symbol_list[sym]['탐욕에너지']})"
+                            # message_list += f" - 탐욕구간 (에너지:{symbol_list[sym]['탐욕에너지']})"
+                            message_list += f" - 탐욕구간"
 
                 # 저가 120 이평선 아래        
                 elif symbol_list[sym]['잔여예산'] >= buy_rate and last_open < average_price_20 and last_open < average_price_60 and last_open < average_price_120:
