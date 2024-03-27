@@ -47,6 +47,7 @@ try:
     #원금
     principal = 14000000
     result_rate = 0
+    result_max = 0
     lostcut = 3
 
     #비트코인 동조화 비교금
@@ -447,8 +448,9 @@ try:
             send_message(message_list)
                           
         # for문 끝 라인..
+        if result_max < result_rate : result_max = result_rate # 최고 수익율 기록
         
-        if result_rate < lostcut: #사이드브레이크
+        if result_rate < (result_max - lostcut): #사이드브레이크
             
             for sym in symbol_list: # 있으면 일괄 매도
                 coin = get_balance(symbol_list[sym]['매도티커'])  # 보유량
