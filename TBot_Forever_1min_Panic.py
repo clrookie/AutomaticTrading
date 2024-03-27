@@ -386,7 +386,7 @@ try:
                 # 비트코인 과매도 -> 알트코인 동조화 ####################################
                         
                 # 비트코인 과탐욕 -> 알트코인 동조화 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-                if BTC_greed_max and symbol_list[sym]['매도티커'] != 'BTC' and (symbol_list[sym]['total'] + comparative_amount) > BTC_price:
+                elif BTC_greed_max and symbol_list[sym]['매도티커'] != 'BTC' and (symbol_list[sym]['total'] + comparative_amount) > BTC_price:
                                         
                     difference = symbol_list[sym]['total'] + comparative_amount - BTC_price
                     difference # 비트코인 동조화
