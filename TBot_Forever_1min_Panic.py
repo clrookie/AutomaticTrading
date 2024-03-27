@@ -145,7 +145,8 @@ try:
             
             formatted_amount = "{:,.0f}원".format(allotment_budget)
             formatted_amount1 = "{:,.0f}원".format(buy_rate)
-            message_list += f"배분: {formatted_amount} (단위 {formatted_amount1}), 로스컷 {result_max - lostcut}% 이하 \n"
+            formatted_amount2 = "{:,.2f}%".format(result_max - lostcut)
+            message_list += f"배분: {formatted_amount} (단위 {formatted_amount1}), 로스컷 {formatted_amount2}% 이하 \n"
             message_list += f"공포 거래량: {panic_volume_rate}배({panic_volume_rate_max}배) / "
             message_list += f"탐욕 거래량: {greed_volume_rate}배 \n\n"
             message_list += "------------------------------------------\n"
