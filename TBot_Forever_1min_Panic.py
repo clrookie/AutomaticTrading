@@ -47,7 +47,7 @@ try:
     #원금
     principal = 14000000
     result_rate = 0
-    lostcut = -7
+    lostcut = 3
 
     #비트코인 동조화 비교금
     comparative_amount = 50000
@@ -57,7 +57,7 @@ try:
     panic_volume_rate_max = 4.5 #2배
 
     panic_betting = 3
-    panic_max_betting = 15
+    panic_max_betting = 6
 
     greed_volume_rate = 1
     greed_volume_rate_max = 1.7
@@ -144,13 +144,14 @@ try:
             
             formatted_amount = "{:,.0f}원".format(allotment_budget)
             formatted_amount1 = "{:,.0f}원".format(buy_rate)
-            message_list += f"배분: {formatted_amount} (단위 {formatted_amount1}) \n"
+            message_list += f"배분: {formatted_amount} (단위 {formatted_amount1}), 로스컷 {lostcut}% 이하 \n"
             message_list += f"공포 거래량: {panic_volume_rate}배({panic_volume_rate_max}배) / "
             message_list += f"탐욕 거래량: {greed_volume_rate}배 \n\n"
             message_list += "------------------------------------------\n"
 
             BTC_price = 0
             BTC_panic_max = False
+            BTC_greed_max = False
             difference = 0
             for sym in symbol_list: # 초기화
                 
@@ -261,11 +262,25 @@ try:
                                 symbol_list[sym]['탐욕에너지'] += 1
 
                             if symbol_list[sym]['공포적립'] > symbol_list[sym]['탐욕에너지']:
+                                
                                 sell_qty = (qty / symbol_list[sym]['공포적립']) * symbol_list[sym]['탐욕에너지']
                                 message_list += f"!! 탐욕 +{symbol_list[sym]['탐욕에너지']} 지급 !! \n"
+
+                                if symbol_list[sym]['매도티커'] == 'BTC'and last_volume >= 20: # 비트코인 과매도
+                                
+                                    more_selling = last_volume / 2
+                                    if more_selling > 50 : more_selling = 50
+
+                                    sell_qty += more_selling
+                                    if sell_qty > qty: sell_qty = qty
+
+                                    BTC_greed_max = True
+                                    message_list += f"!! 비트코인 과탐욕 {more_selling}만원 추가 지급 !! \n"
+
                             else:
                                 sell_qty = qty # 전량 지급
 
+                            
             
                             time.sleep(0.02)
                             avg_price = upbit.get_avg_buy_price(sym)
@@ -316,10 +331,10 @@ try:
                                 rate = panic_betting
                                 message_list += f"!! 공포 {rate}개 예치 !! \n"
 
-                            if symbol_list[sym]['매도티커'] == 'BTC'and last_volume >= 10: # 비트코인 과매도
+                            if symbol_list[sym]['매도티커'] == 'BTC'and last_volume >= 20: # 비트코인 과매도
                                 
-                                morebetting = last_volume
-                                if morebetting > 100 : morebetting = 100
+                                morebetting = last_volume / 2
+                                if morebetting > 50 : morebetting = 50
 
                                 rate += morebetting #
                                 BTC_panic_max = True
@@ -348,7 +363,7 @@ try:
 
 
                 # 비트코인 과매도 -> 알트코인 동조화 ####################################
-                if symbol_list[sym]['매도티커'] != 'BTC' and BTC_panic_max and (symbol_list[sym]['total'] + comparative_amount) < BTC_price:
+                if BTC_panic_max and symbol_list[sym]['매도티커'] != 'BTC' and (symbol_list[sym]['total'] + comparative_amount) < BTC_price:
                                         
                     difference = BTC_price - symbol_list[sym]['total'] + comparative_amount
                     difference # 비트코인 동조화
@@ -369,6 +384,33 @@ try:
                     else:
                         message_list += f"공포 매수 실패 ({buy_result})\n"
                 # 비트코인 과매도 -> 알트코인 동조화 ####################################
+                        
+                # 비트코인 과탐욕 -> 알트코인 동조화 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                if BTC_greed_max and symbol_list[sym]['매도티커'] != 'BTC' and (symbol_list[sym]['total'] + comparative_amount) > BTC_price:
+                                        
+                    difference = symbol_list[sym]['total'] + comparative_amount - BTC_price
+                    difference # 비트코인 동조화
+
+                    formatted_amount = "{:,.0f}원".format(difference)
+                    message_list += f"!! 비트코인 동조화 {formatted_amount} 추가 지급 !! \n"
+
+                     # 탐욕 지급
+                    avg_price = upbit.get_avg_buy_price(sym)
+                    time.sleep(0.02)
+                    sell_result = upbit.sell_market_order(sym, sell_qty)
+                    if sell_result is not None:
+                        
+                        message_list += f"{round(current_price/avg_price,6)}% 탐욕 매도합니다 ^^ ({sell_qty}개)\n"
+
+                        time.sleep(0.02)
+                        qty = get_balance(symbol_list[sym]['매도티커'])
+
+                        symbol_list[sym]['total'] = current_price * qty
+                        formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
+                        message_list += f"갱신: {formatted_amount}\n"
+                    else:
+                        message_list += f"탐욕 매도 실패 ({sell_result})\n"
+                # 비트코인 과탐욕 -> 알트코인 동조화 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
                 total += symbol_list[sym]['total']
                 message_list += "\n\n------------------------------------------\n"
