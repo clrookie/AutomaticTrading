@@ -266,7 +266,7 @@ try:
                                 sell_qty = (qty / symbol_list[sym]['공포적립']) * symbol_list[sym]['탐욕에너지']
                                 message_list += f"!! 탐욕 +{symbol_list[sym]['탐욕에너지']} 지급 !! \n"
 
-                                if symbol_list[sym]['매도티커'] == 'BTC'and last_volume >= 10: # 비트코인 과매도
+                                if symbol_list[sym]['매도티커'] == 'BTC'and last_volume >= 10: # 비트코인 과매수
                                 
                                     more_selling = last_volume / 2
                                     if more_selling > 50 : more_selling = 50
