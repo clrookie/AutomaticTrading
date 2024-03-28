@@ -47,7 +47,7 @@ try:
     #원금
     principal = 14000000
     result_rate = 0
-    result_max = 0
+    result_max = 7.14
     lostcut = 3
 
     #비트코인 동조화 비교금
@@ -79,6 +79,7 @@ try:
     'total': 0,
     '공포에너지': 0,
     '탐욕에너지': 0,
+    '전전거래량':0,
     }
 
     #개별 종목 데이터
@@ -193,6 +194,18 @@ try:
 
                 # 10분봉 데이터 가져오기 (최근 20봉)
                 data = pyupbit.get_ohlcv(sym, interval="minute1", count=20)
+                
+                last_volume = data.iloc[18]['volume']
+                if symbol_list[sym]['전전거래량'] == last_volume: # 거래량 갱신 안됨
+                    time.sleep(0.5)
+                    data = pyupbit.get_ohlcv(sym, interval="minute1", count=20)
+                    last_volume = data.iloc[18]['volume']
+                    
+                    if symbol_list[sym]['전전거래량'] == last_volume:
+                        message_list += f" {sym} 거래량 갱신 실패 0 세팅 !!!\n"
+                        last_volume = 0
+                else:
+                    symbol_list[sym]['전전거래량'] = last_volume
 
                 if data is not None:
                     average_price_20 = data['close'].mean()
@@ -228,9 +241,6 @@ try:
                 average_volume = data['volume'].mean()
                 formatted_amount = "{:,.0f}".format(average_volume)
                 message_list += f"\n\nMA20: {formatted_amount} | "
-
-                # 직전 거래량
-                last_volume = data.iloc[18]['volume']
 
                 avg = (last_volume / average_volume) * 100
                 formatted_amount1 = "{:,.0f}".format(last_volume)
@@ -270,7 +280,7 @@ try:
 
                                 if symbol_list[sym]['매도티커'] == 'BTC'and last_volume >= 10: # 비트코인 과매수
                                 
-                                    more_selling = last_volume / 2
+                                    more_selling = last_volume / 3
                                     if more_selling > 50 : more_selling = 50
 
                                     sell_qty += (qty / symbol_list[sym]['공포적립']) * more_selling
@@ -291,7 +301,7 @@ try:
                             sell_result = upbit.sell_market_order(sym, sell_qty)
                             if sell_result is not None:
                                 
-                                message_list += f"{round(current_price/avg_price,6)}% 탐욕 매도합니다 ^^ ({sell_qty}개)\n"
+                                message_list += f"{round(current_price/avg_price,6)}% 탐욕 매도합니다 ^^\n"
 
                                 time.sleep(0.02)
                                 qty = get_balance(symbol_list[sym]['매도티커'])
@@ -400,7 +410,8 @@ try:
                     avg_price = upbit.get_avg_buy_price(sym)
                     time.sleep(0.02)
                     
-                    sell_result = upbit.sell_market_order(sym, difference)
+                    difference_sell = difference / current_price
+                    sell_result = upbit.sell_market_order(sym, difference_sell)
                     if sell_result is not None:
                         
                         message_list += f"{round(current_price/avg_price,6)}% 탐욕 매도합니다 ^^ ({sell_qty}개)\n"
