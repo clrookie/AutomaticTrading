@@ -202,7 +202,7 @@ try:
                     last_volume = data.iloc[18]['volume']
                     
                     if symbol_list[sym]['전전거래량'] == last_volume:
-                        message_list += f" {sym} 거래량 갱신 실패 0 세팅 !!!\n"
+                        message_list += f"\n {sym} 거래량 갱신 실패 0 세팅 !!!\n"
                         last_volume = 0
                 else:
                     symbol_list[sym]['전전거래량'] = last_volume
