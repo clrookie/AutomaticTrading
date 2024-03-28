@@ -273,7 +273,7 @@ try:
                                     more_selling = last_volume / 2
                                     if more_selling > 50 : more_selling = 50
 
-                                    sell_qty += more_selling
+                                    sell_qty += (qty / symbol_list[sym]['공포적립']) * more_selling
                                     if sell_qty > qty: sell_qty = qty
 
                                     BTC_greed_max = True
@@ -399,7 +399,8 @@ try:
                      # 탐욕 지급
                     avg_price = upbit.get_avg_buy_price(sym)
                     time.sleep(0.02)
-                    sell_result = upbit.sell_market_order(sym, sell_qty)
+                    
+                    sell_result = upbit.sell_market_order(sym, difference)
                     if sell_result is not None:
                         
                         message_list += f"{round(current_price/avg_price,6)}% 탐욕 매도합니다 ^^ ({sell_qty}개)\n"
