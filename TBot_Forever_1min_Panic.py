@@ -132,7 +132,7 @@ try:
 
         if df.index[0].minute != last_min:    # 10분 캔들 갱신
 
-            time.sleep(4) # 데이터 갱신 보정
+            time.sleep(5) # 데이터 갱신 보정
 
             last_min = df.index[0].minute
 
