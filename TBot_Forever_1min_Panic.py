@@ -378,7 +378,7 @@ try:
                 if BTC_panic_max and symbol_list[sym]['매도티커'] != 'BTC' and (symbol_list[sym]['total'] + comparative_amount) < BTC_price:
                                         
                     difference = BTC_price - symbol_list[sym]['total'] + comparative_amount
-                    difference # 비트코인 동조화
+                    difference /= 2 # 비트코인 동조화
 
                     formatted_amount = "{:,.0f}원".format(difference)
                     message_list += f"\n!! 비트코인 동조화 {formatted_amount} 추가 예치 !! \n"
@@ -401,7 +401,7 @@ try:
                 elif BTC_greed_max and symbol_list[sym]['매도티커'] != 'BTC' and (symbol_list[sym]['total'] + comparative_amount) > BTC_price:
                                         
                     difference = symbol_list[sym]['total'] + comparative_amount - BTC_price
-                    difference # 비트코인 동조화
+                    difference /= 2 # 비트코인 동조화
 
                     formatted_amount = "{:,.0f}원".format(difference)
                     message_list += f"\n!! 비트코인 동조화 {formatted_amount} 추가 지급 !! \n"
