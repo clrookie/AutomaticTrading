@@ -374,14 +374,14 @@ try:
                         message_list += " - 공포구간 '양봉'\n"
 
 
-                # 비트코인 과매도 -> 알트코인 동조화 ####################################
+                # 비트코인 과공포 -> 알트코인 동조화 ####################################
                 if BTC_panic_max and symbol_list[sym]['매도티커'] != 'BTC' and (symbol_list[sym]['total'] + comparative_amount) < BTC_price:
                                         
                     difference = BTC_price - symbol_list[sym]['total'] + comparative_amount
                     difference # 비트코인 동조화
 
                     formatted_amount = "{:,.0f}원".format(difference)
-                    message_list += f"!! 비트코인 동조화 {formatted_amount} 추가 예치 !! \n"
+                    message_list += f"\n!! 비트코인 동조화 {formatted_amount} 추가 예치 !! \n"
 
                      # 공포 매수
                     buy_result = upbit.buy_market_order(sym, difference) # 현금
@@ -395,7 +395,7 @@ try:
                         message_list += f"갱신: {formatted_amount}\n"                      
                     else:
                         message_list += f"공포 매수 실패 ({buy_result})\n"
-                # 비트코인 과매도 -> 알트코인 동조화 ####################################
+                # 비트코인 과공포 -> 알트코인 동조화 ####################################
                         
                 # 비트코인 과탐욕 -> 알트코인 동조화 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
                 elif BTC_greed_max and symbol_list[sym]['매도티커'] != 'BTC' and (symbol_list[sym]['total'] + comparative_amount) > BTC_price:
@@ -404,7 +404,7 @@ try:
                     difference # 비트코인 동조화
 
                     formatted_amount = "{:,.0f}원".format(difference)
-                    message_list += f"!! 비트코인 동조화 {formatted_amount} 추가 지급 !! \n"
+                    message_list += f"\n!! 비트코인 동조화 {formatted_amount} 추가 지급 !! \n"
 
                      # 탐욕 지급
                     avg_price = upbit.get_avg_buy_price(sym)
@@ -414,7 +414,7 @@ try:
                     sell_result = upbit.sell_market_order(sym, difference_sell)
                     if sell_result is not None:
                         
-                        message_list += f"{round(current_price/avg_price,6)}% 탐욕 매도합니다 ^^ ({sell_qty}개)\n"
+                        message_list += f"{round(current_price/avg_price,6)}% 탐욕 매도합니다 ^^\n"
 
                         time.sleep(0.02)
                         qty = get_balance(symbol_list[sym]['매도티커'])
