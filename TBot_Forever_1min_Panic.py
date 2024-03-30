@@ -45,9 +45,9 @@ try:
     more_last_result = 0
     
     #원금
-    principal = 14000000
+    principal = 10000000
     result_rate = 0
-    result_max = 7.14
+    result_max = 0
     lostcut = 3
 
     #비트코인 동조화 비교금
@@ -67,8 +67,8 @@ try:
     greed_volume_rate_1_2 = 3.2 # 1/2 청산
     
     # 매수
-    allotment_budget = 2000000
-    division = 200
+    allotment_budget = 1500000
+    division = 150
     buy_rate = allotment_budget / division
 
 
@@ -240,12 +240,16 @@ try:
                 # 평균 거래량 계산
                 average_volume = data['volume'].mean()
                 formatted_amount = "{:,.0f}".format(average_volume)
-                message_list += f"\n\nMA20: {formatted_amount} | "
+                message_list += f"\n\n평균: {formatted_amount} | "
 
                 avg = (last_volume / average_volume) * 100
                 formatted_amount1 = "{:,.0f}".format(last_volume)
                 formatted_amount2 = "{:,.0f}".format(avg)
-                message_list += f"직전: {formatted_amount1} [{formatted_amount2}%]"
+                message_list += f"직전: {formatted_amount1} [{formatted_amount2}%]\n"
+                
+                formatted_amount3 = "{:,.0f}원".format(current_price*average_volume)
+                formatted_amount4 = "{:,.0f}원".format(current_price*last_volume)
+                message_list += f"평균액: {formatted_amount3} (직전액: {formatted_amount4})"
 
                 # 직전 차트
                 last_open = data.iloc[18]['open']
