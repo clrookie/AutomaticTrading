@@ -239,17 +239,20 @@ try:
 
                 # 평균 거래량 계산
                 average_volume = data['volume'].mean()
-                formatted_amount = "{:,.0f}".format(average_volume)
-                message_list += f"\n\n평균: {formatted_amount} | "
+                
+                # formatted_amount = "{:,.0f}".format(average_volume)
+                # message_list += f"\n\n평균: {formatted_amount} | "
 
-                avg = (last_volume / average_volume) * 100
-                formatted_amount1 = "{:,.0f}".format(last_volume)
-                formatted_amount2 = "{:,.0f}".format(avg)
-                message_list += f"직전: {formatted_amount1} [{formatted_amount2}%]\n"
+                # avg = (last_volume / average_volume) * 100
+                # formatted_amount1 = "{:,.0f}".format(last_volume)
+                # formatted_amount2 = "{:,.0f}".format(avg)
+                # message_list += f"직전: {formatted_amount1} [{formatted_amount2}%]\n"
                 
                 formatted_amount3 = "{:,.0f}원".format(current_price*average_volume)
                 formatted_amount4 = "{:,.0f}원".format(current_price*last_volume)
-                message_list += f"평균액: {formatted_amount3} (직전액: {formatted_amount4})"
+                avg1 = (current_price*last_volume / current_price*average_volume) * 100
+                formatted_amount5 = "{:,.0f}%".format(avg1)
+                message_list += f"평균: {formatted_amount3} | 직전: {formatted_amount4} [{formatted_amount5}]"
 
                 # 직전 차트
                 last_open = data.iloc[18]['open']
