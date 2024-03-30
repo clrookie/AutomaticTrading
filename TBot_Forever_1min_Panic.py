@@ -239,7 +239,7 @@ try:
 
                 # 평균 거래량 계산
                 average_volume = data['volume'].mean()
-                
+
                 # formatted_amount = "{:,.0f}".format(average_volume)
                 # message_list += f"\n\n평균: {formatted_amount} | "
 
@@ -250,7 +250,7 @@ try:
                 
                 formatted_amount3 = "{:,.0f}원".format(current_price*average_volume)
                 formatted_amount4 = "{:,.0f}원".format(current_price*last_volume)
-                avg1 = (current_price*last_volume / current_price*average_volume) * 100
+                avg1 = (current_price*last_volume) / (current_price*average_volume) * 100
                 formatted_amount5 = "{:,.0f}%".format(avg1)
                 message_list += f"평균: {formatted_amount3} | 직전: {formatted_amount4} [{formatted_amount5}]"
 
