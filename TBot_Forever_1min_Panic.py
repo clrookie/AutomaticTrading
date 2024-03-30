@@ -252,7 +252,7 @@ try:
                 formatted_amount4 = "{:,.0f}원".format(current_price*last_volume)
                 avg1 = (current_price*last_volume) / (current_price*average_volume) * 100
                 formatted_amount5 = "{:,.0f}%".format(avg1)
-                message_list += f"평균: {formatted_amount3} | 직전: {formatted_amount4} [{formatted_amount5}]"
+                message_list += f"\n\n평균: {formatted_amount3} | 직전: {formatted_amount4} [{formatted_amount5}]"
 
                 # 직전 차트
                 last_open = data.iloc[18]['open']
