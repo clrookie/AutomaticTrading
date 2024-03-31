@@ -35,10 +35,7 @@ try:
     access = "QBgTbRF0Z3f13iAbzxusZkFu21N7j6M3xfuSsPe3"
     secret = "Kh9Weug6GDkBiT4kLzLdu9jfH7hMntHHs9AZCGVV"
     upbit = pyupbit.Upbit(access, secret)
-    send_message("")
-    send_message("======================")
     send_message("=== 코인거래 초기화 ===")
-    send_message("======================")
 
     last_min = 77
     last_result = 0
@@ -199,6 +196,7 @@ try:
 
                 last_volume = data.iloc[18]['volume']
                 if symbol_list[sym]['전전거래량'] == last_volume: # 거래량 갱신 안됨
+                    
                     time.sleep(1)
                     data = pyupbit.get_ohlcv(sym, interval="minute1", count=20)
                     if data is None: continue
