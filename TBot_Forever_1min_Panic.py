@@ -128,7 +128,8 @@ try:
 
     while True:
         
-        df = pyupbit.get_ohlcv("KRW-BTC", interval="minute1", count=1)    
+        df = pyupbit.get_ohlcv("KRW-BTC", interval="minute1", count=1)
+        if df is None: continue
 
         if df.index[0].minute != last_min:    # 10분 캔들 갱신
 
@@ -194,11 +195,14 @@ try:
 
                 # 10분봉 데이터 가져오기 (최근 20봉)
                 data = pyupbit.get_ohlcv(sym, interval="minute1", count=20)
-                
+                if data is None: continue
+
                 last_volume = data.iloc[18]['volume']
                 if symbol_list[sym]['전전거래량'] == last_volume: # 거래량 갱신 안됨
                     time.sleep(0.5)
                     data = pyupbit.get_ohlcv(sym, interval="minute1", count=20)
+                    if data is None: continue
+                    
                     last_volume = data.iloc[18]['volume']
                     
                     if symbol_list[sym]['전전거래량'] == last_volume:
