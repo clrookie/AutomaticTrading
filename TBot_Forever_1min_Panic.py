@@ -199,10 +199,10 @@ try:
 
                 last_volume = data.iloc[18]['volume']
                 if symbol_list[sym]['전전거래량'] == last_volume: # 거래량 갱신 안됨
-                    time.sleep(0.5)
+                    time.sleep(1)
                     data = pyupbit.get_ohlcv(sym, interval="minute1", count=20)
                     if data is None: continue
-                    
+
                     last_volume = data.iloc[18]['volume']
                     
                     if symbol_list[sym]['전전거래량'] == last_volume:
