@@ -101,11 +101,11 @@ try:
     '매도티커':'DOGE',
     **common_data},
 
-    'KRW-AVAX':{'종목명':'아발란체 #6', 
-    '매도티커':'AVAX',
-    **common_data},
+    # 'KRW-AVAX':{'종목명':'아발란체 #6', 
+    # '매도티커':'AVAX',
+    # **common_data},
     
-    'KRW-SHIB':{'종목명':'시바이누 #7', 
+    'KRW-SHIB':{'종목명':'시바이누 #6', 
     '매도티커':'SHIB',
     **common_data},
     
@@ -279,7 +279,7 @@ try:
                         # 양봉이니?
                         if last_open <= last_close:
 
-                            if symbol_list[sym]['탐욕에너지'] < 1:
+                            if symbol_list[sym]['탐욕에너지'] < 5:
                                 symbol_list[sym]['탐욕에너지'] += 1
 
                             if symbol_list[sym]['공포적립'] > symbol_list[sym]['탐욕에너지']:
