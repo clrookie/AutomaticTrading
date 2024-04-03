@@ -354,7 +354,7 @@ try:
 
                             if symbol_list[sym]['매도티커'] == 'BTC'and last_volume >= 20: # 비트코인 과매도
                                 
-                                morebetting = last_volume / 2
+                                morebetting = last_volume / 3
                                 if morebetting > 50 : morebetting = 50
 
                                 rate += morebetting #
