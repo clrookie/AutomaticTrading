@@ -64,8 +64,8 @@ try:
     greed_volume_rate_1_2 = 3.2 # 1/2 청산
     
     # 매수
-    allotment_budget = 1500000
-    division = 150
+    allotment_budget = 1650000
+    division = 165
     buy_rate = allotment_budget / division
 
 
