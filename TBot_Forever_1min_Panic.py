@@ -279,7 +279,7 @@ try:
                         # 양봉이니?
                         if last_open <= last_close:
 
-                            if symbol_list[sym]['탐욕에너지'] < 5:
+                            if symbol_list[sym]['탐욕에너지'] < 2:
                                 symbol_list[sym]['탐욕에너지'] += 1
 
                             if symbol_list[sym]['공포적립'] > symbol_list[sym]['탐욕에너지']:
@@ -473,7 +473,7 @@ try:
         # for문 끝 라인..
 
         if result_rate < (result_max - lostcut): #사이드브레이크
-            
+            result_max = result_rate
             for sym in symbol_list: # 있으면 일괄 매도
                 coin = get_balance(symbol_list[sym]['매도티커'])  # 보유량
                 if coin > 0: # 있다면 매도
@@ -484,12 +484,22 @@ try:
                         send_message(f"[{symbol_list[sym]['매도티커']}] 매도실패 ({sell_result})")
             
             formatted_amount = "{:,.2f}%".format(result_rate)
-            send_message(f"총 수익율 {formatted_amount} 도달로 자동매매를 중지합니다ㅠ")
-            break
+            send_message(f"총 수익율 {formatted_amount} 도달로 자동매매를 일시 중지하고 12시뒤 재가동합니다ㅠ")
+
+            time.sleep(43200) # 12시간 뒤에 재가동
 
         time.sleep(1) # 없거나 짧으면 -> [오류 발생]'NoneType' object has no attribute 'index'
 
 except Exception as e:
     print(e)
     send_message(f"[오류 발생]{e}")
+    
+    for sym in symbol_list: # 있으면 일괄 매도
+        coin = get_balance(symbol_list[sym]['매도티커'])  # 보유량
+        if coin > 0: # 있다면 매도
+            sell_result = upbit.sell_market_order(sym, coin)
+            if sell_result is not None:
+                send_message(f"[{symbol_list[sym]['종목명']}] {coin} 전량 매도했습니다~")
+            else:
+                send_message(f"[{symbol_list[sym]['매도티커']}] 매도실패 ({sell_result})")
 
