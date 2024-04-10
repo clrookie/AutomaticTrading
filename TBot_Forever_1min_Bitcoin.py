@@ -209,12 +209,12 @@ try:
                             message_list += "\n\n--- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 ---\n"
 
                             r_last_volume = round((current_price*last_volume)/buy_rate)
-                            sell_qty = (buy_rate / current_price) * r_last_volume
+                            sell_qty = r_last_volume / current_price
                             if sell_qty > qty: sell_qty = qty
 
-                            message_list += f"!! {r_last_volume}만원 지급 !! \n"
+                            formatted_amount = "{:,.0f}원".format(r_last_volume)
+                            message_list += f"!! {formatted_amount} 지급 !! \n"
 
-                            
                             time.sleep(0.02)
                             avg_price = upbit.get_avg_buy_price(sym)
 
@@ -254,13 +254,14 @@ try:
                             price = 0
                             message_list += "\n\n+++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++\n"
 
-                            r_last_volume = round(last_volume)
+                            r_last_volume = round((current_price*last_volume)/buy_rate)
 
-                            message_list += f"!! {r_last_volume}만원 예치 !! \n"
+                            formatted_amount = "{:,.0f}원".format(r_last_volume)
+                            message_list += f"!! {formatted_amount} 예치 !! \n"
                             
-                            if symbol_list[sym]['잔여예산'] >= buy_rate * r_last_volume:
+                            if symbol_list[sym]['잔여예산'] >= r_last_volume:
                                 
-                                price = buy_rate * r_last_volume
+                                price = r_last_volume
 
                                 # 공포 매수
                                 buy_result = upbit.buy_market_order(sym, price) # 현금
