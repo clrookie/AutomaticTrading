@@ -45,17 +45,17 @@ try:
     principal = 10000000
     result_rate = 0
     result_max = 0
-    lostcut = 3
+    lostcut = 2
 
     #비트코인 동조화 비교금
-    comparative_amount = 50000
+    comparative_amount = 10000
     
     # 기준 거래량 비율
     panic_volume_rate = 3 #1배
     panic_volume_rate_max = 4.5 #2배
 
-    panic_betting = 3
-    panic_max_betting = 6
+    panic_betting = 5
+    panic_max_betting = 10
 
     greed_volume_rate = 1
     greed_volume_rate_max = 1.7
@@ -289,7 +289,7 @@ try:
 
                                 if symbol_list[sym]['매도티커'] == 'BTC'and last_volume >= 10: # 비트코인 과매수
                                 
-                                    more_selling = last_volume / 3
+                                    more_selling = last_volume
                                     if more_selling > 50 : more_selling = 50
 
                                     sell_qty += (qty / symbol_list[sym]['공포적립']) * more_selling
@@ -337,13 +337,41 @@ try:
                         
                         message_list += f" - 공포구간({symbol_list[sym]['공포에너지']})"
 
+                        price = 0
+                        rate = 0
+
+                        # 비트코인 과매도
+                        if symbol_list[sym]['공포에너지'] >= 3 and symbol_list[sym]['매도티커'] == 'BTC'and last_volume >= 20: 
+                                
+                            morebetting = last_volume
+                            if morebetting > 50 : morebetting = 50
+
+                            rate = morebetting
+                            BTC_panic_max = True
+                            message_list += f"!! 비트코인 극공포 {morebetting}만원 추가 예치 !! \n"
+
+                            if symbol_list[sym]['잔여예산'] >= buy_rate * rate:                                
+                                price = buy_rate * rate
+                            else:
+                                price = symbol_list[sym]['잔여예산']
+
+                            # 공포 매수
+                            buy_result = upbit.buy_market_order(sym, price) # 현금
+                            if buy_result is not None:          
+                                
+                                time.sleep(0.02)                                    
+                                qty = get_balance(symbol_list[sym]['매도티커'])
+
+                                symbol_list[sym]['total'] = current_price * qty
+                                formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total']) 
+                                message_list += f"갱신: {formatted_amount}\n"                      
+                            else:
+                                message_list += f"공포 매수 실패 ({buy_result})\n"
+
                         # 거래량 변동성 신호
                         if symbol_list[sym]['공포에너지'] >= 3 and last_volume > (average_volume*panic_volume_rate): 
 
                             message_list += "\n\n+++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++\n"
-
-                            price = 0
-                            rate = 0
 
                             if last_volume > (average_volume*panic_volume_rate_max):
                                 rate = panic_max_betting
@@ -351,15 +379,6 @@ try:
                             else:
                                 rate = panic_betting
                                 message_list += f"!! 공포 {rate}개 예치 !! \n"
-
-                            if symbol_list[sym]['매도티커'] == 'BTC'and last_volume >= 20: # 비트코인 과매도
-                                
-                                morebetting = last_volume / 3
-                                if morebetting > 50 : morebetting = 50
-
-                                rate += morebetting #
-                                BTC_panic_max = True
-                                message_list += f"!! 비트코인 극공포 {morebetting}만원 추가 예치 !! \n"
                             
                             if symbol_list[sym]['잔여예산'] >= buy_rate * rate:
                                 
@@ -387,7 +406,7 @@ try:
                 if BTC_panic_max and symbol_list[sym]['매도티커'] != 'BTC' and (symbol_list[sym]['total'] + comparative_amount) < BTC_price:
                                         
                     difference = BTC_price - symbol_list[sym]['total'] + comparative_amount
-                    difference /= 2 # 비트코인 동조화
+                    difference /= 1.5 # 비트코인 동조화
 
                     formatted_amount = "{:,.0f}원".format(difference)
                     message_list += f"\n!! 비트코인 동조화 {formatted_amount} 추가 예치 !! \n"
@@ -410,7 +429,7 @@ try:
                 elif BTC_greed_max and symbol_list[sym]['매도티커'] != 'BTC' and (symbol_list[sym]['total'] + comparative_amount) > BTC_price:
                                         
                     difference = symbol_list[sym]['total'] + comparative_amount - BTC_price
-                    difference /= 2 # 비트코인 동조화
+                    difference /= 1.5 # 비트코인 동조화
 
                     formatted_amount = "{:,.0f}원".format(difference)
                     message_list += f"\n!! 비트코인 동조화 {formatted_amount} 추가 지급 !! \n"
