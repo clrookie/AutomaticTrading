@@ -208,7 +208,7 @@ try:
                             
                             message_list += "\n\n--- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 ---\n"
 
-                            r_last_volume = round(last_volume)
+                            r_last_volume = round((current_price*last_volume)/buy_rate)
                             sell_qty = (buy_rate / current_price) * r_last_volume
                             if sell_qty > qty: sell_qty = qty
 
