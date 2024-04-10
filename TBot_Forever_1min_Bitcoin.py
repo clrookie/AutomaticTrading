@@ -236,7 +236,7 @@ try:
                                 message_list += f"탐욕 매도 실패 ({sell_result})\n"
 
                         else: # 음봉
-                            message_list += "20 60 120 ↑↑↑↑ '음봉' 나가리~\n"
+                            message_list += "\n20 60 120 ↑↑↑↑ '음봉' 나가리~\n"
                     else: # 변동성 조건 미달
                             message_list += " - 탐욕구간"
 
