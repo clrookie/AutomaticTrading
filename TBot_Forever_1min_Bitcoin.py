@@ -209,11 +209,11 @@ try:
                             message_list += "\n\n--- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 ---\n"
 
                             r_last_volume = round((current_price*last_volume)/buy_rate)
-                            sell_qty = r_last_volume / current_price
-                            if sell_qty > qty: sell_qty = qty
-
                             formatted_amount = "{:,.0f}원".format(r_last_volume)
                             message_list += f"!! {formatted_amount} 지급 !! \n"
+
+                            sell_qty = r_last_volume / current_price
+                            if sell_qty > qty: sell_qty = qty
 
                             time.sleep(0.02)
                             avg_price = upbit.get_avg_buy_price(sym)
