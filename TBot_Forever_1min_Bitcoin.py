@@ -55,6 +55,7 @@ try:
     allotment_budget = 10000000
     division = 1000
     buy_rate = allotment_budget / division #만원씩 거래
+    leverage = 5
 
 
     # 공용 데이터
@@ -97,8 +98,7 @@ try:
             formatted_amount1 = "{:,.0f}원".format(buy_rate)
             formatted_amount2 = "{:,.2f}%".format(result_max - lostcut)
             message_list += f"배분: {formatted_amount} (단위 {formatted_amount1}), 로스컷 {formatted_amount2} \n"
-            message_list += f"공포 거래량: {panic_volume_rate}배 / "
-            message_list += f"탐욕 거래량: {greed_volume_rate}배 \n\n"
+            message_list += f"공포량: {panic_volume_rate}배 / 탐욕량: {greed_volume_rate}배 / 레버리지 {leverage}배 \n\n"
             message_list += "------------------------------------------\n"
 
             for sym in symbol_list: # 초기화
@@ -209,6 +209,8 @@ try:
                             message_list += "\n\n--- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 ---\n"
 
                             r_last_volume = round((current_price*last_volume)/buy_rate)
+                            r_last_volume *= leverage # 레버리지 5배
+
                             formatted_amount = "{:,.0f}원".format(r_last_volume)
                             message_list += f"!! {formatted_amount} 지급 !! \n"
 
@@ -255,28 +257,28 @@ try:
                             message_list += "\n\n+++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++\n"
 
                             r_last_volume = round((current_price*last_volume)/buy_rate)
+                            r_last_volume *= leverage # 레버리지 5배
 
                             formatted_amount = "{:,.0f}원".format(r_last_volume)
                             message_list += f"!! {formatted_amount} 예치 !! \n"
                             
-                            if symbol_list[sym]['잔여예산'] >= r_last_volume:
-                                
+                            if symbol_list[sym]['잔여예산'] >= r_last_volume:                               
                                 price = r_last_volume
+                            else : price = symbol_list[sym]['잔여예산']
 
-                                # 공포 매수
-                                buy_result = upbit.buy_market_order(sym, price) # 현금
-                                if buy_result is not None:          
-                                    
-                                    time.sleep(0.02)                                    
-                                    qty = get_balance(symbol_list[sym]['매도티커'])
+                            # 공포 매수
+                            buy_result = upbit.buy_market_order(sym, price) # 현금
+                            if buy_result is not None:          
+                                
+                                time.sleep(0.02)                                    
+                                qty = get_balance(symbol_list[sym]['매도티커'])
 
-                                    symbol_list[sym]['total'] = current_price * qty
-                                    formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total']) 
-                                    message_list += f"갱신: {formatted_amount}\n"                      
-                                else:
-                                    message_list += f"공포 매수 실패 ({buy_result})\n"
+                                symbol_list[sym]['total'] = current_price * qty
+                                formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total']) 
+                                message_list += f"갱신: {formatted_amount}\n"                      
                             else:
-                                message_list += f"예산 부족 ~ \n"
+                                message_list += f"공포 매수 실패 ({buy_result})\n"
+
                     else: # 양봉
                         message_list += " - 공포구간 '양봉'\n"
                 else:
