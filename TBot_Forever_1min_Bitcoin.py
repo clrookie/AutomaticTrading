@@ -48,14 +48,17 @@ try:
     lostcut = 3
     
     # 기준 거래량 비율
-    panic_volume_rate = 2
+    panic_volume_rate = 3
     greed_volume_rate = 1
     
     # 매수
     allotment_budget = 10000000
     division = 1000
     buy_rate = allotment_budget / division #만원씩 거래
-    leverage = 5
+
+    panic_count = 5
+    panic_leverage = 5
+    greed_leverage = 3.5
 
 
     # 공용 데이터
@@ -98,7 +101,7 @@ try:
             formatted_amount1 = "{:,.0f}원".format(buy_rate)
             formatted_amount2 = "{:,.2f}%".format(result_max - lostcut)
             message_list += f"배분: {formatted_amount} (단위 {formatted_amount1}), 로스컷 {formatted_amount2} \n"
-            message_list += f"공포량: {panic_volume_rate}배 / 탐욕량: {greed_volume_rate}배 / 레버리지 {leverage}배 \n\n"
+            message_list += f"공포량: {panic_volume_rate}배 / 탐욕량: {greed_volume_rate}배 / 레버리지(예치{panic_leverage}배, 지급{greed_leverage}배) \n\n"
             message_list += "------------------------------------------\n"
 
             for sym in symbol_list: # 초기화
@@ -209,7 +212,7 @@ try:
                             message_list += "\n\n--- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 ---\n"
 
                             r_last_volume = round((current_price*last_volume)/buy_rate)
-                            r_last_volume *= leverage # 레버리지 5배
+                            r_last_volume *= greed_leverage # 레버리지 5배
 
                             formatted_amount = "{:,.0f}원".format(r_last_volume)
                             message_list += f"!! {formatted_amount} 지급 !! \n"
@@ -251,13 +254,13 @@ try:
                         message_list += f" - 공포구간({symbol_list[sym]['공포에너지']})"
 
                         # 거래량 변동성 신호
-                        if symbol_list[sym]['공포에너지'] >= 3 and last_volume > (average_volume*panic_volume_rate): # 공포에너지 체크 때문에 거래량 여기서 체크
+                        if symbol_list[sym]['공포에너지'] >= panic_count and last_volume > (average_volume*panic_volume_rate): # 공포에너지 체크 때문에 거래량 여기서 체크
 
                             price = 0
                             message_list += "\n\n+++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++\n"
 
                             r_last_volume = round((current_price*last_volume)/buy_rate)
-                            r_last_volume *= leverage # 레버리지 5배
+                            r_last_volume *= panic_leverage # 레버리지 5배
 
                             formatted_amount = "{:,.0f}원".format(r_last_volume)
                             message_list += f"!! {formatted_amount} 예치 !! \n"
