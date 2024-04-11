@@ -129,7 +129,7 @@ try:
                     avg_price = upbit.get_avg_buy_price(sym)
 
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
-                    formatted_amount1 = "{:,.1f}%".format(current_price/avg_price*100)
+                    formatted_amount1 = "{:,.2f}%".format(current_price/avg_price*100-100)
                     message_list += f"보유 {formatted_amount} ({formatted_amount1})"
 
                 else:
