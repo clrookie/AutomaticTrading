@@ -218,7 +218,11 @@ try:
                             message_list += "\n\n--- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 ---\n"
 
                             r_last_volume = round((current_price*last_volume)/buy_rate)
-                            r_last_volume *= greed_leverage # 레버리지 5배
+
+                            if symbol_list[sym]['잔여예산'] <= allotment_budget * 0.3:
+                                r_last_volume *= greed_leverage*2 # 예산이 얼마 없으면 2배씩 지급
+                                message_list += "예산부족 -> 2배 지급ㅠ\n"
+                            else: r_last_volume *= greed_leverage
 
                             formatted_amount = "{:,.0f}원".format(r_last_volume)
                             message_list += f"!! {formatted_amount} 지급 !! \n"
