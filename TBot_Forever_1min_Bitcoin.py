@@ -45,7 +45,7 @@ try:
     principal = 10000000
     result_rate = 0
     result_max = 0
-    lostcut = 2.5
+    lostcut = 2
     
     # 기준 거래량 비율
     panic_volume_rate = 3
@@ -56,9 +56,9 @@ try:
     division = 1000
     buy_rate = allotment_budget / division #만원씩 거래
 
-    panic_count = 5
+    panic_count = 3
     panic_leverage = 4
-    greed_leverage = 3.5
+    greed_leverage = 3
 
 
     # 공용 데이터
@@ -106,9 +106,11 @@ try:
 
             for sym in symbol_list: # 초기화
                 
-                message_list += f"[{symbol_list[sym]['종목명']}]"
-                
                 current_price = get_current_price(sym)
+                
+                formatted_amount = "{:,.0f}원".format(current_price)
+                message_list += f"[{symbol_list[sym]['종목명']}] 현재가: {formatted_amount}\n"
+
                 qty = get_balance(symbol_list[sym]['매도티커'])
 
                 symbol_list[sym]['total'] = current_price * qty
@@ -124,7 +126,7 @@ try:
 
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
                     formatted_amount1 = "{:,.1f}%".format(current_price/avg_price*100)
-                    message_list += f" {formatted_amount} ({formatted_amount1})"
+                    message_list += f"보유 {formatted_amount} ({formatted_amount1})"
 
                 else:
                     symbol_list[sym]['잔여예산'] = allotment_budget
