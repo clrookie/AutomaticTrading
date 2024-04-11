@@ -38,6 +38,7 @@ try:
     send_message("=== 코인거래 초기화 ===")
 
     last_min = 77
+    last_current = 1
     last_result = 0
     more_last_result = 0
     
@@ -48,7 +49,7 @@ try:
     lostcut = 2
     
     # 기준 거래량 비율
-    panic_volume_rate = 3
+    panic_volume_rate = 2
     greed_volume_rate = 1
     
     # 매수
@@ -109,7 +110,10 @@ try:
                 current_price = get_current_price(sym)
                 
                 formatted_amount = "{:,.0f}원".format(current_price)
-                message_list += f"[{symbol_list[sym]['종목명']}] 현재가: {formatted_amount}\n"
+                formatted_amount1 = "{:,.2f}%".format((current_price/last_current)*100-100)
+                message_list += f"[{symbol_list[sym]['종목명']}] {formatted_amount}({formatted_amount1})\n"
+
+                last_current = current_price
 
                 qty = get_balance(symbol_list[sym]['매도티커'])
 
