@@ -102,7 +102,7 @@ try:
             formatted_amount1 = "{:,.0f}원".format(buy_rate)
             formatted_amount2 = "{:,.2f}%".format(result_max - lostcut)
             message_list += f"배분: {formatted_amount} (단위 {formatted_amount1}), 로스컷 {formatted_amount2} \n"
-            message_list += f"공포량: {panic_volume_rate}배 / 탐욕량: {greed_volume_rate}배 / 레버리지(예치{panic_leverage}배, 지급{greed_leverage}배) \n\n"
+            message_list += f"공포량: {panic_volume_rate}배 / 탐욕량: {greed_volume_rate}배 / 레버리지(예치{panic_leverage}배, 지급 예산비례) \n\n"
             message_list += "------------------------------------------\n"
 
             for sym in symbol_list: # 초기화
@@ -219,10 +219,16 @@ try:
 
                             r_last_volume = round((current_price*last_volume)/buy_rate)
 
-                            if symbol_list[sym]['잔여예산'] <= allotment_budget * 0.3:
-                                r_last_volume *= greed_leverage*2 # 예산이 얼마 없으면 2배씩 지급
-                                message_list += "예산부족 -> 2배 지급ㅠ\n"
-                            else: r_last_volume *= greed_leverage
+                            if symbol_list[sym]['잔여예산'] > 0:
+                                rate = (1 - (symbol_list[sym]['잔여예산'] / allotment_budget)) * 10
+                                rate = round(rate)
+                                if rate < 1: rate = 1
+
+                                r_last_volume *= rate
+                                message_list += f"지급 비율 {rate}배\n"
+
+                            else:
+                                r_last_volume *= 10
 
                             formatted_amount = "{:,.0f}원".format(r_last_volume)
                             message_list += f"!! {formatted_amount} 지급 !! \n"

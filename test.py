@@ -53,7 +53,9 @@ def aaa():
     aa = 34790.0000
     return int(aa) 
 
-print(f"### total_cash ###")
+rate = (1 - (9660000 / 10000000)) * 10
+rate = round(rate)
+print(f"{rate}### total_cash ###")
 
 # try:
       # # 코스피(KOSPI) 종목 코드
