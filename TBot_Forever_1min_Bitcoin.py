@@ -53,6 +53,7 @@ try:
     greed_volume_rate = 1
     
     # 매수
+    bbuy = 0
     allotment_budget = 10000000
     division = 1000
     buy_rate = allotment_budget / division #만원씩 거래
@@ -90,6 +91,7 @@ try:
 
             time.sleep(0.2) # 데이터 갱신 보정
 
+            bbuy = 0
             last_min = df.index[0].minute
 
             message_list = "\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n"
@@ -289,7 +291,8 @@ try:
                             buy_result = upbit.buy_market_order(sym, price) # 현금
                             if buy_result is not None:          
                                 
-                                time.sleep(0.02)                                    
+                                time.sleep(1)
+                                bbuy = 1
                                 qty = get_balance(symbol_list[sym]['매도티커'])
 
                                 symbol_list[sym]['total'] = current_price * qty
@@ -341,7 +344,7 @@ try:
                           
         # for문 끝 라인..
 
-        if result_rate < (result_max - lostcut): #사이드브레이크
+        if bbuy == 0 and result_rate < (result_max - lostcut): #사이드브레이크
             
             formatted_amount = "{:,.2f}%".format(result_rate)
             send_message(f"총 수익율 {formatted_amount} 도달로 절반 매도합니다ㅠ")
