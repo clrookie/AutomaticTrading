@@ -222,7 +222,7 @@ try:
                             r_last_volume = round((current_price*last_volume)/buy_rate)
 
                             if symbol_list[sym]['잔여예산'] > 0:
-                                rate = (1 - (symbol_list[sym]['잔여예산'] / allotment_budget)) * 5
+                                rate = (1 - (symbol_list[sym]['잔여예산'] / allotment_budget)) * 7
                                 rate = round(rate)
                                 if rate < 1: rate = 1
 
