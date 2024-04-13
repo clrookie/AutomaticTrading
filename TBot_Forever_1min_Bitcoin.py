@@ -59,7 +59,7 @@ try:
     buy_rate = allotment_budget / division #만원씩 거래
 
     panic_count = 3
-    panic_leverage = 4
+    panic_leverage = 5
     greed_leverage = 3
 
 
@@ -222,7 +222,7 @@ try:
                             r_last_volume = round((current_price*last_volume)/buy_rate)
 
                             if symbol_list[sym]['잔여예산'] > 0:
-                                rate = (1 - (symbol_list[sym]['잔여예산'] / allotment_budget)) * 10
+                                rate = (1 - (symbol_list[sym]['잔여예산'] / allotment_budget)) * 5
                                 rate = round(rate)
                                 if rate < 1: rate = 1
 
