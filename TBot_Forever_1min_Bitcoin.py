@@ -60,7 +60,7 @@ try:
 
     panic_count = 3
     panic_leverage = 5
-    greed_leverage = 5
+    greed_leverage = 3.5
 
 
     # 공용 데이터
@@ -224,7 +224,7 @@ try:
                             if symbol_list[sym]['잔여예산'] > 0:
                                 rate = (1 - (symbol_list[sym]['잔여예산'] / allotment_budget)) * greed_leverage
                                 rate = round(rate,2)
-                                if rate < 1: rate = 1
+                                if rate < 0.5: rate = 0.5
 
                                 r_last_volume *= rate
                                 message_list += f"지급 비율 {rate}배\n"
