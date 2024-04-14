@@ -347,7 +347,7 @@ try:
         if bbuy == 0 and result_rate < (result_max - lostcut): #사이드브레이크
             
             formatted_amount = "{:,.2f}%".format(result_rate)
-            send_message(f"총 수익율 {formatted_amount} 도달로 절반 매도합니다ㅠ")
+            send_message(f"총 수익율 {formatted_amount} 도달로 1/3 매도합니다ㅠ")
 
             result_max = result_rate
             for sym in symbol_list: # 있으면 일괄 매도
@@ -355,7 +355,7 @@ try:
                 if coin > 0: # 있다면 매도
                     sell_result = upbit.sell_market_order(sym, coin/3)
                     if sell_result is not None:
-                        send_message(f"[{symbol_list[sym]['종목명']}] {coin} 절반 매도했습니다~")
+                        send_message(f"[{symbol_list[sym]['종목명']}] {coin} 1/3 매도했습니다~")
                     else:
                         send_message(f"[{symbol_list[sym]['매도티커']}] 매도실패 ({sell_result})")
             
