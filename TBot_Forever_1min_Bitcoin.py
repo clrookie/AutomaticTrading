@@ -223,7 +223,7 @@ try:
 
                             if symbol_list[sym]['잔여예산'] > 0:
                                 rate = (1 - (symbol_list[sym]['잔여예산'] / allotment_budget)) * 7
-                                rate = round(rate)
+                                rate = round(rate,2)
                                 if rate < 1: rate = 1
 
                                 r_last_volume *= rate

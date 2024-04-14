@@ -54,7 +54,7 @@ def aaa():
     return int(aa) 
 
 rate = (1 - (9660000 / 10000000)) * 10
-rate = round(rate)
+rate = round(rate,2)
 print(f"{rate}### total_cash ###")
 
 # try:
