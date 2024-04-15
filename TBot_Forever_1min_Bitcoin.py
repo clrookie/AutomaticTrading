@@ -60,7 +60,7 @@ try:
 
     panic_count = 3
     panic_leverage = 5
-    greed_leverage = 3.5
+    greed_leverage = 4
 
 
     # 공용 데이터
