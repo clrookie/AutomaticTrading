@@ -60,7 +60,7 @@ try:
 
     panic_count = 3
     panic_leverage = 5
-    greed_leverage = 4
+    greed_leverage = 5
 
 
     # 공용 데이터
@@ -142,7 +142,56 @@ try:
                 average_price_60 = 0
                 average_price_120 = 0
 
+
                 # 10분봉 데이터 가져오기 (최근 20봉)
+                average_price_10_20 = 0
+                average_price_10_60 = 0
+                average_price_10_120 = 0
+
+                data_10 = pyupbit.get_ohlcv(sym, interval="minute10", count=20)
+
+                if data_10 is not None:
+                    average_price_10_20 = data_10['close'].mean()
+                    time.sleep(0.02)
+
+                    # 최근 60봉
+                    data_10_60 = pyupbit.get_ohlcv(sym, interval="minute10", count=60)
+
+                    if data_10_60 is not None:
+                        average_price_10_60 = data_10_60['close'].mean()
+                        time.sleep(0.02)
+
+                        # 최근 120봉
+                        data_10_120 = pyupbit.get_ohlcv(sym, interval="minute10", count=120)
+
+                        if data_10_120 is not None:
+                            average_price_10_120 = data_10_120['close'].mean()
+
+                            # 예치/지급 배율 세팅
+                            if current_price > average_price_10_20 and current_price > average_price_10_60 and current_price > average_price_10_120:
+                                panic_leverage = 6
+                                greed_leverage = 3
+                            elif current_price < average_price_10_20 and current_price < average_price_10_60 and current_price < average_price_10_120:
+                                panic_leverage = 3
+                                greed_leverage = 6
+                            else:
+                                panic_leverage = 5
+                                greed_leverage = 4
+
+                        else:
+                            message_list += "10분봉 120 이평선 실패 !! \n"
+                            continue
+                    else:
+                        message_list += "10분봉 60 이평선 실패 !! \n"
+                        continue
+
+                else:
+                    message_list += "10분봉 20 이평선 실패 !! \n"
+                    continue
+                   
+                time.sleep(0.02)
+
+                # 1분봉 데이터 가져오기 (최근 20봉)
                 data = pyupbit.get_ohlcv(sym, interval="minute1", count=20)
                 if data is None: continue
 
