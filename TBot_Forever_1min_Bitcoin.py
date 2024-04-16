@@ -168,10 +168,10 @@ try:
                             average_price_10_120 = data_10_120['close'].mean()
 
                             # 예치/지급 배율 세팅
-                            if current_price > average_price_10_20 and current_price > average_price_10_60 and current_price > average_price_10_120:
+                            if average_price_10_20 > average_price_10_60 and average_price_10_20 > average_price_10_120:
                                 panic_leverage = 6
                                 greed_leverage = 3
-                            elif current_price < average_price_10_20 and current_price < average_price_10_60 and current_price < average_price_10_120:
+                            elif average_price_10_20 < average_price_10_60 and average_price_10_20 < average_price_10_120:
                                 panic_leverage = 3
                                 greed_leverage = 6
                             else:
