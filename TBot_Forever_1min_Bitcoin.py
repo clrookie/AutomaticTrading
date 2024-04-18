@@ -143,26 +143,26 @@ try:
                 average_price_120 = 0
 
 
-                # 10분봉 데이터 가져오기 (최근 20봉)
+                # 60분봉 데이터 가져오기 (최근 20봉)
                 average_price_10_20 = 0
                 average_price_10_60 = 0
                 average_price_10_120 = 0
 
-                data_10 = pyupbit.get_ohlcv(sym, interval="minute10", count=20)
+                data_10 = pyupbit.get_ohlcv(sym, interval="minute60", count=20)
 
                 if data_10 is not None:
                     average_price_10_20 = data_10['close'].mean()
                     time.sleep(0.02)
 
                     # 최근 60봉
-                    data_10_60 = pyupbit.get_ohlcv(sym, interval="minute10", count=60)
+                    data_10_60 = pyupbit.get_ohlcv(sym, interval="minute60", count=60)
 
                     if data_10_60 is not None:
                         average_price_10_60 = data_10_60['close'].mean()
                         time.sleep(0.02)
 
                         # 최근 120봉
-                        data_10_120 = pyupbit.get_ohlcv(sym, interval="minute10", count=120)
+                        data_10_120 = pyupbit.get_ohlcv(sym, interval="minute60", count=120)
 
                         if data_10_120 is not None:
                             average_price_10_120 = data_10_120['close'].mean()
