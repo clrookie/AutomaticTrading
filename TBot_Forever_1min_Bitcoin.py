@@ -59,7 +59,7 @@ try:
     buy_rate = allotment_budget / division #만원씩 거래
 
     panic_count = 3
-    panic_leverage = 5
+    panic_leverage = 4
     greed_leverage = 5
 
 
@@ -172,11 +172,11 @@ try:
                                 panic_leverage = 6
                                 greed_leverage = 3
                             elif average_price_10_20 < average_price_10_60 and average_price_10_20 < average_price_10_120:
-                                panic_leverage = 3
-                                greed_leverage = 6
+                                panic_leverage = 2
+                                greed_leverage = 7
                             else:
-                                panic_leverage = 5
-                                greed_leverage = 4
+                                panic_leverage = 4
+                                greed_leverage = 5
 
                         else:
                             message_list += "10분봉 120 이평선 실패 !! \n"
