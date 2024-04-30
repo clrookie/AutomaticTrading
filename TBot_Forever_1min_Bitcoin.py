@@ -293,6 +293,7 @@ try:
                             sell_result = upbit.sell_market_order(sym, sell_qty)
                             if sell_result is not None:
                                 
+                                bbuy = 1
                                 message_list += f"{round(current_price/avg_price,6)}% 탐욕 매도합니다 ^^\n"
 
                                 time.sleep(0.02)
@@ -388,7 +389,13 @@ try:
             if result_max < result_rate: result_max = result_rate # 최고 수익율 기록
 
             message_list += f"\n===========({last_min}분)===========\n\n\n"
-            send_message(message_list)
+            
+            if bbuy == 1:
+                send_message(message_list)
+            else:
+                message_symplelist = f"총 수익율: {formatted_amount0} ({formatted_amount1} > {formatted_amount2} > '{formatted_amount3}')"
+                send_message(message_symplelist)
+                
                           
         # for문 끝 라인..
 
