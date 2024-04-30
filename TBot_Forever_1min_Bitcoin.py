@@ -393,7 +393,7 @@ try:
             if bbuy == 1:
                 send_message(message_list)
             else:
-                message_symplelist = f"총 수익율: {formatted_amount0} ({formatted_amount1} > {formatted_amount2} > '{formatted_amount3}')"
+                message_symplelist = f"총 수익: {formatted_amount0}"
                 send_message(message_symplelist)
                 
                           
