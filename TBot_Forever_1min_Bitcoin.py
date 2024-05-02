@@ -54,9 +54,7 @@ try:
     
     # 매수
     bbuy = 0
-    allotment_budget = 10000000
-    division = 1000
-    buy_rate = allotment_budget / division #만원씩 거래
+    buy_rate = 10000 #만원씩 거래
 
     panic_count = 3
     panic_leverage = 3
@@ -100,10 +98,9 @@ try:
 
             total = 0
             
-            formatted_amount = "{:,.0f}원".format(allotment_budget)
             formatted_amount1 = "{:,.0f}원".format(buy_rate)
             formatted_amount2 = "{:,.2f}%".format(result_max - lostcut)
-            message_list += f"배분: {formatted_amount} (단위 {formatted_amount1}), 로스컷 {formatted_amount2} \n"
+            message_list += f"거래단위 {formatted_amount1}, 로스컷 {formatted_amount2} \n"
             message_list += f"공포량: {panic_volume_rate}배 / 탐욕량: {greed_volume_rate}배 / 레버리지(예치{panic_leverage}배, 지급{greed_leverage}배) \n\n"
             message_list += "------------------------------------------\n"
 
@@ -120,12 +117,9 @@ try:
                 qty = get_balance(symbol_list[sym]['매도티커'])
 
                 symbol_list[sym]['total'] = current_price * qty
+                symbol_list[sym]['잔여예산'] = get_balance("KRW") # 현금잔고 조회
 
                 if symbol_list[sym]['total'] >= buy_rate: # 최소 주문 가격 이상일 때
-
-                    # 잔여예산 초기화
-                    symbol_list[sym]['잔여예산'] = allotment_budget - symbol_list[sym]['total']
-                    if symbol_list[sym]['잔여예산'] < 0: symbol_list[sym]['잔여예산'] = 0
 
                     time.sleep(0.02)
                     avg_price = upbit.get_avg_buy_price(sym)
@@ -133,9 +127,6 @@ try:
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
                     formatted_amount1 = "{:,.2f}%".format(current_price/avg_price*100-100)
                     message_list += f"보유 {formatted_amount} ({formatted_amount1})"
-
-                else:
-                    symbol_list[sym]['잔여예산'] = allotment_budget
 
                 
                 average_price_20 = 0
@@ -168,15 +159,15 @@ try:
                             average_price_10_120 = data_10_120['close'].mean()
 
                             # 예치/지급 배율 세팅
-                            if average_price_10_20 > average_price_10_60 and average_price_10_20 > average_price_10_120:
+                            if average_price_10_20 > average_price_10_60 and average_price_10_20 > average_price_10_120: #탐욕구간
                                 panic_leverage = 4
-                                greed_leverage = 5
-                            elif average_price_10_20 < average_price_10_60 and average_price_10_20 < average_price_10_120:
+                                greed_leverage = 4
+                            elif average_price_10_20 < average_price_10_60 and average_price_10_20 < average_price_10_120: #공포구간
                                 panic_leverage = 2
-                                greed_leverage = 7
+                                greed_leverage = 6
                             else:
                                 panic_leverage = 3
-                                greed_leverage = 6
+                                greed_leverage = 5
 
                         else:
                             message_list += "10분봉 120 이평선 실패 !! \n"
@@ -271,7 +262,7 @@ try:
                             r_last_volume = round((current_price*last_volume)/buy_rate)
 
                             if symbol_list[sym]['잔여예산'] > 0:
-                                rate = (1 - (symbol_list[sym]['잔여예산'] / allotment_budget)) * greed_leverage
+                                rate = (1 - (symbol_list[sym]['잔여예산'] / (symbol_list[sym]['total']+symbol_list[sym]['잔여예산']))) * greed_leverage
                                 rate = round(rate,2)
                                 if rate < 0.5: rate = 0.5
 
@@ -402,6 +393,7 @@ try:
         if bbuy == 0 and result_rate < (result_max - lostcut): #사이드브레이크
             
             formatted_amount = "{:,.2f}%".format(result_rate)
+            send_message("###########################################")
             send_message(f"총 수익율 {formatted_amount} 도달로 1/3 매도합니다ㅠ")
 
             result_max = result_rate
@@ -419,6 +411,8 @@ try:
 
 except Exception as e:
     print(e)
+    
+    send_message("###########################################")
     send_message(f"[오류 발생]{e}")
     
     for sym in symbol_list: # 있으면 일괄 매도
