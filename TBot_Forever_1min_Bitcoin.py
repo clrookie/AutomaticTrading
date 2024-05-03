@@ -127,7 +127,7 @@ try:
 
                 # 기준금액 총 잔액 연동
                 buy_rate = min_buy * (principal/(symbol_list[sym]['total']+symbol_list[sym]['잔여예산']))
-                if buy_rate < min_buy: buy_rate = min_buy
+                if buy_rate > min_buy: buy_rate = min_buy
 
                 if symbol_list[sym]['total'] >= min_buy: # 최소 주문 가격 이상일 때
 
