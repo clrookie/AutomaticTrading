@@ -54,12 +54,16 @@ try:
     
     # 매수
     bbuy = 0
+    min_buy = 10000 #만원씩 거래
     buy_rate = 10000 #만원씩 거래
 
     panic_count = 3
     panic_leverage = 3
     greed_leverage = 6
 
+    #60분봉 데드크로스 체크
+    b_60_goldencross = False
+    b_60_deadcross = False
 
     # 공용 데이터
     common_data ={
@@ -98,9 +102,11 @@ try:
 
             total = 0
             
+            principal = 10000000
+            
             formatted_amount1 = "{:,.0f}원".format(buy_rate)
             formatted_amount2 = "{:,.2f}%".format(result_max - lostcut)
-            message_list += f"거래단위 {formatted_amount1}, 로스컷 {formatted_amount2} \n"
+            message_list += f"기준금액 {formatted_amount1}, 로스컷 {formatted_amount2} \n"
             message_list += f"공포량: {panic_volume_rate}배 / 탐욕량: {greed_volume_rate}배 / 레버리지(예치{panic_leverage}배, 지급{greed_leverage}배) \n\n"
             message_list += "------------------------------------------\n"
 
@@ -119,7 +125,11 @@ try:
                 symbol_list[sym]['total'] = current_price * qty
                 symbol_list[sym]['잔여예산'] = get_balance("KRW") # 현금잔고 조회
 
-                if symbol_list[sym]['total'] >= buy_rate: # 최소 주문 가격 이상일 때
+                # 기준금액 총 잔액 연동
+                buy_rate = min_buy * (principal/(symbol_list[sym]['total']+symbol_list[sym]['잔여예산']))
+                if buy_rate < min_buy: buy_rate = min_buy
+
+                if symbol_list[sym]['total'] >= min_buy: # 최소 주문 가격 이상일 때
 
                     time.sleep(0.02)
                     avg_price = upbit.get_avg_buy_price(sym)
@@ -162,9 +172,30 @@ try:
                             if average_price_10_20 > average_price_10_60 and average_price_10_20 > average_price_10_120: #탐욕구간
                                 panic_leverage = 4
                                 greed_leverage = 4
+
+                                if b_60_deadcross == True and b_60_goldencross == False: # 골든크로스 체크
+                                    b_60_deadcross = False
+                                    b_60_goldencross = True
+
                             elif average_price_10_20 < average_price_10_60 and average_price_10_20 < average_price_10_120: #공포구간
                                 panic_leverage = 2
                                 greed_leverage = 6
+
+                                if b_60_deadcross == False and b_60_goldencross == True: # 데드크로스 체크
+                                    b_60_deadcross = True
+                                    b_60_goldencross = False
+
+                                    # 데드크로스 청산
+                                    send_message("###### 60분봉 데드크로스 ### 60분봉 데드크로스 ######")
+                                    coin = get_balance(symbol_list[sym]['매도티커'])  # 보유량
+                                    if coin > 0: # 있다면 매도
+                                        sell_result = upbit.sell_market_order(sym, coin)
+                                        if sell_result is not None:
+                                            send_message(f"[{symbol_list[sym]['종목명']}] {coin} 전량 매도했습니다~")
+                                        else:
+                                            send_message(f"[{symbol_list[sym]['매도티커']}] 매도실패 ({sell_result})")
+                                        continue
+
                             else:
                                 panic_leverage = 3
                                 greed_leverage = 5
@@ -247,7 +278,7 @@ try:
                 last_low = data.iloc[18]['low']
 
                 # 시가 120 이평선 위에
-                if symbol_list[sym]['total'] >= buy_rate and last_open > average_price_20 and last_open > average_price_60 and last_open > average_price_120:
+                if symbol_list[sym]['total'] >= min_buy and last_open > average_price_20 and last_open > average_price_60 and last_open > average_price_120:
 
                     symbol_list[sym]['공포에너지'] = 0
 
@@ -302,7 +333,7 @@ try:
                             message_list += " - 탐욕구간"
 
                 # 저가 120 이평선 아래        
-                elif symbol_list[sym]['잔여예산'] >= buy_rate and last_open < average_price_20 and last_open < average_price_60 and last_open < average_price_120:
+                elif symbol_list[sym]['잔여예산'] >= min_buy and last_open < average_price_20 and last_open < average_price_60 and last_open < average_price_120:
 
                     # 음봉이니?
                     if last_open >= last_close:
