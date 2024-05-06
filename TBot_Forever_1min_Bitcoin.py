@@ -58,8 +58,8 @@ try:
     buy_rate = 10000 #만원씩 거래
 
     panic_count = 3
-    panic_leverage = 3
-    greed_leverage = 6
+    panic_leverage = 2
+    greed_leverage = 5
 
     #60분봉 데드크로스 체크
     b_60_goldencross = False
@@ -171,14 +171,14 @@ try:
 
                             # 예치/지급 배율 세팅
                             if average_price_10_20 > average_price_10_60 and average_price_10_20 > average_price_10_120: #탐욕구간
-                                panic_leverage = 4
+                                panic_leverage = 3
                                 greed_leverage = 4
 
                                 b_60_goldencross = True
                                 b_60_deadcross = False
 
                             elif average_price_10_20 < average_price_10_60 and average_price_10_20 < average_price_10_120: #공포구간
-                                panic_leverage = 2
+                                panic_leverage = 1
                                 greed_leverage = 6
 
                                 if b_60_goldencross == True: # 데드크로스 체크
@@ -198,7 +198,7 @@ try:
                                 b_60_deadcross = True
 
                             else:
-                                panic_leverage = 3
+                                panic_leverage = 2
                                 greed_leverage = 5                                
 
                         else:
