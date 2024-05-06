@@ -63,6 +63,7 @@ try:
 
     #60분봉 데드크로스 체크
     b_60_goldencross = False
+    b_60_middle = False
     b_60_deadcross = False
 
     # 공용 데이터
@@ -173,17 +174,14 @@ try:
                                 panic_leverage = 4
                                 greed_leverage = 4
 
-                                if b_60_deadcross == True and b_60_goldencross == False: # 골든크로스 체크
-                                    b_60_deadcross = False
-                                    b_60_goldencross = True
+                                b_60_goldencross = True
+                                b_60_deadcross = False
 
                             elif average_price_10_20 < average_price_10_60 and average_price_10_20 < average_price_10_120: #공포구간
                                 panic_leverage = 2
                                 greed_leverage = 6
 
-                                if b_60_deadcross == False and b_60_goldencross == True: # 데드크로스 체크
-                                    b_60_deadcross = True
-                                    b_60_goldencross = False
+                                if b_60_goldencross == True: # 데드크로스 체크
 
                                     # 데드크로스 청산
                                     send_message("###### 60분봉 데드크로스 ### 60분봉 데드크로스 ######")
@@ -195,10 +193,13 @@ try:
                                         else:
                                             send_message(f"[{symbol_list[sym]['매도티커']}] 매도실패 ({sell_result})")
                                         continue
+                                
+                                b_60_goldencross = False
+                                b_60_deadcross = True
 
                             else:
                                 panic_leverage = 3
-                                greed_leverage = 5
+                                greed_leverage = 5                                
 
                         else:
                             message_list += "10분봉 120 이평선 실패 !! \n"
