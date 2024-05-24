@@ -192,7 +192,7 @@ try:
                                             send_message(f"[{symbol_list[sym]['종목명']}] {coin} 1/2 매도했습니다~")
                                         else:
                                             send_message(f"[{symbol_list[sym]['매도티커']}] 매도실패 ({sell_result})")
-                                        continue
+                                            continue
                                 
                                 b_60_goldencross = False
                                 b_60_deadcross = True
