@@ -189,6 +189,8 @@ try:
                                     if coin > 0: # 있다면 매도
                                         sell_result = upbit.sell_market_order(sym, coin/2)
                                         if sell_result is not None:
+                                            qty = get_balance(symbol_list[sym]['매도티커'])
+                                            symbol_list[sym]['total'] = current_price * qty
                                             send_message(f"[{symbol_list[sym]['종목명']}] {coin} 1/2 매도했습니다~")
                                         else:
                                             send_message(f"[{symbol_list[sym]['매도티커']}] 매도실패 ({sell_result})")
