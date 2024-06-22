@@ -187,9 +187,11 @@ try:
                                     send_message("###### 60분봉 데드크로스 ### 60분봉 데드크로스 ######")
                                     coin = get_balance(symbol_list[sym]['매도티커'])  # 보유량
                                     if coin > 0: # 있다면 매도
-                                        sell_result = upbit.sell_market_order(sym, coin/2)
+                                        sell_result = upbit.sell_market_order(sym, coin/3)
                                         if sell_result is not None:
-                                            send_message(f"[{symbol_list[sym]['종목명']}] {coin} 1/2 매도했습니다~")
+                                            qty = get_balance(symbol_list[sym]['매도티커'])
+                                            symbol_list[sym]['total'] = current_price * qty
+                                            send_message(f"[{symbol_list[sym]['종목명']}] {coin} 1/3 매도했습니다~")
                                         else:
                                             send_message(f"[{symbol_list[sym]['매도티커']}] 매도실패 ({sell_result})")
                                         #    continue
