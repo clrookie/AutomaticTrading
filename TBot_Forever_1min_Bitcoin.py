@@ -46,7 +46,7 @@ try:
     principal = 10000000
     result_rate = 0
     result_max = 0
-    lostcut = 2
+    lostcut = 3
     
     # 기준 거래량 비율
     panic_volume_rate = 2
