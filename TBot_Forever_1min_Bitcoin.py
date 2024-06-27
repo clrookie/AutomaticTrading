@@ -52,14 +52,19 @@ try:
     panic_volume_rate = 2
     greed_volume_rate = 1
     
-    # 매수
+    # 예치
     bbuy = 0
     min_buy = 10000 #만원씩 거래
     buy_rate = 10000 #만원씩 거래
 
-    panic_count = 3
+    panic_count = 1
     panic_leverage = 2
     greed_leverage = 5
+    
+    # 지급
+    bsell = 0
+    base_sell_rate = 0
+    backup_rate = 0
 
     #60분봉 데드크로스 체크
     b_60_goldencross = False
@@ -95,6 +100,9 @@ try:
             time.sleep(0.2) # 데이터 갱신 보정
 
             bbuy = 0
+            bsell = 0
+            backup_rate = 0
+
             last_min = df.index[0].minute
 
             message_list = "\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n"
@@ -136,8 +144,11 @@ try:
                     avg_price = upbit.get_avg_buy_price(sym)
 
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
-                    formatted_amount1 = "{:,.2f}%".format(current_price/avg_price*100-100)
-                    message_list += f"보유 {formatted_amount} ({formatted_amount1})"
+                    backup_rate = "{:,.2f}%".format(current_price/avg_price*100-100)
+                    message_list += f"보유 {formatted_amount} ({backup_rate})"
+
+                    # 수익상태에 따라 지급 결정
+                    if (current_price/avg_price*100-100) > base_sell_rate : bsell = 1
 
                 
                 average_price_20 = 0
@@ -289,7 +300,7 @@ try:
                     if last_volume > (average_volume*greed_volume_rate):
                                            
                         # 양봉이니?
-                        if last_open <= last_close:
+                        if last_open <= last_close and bsell == 1:
                             
                             message_list += "\n\n--- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 --- 탐욕 지급 ---\n"
 
@@ -418,7 +429,7 @@ try:
             if bbuy == 1:
                 send_message(message_list)
             else:
-                message_symplelist = f"총 수익: {formatted_amount0}"
+                message_symplelist = f"총 수익: {formatted_amount0} / 보유수익: {backup_rate}"
                 send_message(message_symplelist)
                 
                           
