@@ -315,17 +315,17 @@ try:
                             r_last_volume = round((current_price*last_volume)/buy_rate)
 
                             # 잔여예산 탄력지급 로직
-                            # if symbol_list[sym]['잔여예산'] > 0:
-                            #     rate = (1 - (symbol_list[sym]['잔여예산'] / (symbol_list[sym]['total']+symbol_list[sym]['잔여예산']))) * greed_leverage
-                            #     rate = round(rate,2)
-                            #     if rate < 0.2: rate = 0.2
+                            if symbol_list[sym]['잔여예산'] > 0:
+                                rate = (1 - (symbol_list[sym]['잔여예산'] / (symbol_list[sym]['total']+symbol_list[sym]['잔여예산']))) * greed_leverage
+                                rate = round(rate,2)
+                                if rate < 0.2: rate = 0.2
 
-                            #     r_last_volume *= rate
-                            #     message_list += f"지급 비율 {rate}배\n"
-                            # else:
-                            #     r_last_volume *= greed_leverage
+                                r_last_volume *= rate
+                                message_list += f"지급 비율 {rate}배\n"
+                            else:
+                                r_last_volume *= greed_leverage
 
-                            r_last_volume *= greed_leverage
+                            # r_last_volume *= greed_leverage
 
                             formatted_amount = "{:,.0f}원".format(r_last_volume)
                             message_list += f"!! {formatted_amount} 지급 !! \n"
