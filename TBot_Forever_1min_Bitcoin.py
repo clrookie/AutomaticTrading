@@ -186,8 +186,8 @@ try:
                             if average_price_10_20 > average_price_10_60 and average_price_10_20 > average_price_10_120: #탐욕구간
                                 # panic_leverage = 3
                                 # greed_leverage = 4
-                                panic_leverage = 1
-                                greed_leverage = 1
+                                panic_leverage = 3
+                                greed_leverage = 3
 
                                 b_60_goldencross = True
                                 b_60_deadcross = False
@@ -219,8 +219,8 @@ try:
                             else:
                                 # panic_leverage = 2
                                 # greed_leverage = 5       
-                                panic_leverage = 1
-                                greed_leverage = 1                           
+                                panic_leverage = 2
+                                greed_leverage = 2                           
 
                         else:
                             message_list += "10분봉 120 이평선 실패 !! \n"
