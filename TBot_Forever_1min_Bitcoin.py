@@ -187,7 +187,7 @@ try:
                                 # panic_leverage = 3
                                 # greed_leverage = 4
                                 panic_leverage = 3
-                                greed_leverage = 3
+                                greed_leverage = 1
 
                                 b_60_goldencross = True
                                 b_60_deadcross = False
@@ -220,7 +220,7 @@ try:
                                 # panic_leverage = 2
                                 # greed_leverage = 5       
                                 panic_leverage = 2
-                                greed_leverage = 2                           
+                                greed_leverage = 1                           
 
                         else:
                             message_list += "10분봉 120 이평선 실패 !! \n"
