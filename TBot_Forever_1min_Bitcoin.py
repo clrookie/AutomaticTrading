@@ -58,11 +58,13 @@ try:
     buy_rate = 10000 #만원씩 거래
 
     panic_count = 1
-    panic_leverage = 2
-    greed_leverage = 5
+    # panic_leverage = 2
+    # greed_leverage = 5
+    panic_leverage = 1
+    greed_leverage = 1
     
     # 지급
-    bsell = 0
+    bsell = 1
     base_sell_rate = 0
     backup_rate = 0
 
@@ -100,7 +102,7 @@ try:
             time.sleep(0.2) # 데이터 갱신 보정
 
             bbuy = 0
-            bsell = 0
+            bsell = 1
             backup_rate = 0
 
             last_min = df.index[0].minute
@@ -148,7 +150,7 @@ try:
                     message_list += f"보유 {formatted_amount} ({backup_rate})"
 
                     # 수익상태에 따라 지급 결정
-                    if (current_price/avg_price*100-100) > base_sell_rate : bsell = 1
+                    # if (current_price/avg_price*100-100) > base_sell_rate : bsell = 1
 
                 
                 average_price_20 = 0
@@ -182,37 +184,43 @@ try:
 
                             # 예치/지급 배율 세팅
                             if average_price_10_20 > average_price_10_60 and average_price_10_20 > average_price_10_120: #탐욕구간
-                                panic_leverage = 3
-                                greed_leverage = 4
+                                # panic_leverage = 3
+                                # greed_leverage = 4
+                                panic_leverage = 1
+                                greed_leverage = 1
 
                                 b_60_goldencross = True
                                 b_60_deadcross = False
 
                             elif average_price_10_20 < average_price_10_60 and average_price_10_20 < average_price_10_120: #공포구간
+                                # panic_leverage = 1
+                                # greed_leverage = 6
                                 panic_leverage = 1
-                                greed_leverage = 6
+                                greed_leverage = 1
 
-                                if b_60_goldencross == True: # 데드크로스 체크
+                                # if b_60_goldencross == True: # 데드크로스 체크
 
-                                    # 데드크로스 청산
-                                    send_message("###### 60분봉 데드크로스 ### 60분봉 데드크로스 ######")
-                                    coin = get_balance(symbol_list[sym]['매도티커'])  # 보유량
-                                    if coin > 0: # 있다면 매도
-                                        sell_result = upbit.sell_market_order(sym, coin/3)
-                                        if sell_result is not None:
-                                            qty = get_balance(symbol_list[sym]['매도티커'])
-                                            symbol_list[sym]['total'] = current_price * qty
-                                            send_message(f"[{symbol_list[sym]['종목명']}] {coin} 1/3 매도했습니다~")
-                                        else:
-                                            send_message(f"[{symbol_list[sym]['매도티커']}] 매도실패 ({sell_result})")
+                                    # 데드크로스 청산 (오히려 이때 반등 많이 나옴)
+                                    # send_message("###### 60분봉 데드크로스 ### 60분봉 데드크로스 ######")
+                                    # coin = get_balance(symbol_list[sym]['매도티커'])  # 보유량
+                                    # if coin > 0: # 있다면 매도
+                                    #     sell_result = upbit.sell_market_order(sym, coin/3)
+                                    #     if sell_result is not None:
+                                    #         qty = get_balance(symbol_list[sym]['매도티커'])
+                                    #         symbol_list[sym]['total'] = current_price * qty
+                                    #         send_message(f"[{symbol_list[sym]['종목명']}] {coin} 1/3 매도했습니다~")
+                                    #     else:
+                                    #         send_message(f"[{symbol_list[sym]['매도티커']}] 매도실패 ({sell_result})")
                                         #    continue
                                 
                                 b_60_goldencross = False
                                 b_60_deadcross = True
 
                             else:
-                                panic_leverage = 2
-                                greed_leverage = 5                                
+                                # panic_leverage = 2
+                                # greed_leverage = 5       
+                                panic_leverage = 1
+                                greed_leverage = 1                           
 
                         else:
                             message_list += "10분봉 120 이평선 실패 !! \n"
@@ -279,8 +287,8 @@ try:
                 # 평균 거래량 계산
                 average_volume = data['volume'].mean()
                 
-                formatted_amount3 = "{:,.0f}원".format(current_price*average_volume)
-                formatted_amount4 = "{:,.0f}원".format(current_price*last_volume)
+                formatted_amount3 = "{:,.0f}".format(current_price*average_volume)
+                formatted_amount4 = "{:,.0f}".format(current_price*last_volume)
                 avg1 = (current_price*last_volume) / (current_price*average_volume) * 100
                 formatted_amount5 = "{:,.0f}%".format(avg1)
                 message_list += f"\n\n평균: {formatted_amount3} | 직전: {formatted_amount4} [{formatted_amount5}]"
