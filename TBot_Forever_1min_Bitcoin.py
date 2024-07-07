@@ -67,6 +67,7 @@ try:
     bsell = 1
     base_sell_rate = 0
     backup_rate = 0
+    backup_avg = 0
 
     #60분봉 데드크로스 체크
     b_60_goldencross = False
@@ -104,6 +105,8 @@ try:
             bbuy = 0
             bsell = 1
             backup_rate = 0
+            backup_avg = 0
+            
 
             last_min = df.index[0].minute
 
@@ -144,6 +147,9 @@ try:
 
                     time.sleep(0.02)
                     avg_price = upbit.get_avg_buy_price(sym)
+                    
+                    formatted_amount = "{:,.0f}원".format(avg_price)
+                    backup_avg = formatted_amount # 평균가 백업
 
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
                     backup_rate = "{:,.2f}%".format(current_price/avg_price*100-100)
@@ -440,7 +446,7 @@ try:
             if bbuy == 1:
                 send_message(message_list)
             else:
-                message_symplelist = f"총 수익: {formatted_amount0} / 보유수익: {backup_rate}"
+                message_symplelist = f"총 수익: {formatted_amount0} / {backup_avg}({backup_rate})"
                 send_message(message_symplelist)
                 
                           
