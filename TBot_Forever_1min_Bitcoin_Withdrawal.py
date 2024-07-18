@@ -443,8 +443,7 @@ try:
 
             result_rate = ((total_cash+total) / principal * 100) - 100
 
-            # formatted_amount0 = "{:,.0f}원".format((total_cash+total)-principal)
-            formatted_amount0 = "{:,.0f}원".format(withdrawal)
+            formatted_amount0 = "{:,.0f}원".format((total_cash+total)-principal)
             formatted_amount1 = "{:,.2f}%".format(more_last_result)
             formatted_amount2 = "{:,.2f}%".format(last_result)
             formatted_amount3 = "{:,.2f}%".format(result_rate)
@@ -459,7 +458,8 @@ try:
             if bbuy == 1:
                 send_message(message_list)
             else:
-                message_symplelist = f"총 출금: {formatted_amount0} / {backup_avg}({backup_rate})"
+                formatted_amount4 = "{:,.0f}원".format(withdrawal)
+                message_symplelist = f"총 출금: {formatted_amount4} / {backup_avg}({backup_rate})"
                 send_message(message_symplelist)
                 
                           
