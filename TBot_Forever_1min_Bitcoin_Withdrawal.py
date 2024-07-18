@@ -44,6 +44,7 @@ try:
     
     #원금
     principal = 10000000
+    withdrawal_need = 0
     withdrawal = 0
     cash_backup = 0
 
@@ -143,10 +144,13 @@ try:
 
                 symbol_list[sym]['잔여예산'] = get_balance("KRW") # 현금잔고 조회
 
-                # 출금액
+                # 인출 했니?
                 if cash_backup > symbol_list[sym]['잔여예산']:
                     withdrawal += cash_backup - symbol_list[sym]['잔여예산']
                     result_max -= (withdrawal/principal*100)
+                    withdrawal_need = 0 #
+                else:
+                    withdrawal = 0
 
                 # 기준금액 총 잔액 연동
                 buy_rate = min_buy * (principal/(symbol_list[sym]['total']+symbol_list[sym]['잔여예산']))
@@ -441,11 +445,16 @@ try:
 
             result_rate = ((total_cash+total) / principal * 100) - 100
 
-            formatted_amount0 = "{:,.0f}원".format((total_cash+total)-principal)
+
+            # 출금 필요액 갱신
+            if withdrawal_need < (total_cash+total)-principal:
+                withdrawal_need = (total_cash+total)-principal
+
+            formatted_amount0 = "{:,.0f}원".format(withdrawal_need)
             formatted_amount1 = "{:,.2f}%".format(more_last_result)
             formatted_amount2 = "{:,.2f}%".format(last_result)
             formatted_amount3 = "{:,.2f}%".format(result_rate)
-            message_list += f"총 수익율: {formatted_amount0} ({formatted_amount1} > {formatted_amount2} > '{formatted_amount3}')"
+            message_list += f"출금필요: {formatted_amount0} ({formatted_amount1} > {formatted_amount2} > '{formatted_amount3}')"
             
             more_last_result = last_result
             last_result = result_rate
@@ -456,8 +465,8 @@ try:
             if bbuy == 1:
                 send_message(message_list)
             else:
-                formatted_amount4 = "{:,.0f}원".format(withdrawal)
-                message_symplelist = f"총 출금: {formatted_amount4} / {backup_avg}({backup_rate})"
+                formatted_amount4 = "{:,.0f}원".format(total_cash+total)
+                message_symplelist = f"총 잔고: {formatted_amount4} / {backup_avg}({backup_rate})"
                 send_message(message_symplelist)
                 
                           
