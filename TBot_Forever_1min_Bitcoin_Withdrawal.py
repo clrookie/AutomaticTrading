@@ -147,8 +147,6 @@ try:
                 if cash_backup > symbol_list[sym]['잔여예산']:
                     withdrawal += cash_backup - symbol_list[sym]['잔여예산']
                     result_max -= (withdrawal/principal*100)
-                else:
-                    withdrawal = 0
 
                 # 기준금액 총 잔액 연동
                 buy_rate = min_buy * (principal/(symbol_list[sym]['total']+symbol_list[sym]['잔여예산']))
