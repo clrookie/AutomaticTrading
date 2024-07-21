@@ -425,7 +425,7 @@ try:
                     message_list += " - 관망중..'\n"
 
                 total += symbol_list[sym]['total']
-                message_list += "\n\n------------------------------------------\n"
+                # message_list += "\n\n------------------------------------------\n"
                 
             
             
@@ -457,7 +457,7 @@ try:
             formatted_amount1 = "{:,.2f}%".format(more_last_result)
             formatted_amount2 = "{:,.2f}%".format(last_result)
             formatted_amount3 = "{:,.2f}%".format(result_rate)
-            message_list += f"수익실현: {formatted_amount0} ({formatted_amount1} > {formatted_amount2} > '{formatted_amount3}')"
+            message_list += f"수익금: {formatted_amount0} ({formatted_amount1} > {formatted_amount2} > '{formatted_amount3}')"
             
             more_last_result = last_result
             last_result = result_rate
