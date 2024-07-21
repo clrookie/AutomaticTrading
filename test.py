@@ -56,7 +56,12 @@ def aaa():
 rate = (1 - (9660000 / 10000000)) * 10
 rate = round(rate,2)
 
-withdrawal_need = 345
+principal = 10000000
+bbb = 9000000
+withdrawal_need = 1
+
+withdrawal_need *= 1-bbb/principal
+
 withdrawal_need = (withdrawal_need // 10000) * 10000
 ormatted_amount0 = "{:,.0f}원".format(withdrawal_need)
 print(f"{ormatted_amount0}### total_cash ###")

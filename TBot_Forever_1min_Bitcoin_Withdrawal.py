@@ -449,8 +449,12 @@ try:
 
 
             # 출금 필요액 갱신
-            if withdrawal_need < (total_cash+total)-principal:
-                withdrawal_need = (total_cash+total)-principal
+            profit = (total_cash+total)-principal
+            if profit > 0:
+                profit *= 1 - total_cash/principal
+
+            if withdrawal_need < profit:
+                withdrawal_need = profit
                 withdrawal_need = (withdrawal_need // 10000) * 10000
 
             formatted_amount0 = "{:,.0f}원".format(withdrawal_need)
