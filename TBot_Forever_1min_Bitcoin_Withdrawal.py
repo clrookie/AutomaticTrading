@@ -144,13 +144,15 @@ try:
 
                 symbol_list[sym]['잔여예산'] = get_balance("KRW") # 현금잔고 조회
 
-                # 인출 했니?
+                # 수익실현 했니?
                 if cash_backup > symbol_list[sym]['잔여예산']:
-                    withdrawal += cash_backup - symbol_list[sym]['잔여예산']
+                    withdrawal = cash_backup - symbol_list[sym]['잔여예산']
                     result_max -= (withdrawal/principal*100)
                     withdrawal_need = 0 #
                 else:
                     withdrawal = 0
+                    if symbol_list[sym]['잔여예산'] > withdrawal_need:
+                        symbol_list[sym]['잔여예산'] -= withdrawal_need
 
                 # 기준금액 총 잔액 연동
                 buy_rate = min_buy * (principal/(symbol_list[sym]['total']+symbol_list[sym]['잔여예산']))
@@ -449,12 +451,13 @@ try:
             # 출금 필요액 갱신
             if withdrawal_need < (total_cash+total)-principal:
                 withdrawal_need = (total_cash+total)-principal
+                withdrawal_need = (withdrawal_need // 10000) * 1000
 
             formatted_amount0 = "{:,.0f}원".format(withdrawal_need)
             formatted_amount1 = "{:,.2f}%".format(more_last_result)
             formatted_amount2 = "{:,.2f}%".format(last_result)
             formatted_amount3 = "{:,.2f}%".format(result_rate)
-            message_list += f"출금필요: {formatted_amount0} ({formatted_amount1} > {formatted_amount2} > '{formatted_amount3}')"
+            message_list += f"수익실현: {formatted_amount0} ({formatted_amount1} > {formatted_amount2} > '{formatted_amount3}')"
             
             more_last_result = last_result
             last_result = result_rate
