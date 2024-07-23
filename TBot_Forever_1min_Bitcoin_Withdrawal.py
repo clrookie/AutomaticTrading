@@ -452,6 +452,7 @@ try:
                 profit *= 1 - total_cash/principal
                 if withdrawal_need < profit:
                     withdrawal_need = (profit // 10000) * 10000            
+                    lostcut = -3
 
             formatted_amount0 = "{:,.0f}원".format(withdrawal_need)
             formatted_amount1 = "{:,.2f}%".format(more_last_result)
