@@ -45,12 +45,12 @@ try:
     #원금
     principal = 10000000
     withdrawal_need = 0
-    withdrawal = 0
     cash_backup = 0
 
     result_rate = 0
-    result_max = 0
-    lostcut = 3
+    lostcut = -3
+    lostcut_step = 3
+    once = False
     
     # 기준 거래량 비율
     panic_volume_rate = 2
@@ -123,7 +123,7 @@ try:
             principal = 10000000
             
             formatted_amount1 = "{:,.0f}원".format(buy_rate)
-            formatted_amount2 = "{:,.2f}%".format(result_max - lostcut)
+            formatted_amount2 = "{:,.2f}%".format(lostcut)
             message_list += f"기준금액 {formatted_amount1}, 로스컷 {formatted_amount2} \n"
             message_list += f"공포량: {panic_volume_rate}배 / 탐욕량: {greed_volume_rate}배 / 레버리지(예치{panic_leverage}배, 지급{greed_leverage}배) \n\n"
             message_list += "------------------------------------------\n"
@@ -146,13 +146,7 @@ try:
 
                 # 수익실현 했니?
                 if cash_backup > symbol_list[sym]['잔여예산']:
-                    withdrawal = cash_backup - symbol_list[sym]['잔여예산']
-                    result_max -= (withdrawal/principal*100)
                     withdrawal_need = 0 #
-                else:
-                    withdrawal = 0
-                    if symbol_list[sym]['잔여예산'] > withdrawal_need:
-                        symbol_list[sym]['잔여예산'] -= withdrawal_need
 
                 # 기준금액 총 잔액 연동
                 buy_rate = min_buy * (principal/(symbol_list[sym]['total']+symbol_list[sym]['잔여예산']))
@@ -342,14 +336,14 @@ try:
                                 if rate < 0.2: rate = 0.2
 
                                 r_last_volume *= rate
-                                message_list += f"지급 비율 {rate}배\n"
+                                message_list += f"지급 비율 {rate}배 | "
                             else:
                                 r_last_volume *= greed_leverage
 
                             # r_last_volume *= greed_leverage
 
                             formatted_amount = "{:,.0f}원".format(r_last_volume)
-                            message_list += f"!! {formatted_amount} 지급 !! \n"
+                            message_list += f"!! {formatted_amount} 지급 !! |"
 
                             sell_qty = r_last_volume / current_price
                             if sell_qty > qty: sell_qty = qty
@@ -365,11 +359,11 @@ try:
                                 message_list += f"{round(current_price/avg_price,6)}% 탐욕 매도합니다 ^^\n"
 
                                 time.sleep(0.02)
-                                qty = get_balance(symbol_list[sym]['매도티커'])
+                                # qty = get_balance(symbol_list[sym]['매도티커'])
 
-                                symbol_list[sym]['total'] = current_price * qty
-                                formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
-                                message_list += f"갱신: {formatted_amount}\n"
+                                # symbol_list[sym]['total'] = current_price * qty
+                                # formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
+                                # message_list += f"갱신: {formatted_amount}\n"
                             else:
                                 message_list += f"탐욕 매도 실패 ({sell_result})\n"
 
@@ -410,11 +404,11 @@ try:
                                 
                                 time.sleep(1)
                                 bbuy = 1
-                                qty = get_balance(symbol_list[sym]['매도티커'])
+                                # qty = get_balance(symbol_list[sym]['매도티커'])
 
-                                symbol_list[sym]['total'] = current_price * qty
-                                formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total']) 
-                                message_list += f"갱신: {formatted_amount}\n"                      
+                                # symbol_list[sym]['total'] = current_price * qty
+                                # formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total']) 
+                                # message_list += f"갱신: {formatted_amount}\n"                      
                             else:
                                 message_list += f"공포 매수 실패 ({buy_result})\n"
 
@@ -447,15 +441,17 @@ try:
 
             result_rate = ((total_cash+total) / principal * 100) - 100
 
+            # 최초 한번 로스컷 세팅
+            if once == False:
+                once = True
+                lostcut = result_rate - lostcut_step
 
             # 출금 필요액 갱신
             profit = (total_cash+total)-principal
             if profit > 0:
                 profit *= 1 - total_cash/principal
-
-            if withdrawal_need < profit:
-                withdrawal_need = profit
-                withdrawal_need = (withdrawal_need // 10000) * 10000
+                if withdrawal_need < profit:
+                    withdrawal_need = (profit // 10000) * 10000            
 
             formatted_amount0 = "{:,.0f}원".format(withdrawal_need)
             formatted_amount1 = "{:,.2f}%".format(more_last_result)
@@ -465,7 +461,6 @@ try:
             
             more_last_result = last_result
             last_result = result_rate
-            if result_max < result_rate: result_max = result_rate # 최고 수익율 기록
 
             message_list += f"\n===========({last_min}분)===========\n\n\n"
             
@@ -479,13 +474,13 @@ try:
                           
         # for문 끝 라인..
 
-        if bbuy == 0 and result_rate < (result_max - lostcut): #사이드브레이크
+        if bbuy == 0 and lostcut > result_rate: #사이드브레이크
             
             formatted_amount = "{:,.2f}%".format(result_rate)
             send_message("###########################################")
             send_message(f"총 수익율 {formatted_amount} 도달로 1/3 매도합니다ㅠ")
 
-            result_max = result_rate
+            lostcut -= lostcut_step
             for sym in symbol_list: # 있으면 일괄 매도
                 coin = get_balance(symbol_list[sym]['매도티커'])  # 보유량
                 if coin > 0: # 있다면 매도
