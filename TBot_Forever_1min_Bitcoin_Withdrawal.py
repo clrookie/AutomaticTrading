@@ -343,7 +343,7 @@ try:
                             # r_last_volume *= greed_leverage
 
                             formatted_amount = "{:,.0f}원".format(r_last_volume)
-                            message_list += f"{formatted_amount} 지급 |"
+                            message_list += f"{formatted_amount} 지급 | "
 
                             sell_qty = r_last_volume / current_price
                             if sell_qty > qty: sell_qty = qty
