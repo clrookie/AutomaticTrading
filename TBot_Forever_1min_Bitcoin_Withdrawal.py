@@ -336,14 +336,14 @@ try:
                                 if rate < 0.2: rate = 0.2
 
                                 r_last_volume *= rate
-                                message_list += f"지급 비율 {rate}배 | "
+                                message_list += f"지급률 {rate}배 | "
                             else:
                                 r_last_volume *= greed_leverage
 
                             # r_last_volume *= greed_leverage
 
                             formatted_amount = "{:,.0f}원".format(r_last_volume)
-                            message_list += f"!! {formatted_amount} 지급 !! |"
+                            message_list += f"{formatted_amount} 지급 |"
 
                             sell_qty = r_last_volume / current_price
                             if sell_qty > qty: sell_qty = qty
@@ -359,9 +359,9 @@ try:
                                 message_list += f"{round(current_price/avg_price,6)}% 탐욕 매도합니다 ^^\n"
 
                                 time.sleep(0.02)
-                                # qty = get_balance(symbol_list[sym]['매도티커'])
+                                qty = get_balance(symbol_list[sym]['매도티커'])
 
-                                # symbol_list[sym]['total'] = current_price * qty
+                                symbol_list[sym]['total'] = current_price * qty
                                 # formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
                                 # message_list += f"갱신: {formatted_amount}\n"
                             else:
@@ -404,9 +404,9 @@ try:
                                 
                                 time.sleep(1)
                                 bbuy = 1
-                                # qty = get_balance(symbol_list[sym]['매도티커'])
+                                qty = get_balance(symbol_list[sym]['매도티커'])
 
-                                # symbol_list[sym]['total'] = current_price * qty
+                                symbol_list[sym]['total'] = current_price * qty
                                 # formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total']) 
                                 # message_list += f"갱신: {formatted_amount}\n"                      
                             else:
