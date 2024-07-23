@@ -457,7 +457,8 @@ try:
             formatted_amount1 = "{:,.2f}%".format(more_last_result)
             formatted_amount2 = "{:,.2f}%".format(last_result)
             formatted_amount3 = "{:,.2f}%".format(result_rate)
-            message_list += f"수익금: {formatted_amount0} ({formatted_amount1} > {formatted_amount2} > '{formatted_amount3}')"
+            message_list += f"추이: {formatted_amount1} > {formatted_amount2} > '{formatted_amount3}'\n\n"
+            message_list += f"수익금: {formatted_amount0}"
             
             more_last_result = last_result
             last_result = result_rate
