@@ -343,7 +343,7 @@ try:
                             # r_last_volume *= greed_leverage
 
                             formatted_amount = "{:,.0f}원".format(r_last_volume)
-                            message_list += f"{formatted_amount} 지급 (지급률 {rate}) | "
+                            message_list += f"{formatted_amount} 지급 (지급률 {rate}%) | "
 
                             sell_qty = r_last_volume / current_price
                             if sell_qty > qty: sell_qty = qty
@@ -356,7 +356,7 @@ try:
                             if sell_result is not None:
                                 
                                 bbuy = 1
-                                message_list += f"{round(current_price/avg_price,6)}% 탐욕 매도 ^^\n"
+                                message_list += f"{round(current_price/avg_price*100-100,2)}% 탐욕 매도 ^^\n"
 
                                 time.sleep(0.02)
                                 qty = get_balance(symbol_list[sym]['매도티커'])
