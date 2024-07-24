@@ -201,7 +201,7 @@ try:
                             if average_price_10_20 > average_price_10_60 and average_price_10_20 > average_price_10_120: #탐욕구간
                                 # panic_leverage = 3
                                 # greed_leverage = 4
-                                panic_leverage = 1.5
+                                panic_leverage = 1.2
                                 greed_leverage = 1
 
                                 b_60_goldencross = True
@@ -211,7 +211,7 @@ try:
                                 # panic_leverage = 1
                                 # greed_leverage = 6
                                 panic_leverage = 0.5
-                                greed_leverage = 2
+                                greed_leverage = 1.5
 
                                 # if b_60_goldencross == True: # 데드크로스 체크
 
@@ -234,8 +234,8 @@ try:
                             else:
                                 # panic_leverage = 2
                                 # greed_leverage = 5       
-                                panic_leverage = 1
-                                greed_leverage = 1.5                         
+                                panic_leverage = 0.85
+                                greed_leverage = 1.25                         
 
                         else:
                             message_list += "10분봉 120 이평선 실패 !! \n"
@@ -330,20 +330,20 @@ try:
                             r_last_volume = round((current_price*last_volume)/buy_rate)
 
                             # 잔여예산 탄력지급 로직
+                            rate = greed_leverage
                             if symbol_list[sym]['잔여예산'] > 0:
                                 rate = (1 - (symbol_list[sym]['잔여예산'] / (symbol_list[sym]['total']+symbol_list[sym]['잔여예산']))) * greed_leverage
                                 rate = round(rate,2)
                                 if rate < 0.2: rate = 0.2
 
                                 r_last_volume *= rate
-                                message_list += f"지급률 {rate}배 | "
                             else:
                                 r_last_volume *= greed_leverage
 
                             # r_last_volume *= greed_leverage
 
                             formatted_amount = "{:,.0f}원".format(r_last_volume)
-                            message_list += f"{formatted_amount} 지급 | "
+                            message_list += f"{formatted_amount} 지급 (지급률 {rate}) | "
 
                             sell_qty = r_last_volume / current_price
                             if sell_qty > qty: sell_qty = qty
@@ -356,7 +356,7 @@ try:
                             if sell_result is not None:
                                 
                                 bbuy = 1
-                                message_list += f"{round(current_price/avg_price,6)}% 탐욕 매도합니다 ^^\n"
+                                message_list += f"{round(current_price/avg_price,6)}% 탐욕 매도 ^^\n"
 
                                 time.sleep(0.02)
                                 qty = get_balance(symbol_list[sym]['매도티커'])
@@ -444,15 +444,19 @@ try:
             # 최초 한번 로스컷 세팅
             if once == False:
                 once = True
-                lostcut = result_rate - lostcut_step
+                while lostcut > result_rate:    # 로스컷 보다 작다면,
+                    lostcut -= lostcut_step
+            else:
+                if lostcut+(lostcut_step*2) < result_rate:    # 로스컷 + 2단계 보다 크다면,
+                    lostcut += lostcut_step
 
             # 출금 필요액 갱신
             profit = (total_cash+total)-principal
             if profit > 0:
                 profit *= 1 - total_cash/principal
                 if withdrawal_need < profit:
-                    withdrawal_need = (profit // 10000) * 10000            
-                    lostcut = -3
+                    withdrawal_need = (profit // 10000) * 10000 
+                    lostcut = -3  # 로스컷 초기화
 
             formatted_amount0 = "{:,.0f}원".format(withdrawal_need)
             formatted_amount1 = "{:,.2f}%".format(more_last_result)
