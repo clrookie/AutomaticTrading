@@ -476,7 +476,7 @@ try:
 
             message_list += f"\n===========({last_min}분)=======================\n\n\n"
 
-            if last_min != 0:
+            if last_min == 0:
                 send_message_Report(message_list)
             
             if bbuy == 1:
