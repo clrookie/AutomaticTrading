@@ -12,6 +12,12 @@ def send_message(msg):
     requests.post('https://discord.com/api/webhooks/1200644595919360010/IGX1ctpFUQLHuMchUET2N7qfIkV4VedBfzg3JRppv3SyHAm3v6pV1tGrz-UvLXdnpmBj', data=message)
     print(message)
 
+def send_message_Report(msg):
+    """디스코드 메세지 전송"""
+    now = datetime.datetime.now()
+    message = {"content": f"[{now.strftime('%m-%d %H:%M:%S')}] {str(msg)}"}
+    requests.post('https://discord.com/api/webhooks/1265969591839096935/HH4m0PWkhBhnNf61JhsfHjlw4iPUDeoA5ZEfIKWx35Go2rtX_eJOwSGlcFboReoNUntg', data=message)
+    print(message)
 
 def get_balance(ticker):
     """잔고 조회"""
@@ -468,7 +474,10 @@ try:
             more_last_result = last_result
             last_result = result_rate
 
-            message_list += f"\n===========({last_min}분)===========\n\n\n"
+            message_list += f"\n===========({last_min}분)=======================\n\n\n"
+
+            if last_min != 0:
+                send_message_Report(message_list)
             
             if bbuy == 1:
                 send_message(message_list)
@@ -484,7 +493,10 @@ try:
             
             formatted_amount = "{:,.2f}%".format(result_rate)
             send_message("###########################################")
+            send_message("###########################################")
             send_message(f"총 수익율 {formatted_amount} 도달로 1/3 매도합니다ㅠ")
+            send_message("###########################################")
+            send_message("###########################################")
 
             lostcut -= lostcut_step
             for sym in symbol_list: # 있으면 일괄 매도
