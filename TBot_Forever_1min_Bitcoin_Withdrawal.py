@@ -54,8 +54,8 @@ try:
     cash_backup = 0
 
     result_rate = 0
-    lostcut = -3
-    lostcut_step = 3
+    lostcut = -5
+    lostcut_step = 5
     once = False
     
     # 기준 거래량 비율
@@ -68,10 +68,11 @@ try:
     buy_rate = 10000 #만원씩 거래
 
     panic_count = 1
-    # panic_leverage = 2
-    # greed_leverage = 5
     panic_leverage = 1
     greed_leverage = 1
+    high = 1
+    mid = 0.85
+    low = 0.7
     
     # 지급
     bsell = 1
@@ -205,19 +206,15 @@ try:
 
                             # 예치/지급 배율 세팅
                             if average_price_10_20 > average_price_10_60 and average_price_10_20 > average_price_10_120: #탐욕구간
-                                # panic_leverage = 3
-                                # greed_leverage = 4
-                                panic_leverage = 1.2
-                                greed_leverage = 1
+                                panic_leverage = low
+                                greed_leverage = low
 
                                 b_60_goldencross = True
                                 b_60_deadcross = False
 
                             elif average_price_10_20 < average_price_10_60 and average_price_10_20 < average_price_10_120: #공포구간
-                                # panic_leverage = 1
-                                # greed_leverage = 6
-                                panic_leverage = 0.5
-                                greed_leverage = 1.5
+                                panic_leverage = high
+                                greed_leverage = high
 
                                 # if b_60_goldencross == True: # 데드크로스 체크
 
@@ -238,10 +235,8 @@ try:
                                 b_60_deadcross = True
 
                             else:
-                                # panic_leverage = 2
-                                # greed_leverage = 5       
-                                panic_leverage = 0.85
-                                greed_leverage = 1.25                         
+                                panic_leverage = mid
+                                greed_leverage = mid                         
 
                         else:
                             message_list += "10분봉 120 이평선 실패 !! \n"
@@ -395,7 +390,7 @@ try:
                             message_list += "\n\n+++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++ 공포 예치 +++\n"
 
                             r_last_volume = round((current_price*last_volume)/buy_rate)
-                            r_last_volume *= panic_leverage # 레버리지 5배
+                            r_last_volume *= panic_leverage # 
 
                             formatted_amount = "{:,.0f}원".format(r_last_volume)
                             message_list += f"!! {formatted_amount} 예치 !! \n"
