@@ -484,7 +484,7 @@ try:
                           
         # for문 끝 라인..
 
-        if bbuy == 0 and lostcut > result_rate: #사이드브레이크
+        if symbol_list[sym]['잔여예산'] < min_buy and bbuy == 0 and lostcut > result_rate: #사이드브레이크
             
             formatted_amount = "{:,.2f}%".format(result_rate)
             send_message("###########################################")
