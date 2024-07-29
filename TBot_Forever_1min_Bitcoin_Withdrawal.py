@@ -332,14 +332,14 @@ try:
 
                             # 잔여예산 탄력지급 로직
                             rate = greed_leverage
-                            if symbol_list[sym]['잔여예산'] > 0:
-                                rate = (1 - (symbol_list[sym]['잔여예산'] / (symbol_list[sym]['total']+symbol_list[sym]['잔여예산']))) * greed_leverage
-                                rate = round(rate,2)
-                                if rate < 0.2: rate = 0.2
+                            # if symbol_list[sym]['잔여예산'] > 0:
+                            #     rate = (1 - (symbol_list[sym]['잔여예산'] / (symbol_list[sym]['total']+symbol_list[sym]['잔여예산']))) * greed_leverage
+                            #     rate = round(rate,2)
+                            #     if rate < 0.2: rate = 0.2
 
-                                r_last_volume *= rate
-                            else:
-                                r_last_volume *= greed_leverage
+                            r_last_volume *= rate
+                            # else:
+                                # r_last_volume *= greed_leverage
 
                             # r_last_volume *= greed_leverage
 
