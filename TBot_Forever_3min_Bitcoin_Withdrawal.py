@@ -54,8 +54,8 @@ try:
     cash_backup = 0
 
     result_rate = 0
-    lostcut = -3
-    lostcut_step = 3
+    lostcut = -5
+    lostcut_step = 5
     once = False
     
     # 기준 거래량 비율
@@ -70,8 +70,8 @@ try:
     panic_count = 1
     panic_leverage = 1
     greed_leverage = 1
-    high = 0.7
-    mid = 0.7
+    high = 1
+    mid = 0.85
     low = 0.7
     
     # 지급
@@ -106,7 +106,7 @@ try:
 
     while True:
         
-        df = pyupbit.get_ohlcv("KRW-BTC", interval="minute1", count=1)
+        df = pyupbit.get_ohlcv("KRW-BTC", interval="minute3", count=1)
         if df is None: continue
 
         if df.index[0].minute != last_min:    # 1분 캔들 갱신
@@ -409,13 +409,7 @@ try:
 
                                 symbol_list[sym]['total'] = current_price * qty
                                 # formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total']) 
-                                # message_list += f"갱신: {formatted_amount}\n"
-                        
-                                time.sleep(0.02)
-                                avg_price = upbit.get_avg_buy_price(sym)
-                                formatted_amount = "{:,.0f}원".format(avg_price)
-                                backup_avg = formatted_amount # 평균가 백업  
-
+                                # message_list += f"갱신: {formatted_amount}\n"                      
                             else:
                                 message_list += f"공포 매수 실패 ({buy_result})\n"
 
@@ -469,15 +463,13 @@ try:
             formatted_amount1 = "{:,.2f}%".format(more_last_result)
             formatted_amount2 = "{:,.2f}%".format(last_result)
             formatted_amount3 = "{:,.2f}%".format(result_rate)
-            message_list += f"추이: {formatted_amount1} > {formatted_amount2} > '{formatted_amount3}'\n"
-            message_list += f"평단가: {backup_avg}\n\n"
-
-            message_list += f"수익금: {formatted_amount0}\n"
+            message_list += f"추이: {formatted_amount1} > {formatted_amount2} > '{formatted_amount3}'\n\n"
+            message_list += f"수익금: {formatted_amount0}"
             
             more_last_result = last_result
             last_result = result_rate
 
-            message_list += f"===========({last_min}분)=======================\n\n\n"
+            message_list += f"\n===========({last_min}분)=======================\n\n\n"
 
             if last_min == 0:
                 send_message_Report(message_list)
@@ -492,7 +484,7 @@ try:
                           
         # for문 끝 라인..
 
-        if bbuy == 0 and lostcut > result_rate: #사이드브레이크
+        if symbol_list[sym]['잔여예산'] < min_buy and bbuy == 0 and lostcut > result_rate: #사이드브레이크
             
             formatted_amount = "{:,.2f}%".format(result_rate)
             send_message("###########################################")
