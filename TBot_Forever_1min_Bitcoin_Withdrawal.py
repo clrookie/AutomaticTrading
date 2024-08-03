@@ -69,10 +69,13 @@ try:
 
     panic_count = 1
     panic_leverage = 1
+    panic_low = 0.7
+    panic_mid = 0.7
+    panic_high = 0.7
     greed_leverage = 1
-    high = 0.7
-    mid = 0.7
-    low = 0.7
+    greed_low = 0.5
+    greed_mid = 0.5
+    greed_high = 0.5
     
     # 지급
     bsell = 1
@@ -206,15 +209,15 @@ try:
 
                             # 예치/지급 배율 세팅
                             if average_price_10_20 > average_price_10_60 and average_price_10_20 > average_price_10_120: #탐욕구간
-                                panic_leverage = low
-                                greed_leverage = low
+                                panic_leverage = panic_low
+                                greed_leverage = greed_low
 
                                 b_60_goldencross = True
                                 b_60_deadcross = False
 
                             elif average_price_10_20 < average_price_10_60 and average_price_10_20 < average_price_10_120: #공포구간
-                                panic_leverage = high
-                                greed_leverage = high
+                                panic_leverage = panic_high
+                                greed_leverage = greed_high
 
                                 # if b_60_goldencross == True: # 데드크로스 체크
 
@@ -235,8 +238,8 @@ try:
                                 b_60_deadcross = True
 
                             else:
-                                panic_leverage = mid
-                                greed_leverage = mid                         
+                                panic_leverage = panic_mid
+                                greed_leverage = greed_mid                         
 
                         else:
                             message_list += "10분봉 120 이평선 실패 !! \n"
