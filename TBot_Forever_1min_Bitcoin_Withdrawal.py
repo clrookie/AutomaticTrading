@@ -54,8 +54,8 @@ try:
     cash_backup = 0
 
     result_rate = 0
-    lostcut = -3
-    lostcut_step = 3
+    lostcut = -20
+    lostcut_step = 5
     once = False
     
     # 기준 거래량 비율
