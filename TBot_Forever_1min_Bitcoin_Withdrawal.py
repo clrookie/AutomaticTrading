@@ -71,11 +71,11 @@ try:
     panic_leverage = 1
     panic_low = 0.7
     panic_mid = 0.7
-    panic_high = 0.7
+    panic_high = 0.2
     greed_leverage = 1
     greed_low = 0.5
     greed_mid = 0.5
-    greed_high = 0.5
+    greed_high = 3
     
     # 지급
     bsell = 1
