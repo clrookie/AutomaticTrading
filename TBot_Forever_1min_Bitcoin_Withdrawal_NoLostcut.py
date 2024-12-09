@@ -50,7 +50,6 @@ try:
     
     #원금
     principal = 10000000
-    withdrawal_need = 0
     cash_backup = 0
 
     result_rate = 0
@@ -153,9 +152,6 @@ try:
 
                 symbol_list[sym]['잔여예산'] = get_balance("KRW") # 현금잔고 조회
 
-                # 수익실현 했니?
-                if cash_backup > symbol_list[sym]['잔여예산']:
-                    withdrawal_need = 0 #
 
                 # 기준금액 총 잔액 연동
                 buy_rate = min_buy * (principal/(symbol_list[sym]['total']+symbol_list[sym]['잔여예산']))
@@ -172,10 +168,9 @@ try:
                     formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
                     backup_rate = "{:,.2f}%".format(current_price/avg_price*100-100)
                     message_list += f"보유 {formatted_amount} ({backup_rate})"
-
-                    # 수익상태에 따라 지급 결정
-                    # if (current_price/avg_price*100-100) > base_sell_rate : bsell = 1
-
+                # else: # 비트코인 청산 상태
+                #     if symbol_list[sym]['잔여예산'] > principal:
+                        
                 
                 average_price_20 = 0
                 average_price_60 = 0
@@ -217,21 +212,6 @@ try:
                             elif average_price_10_20 < average_price_10_60 and average_price_10_20 < average_price_10_120: #공포구간
                                 panic_leverage = panic_high
                                 greed_leverage = greed_high
-
-                                # if b_60_goldencross == True: # 데드크로스 체크
-
-                                    # 데드크로스 청산 (오히려 이때 반등 많이 나옴)
-                                    # send_message("###### 60분봉 데드크로스 ### 60분봉 데드크로스 ######")
-                                    # coin = get_balance(symbol_list[sym]['매도티커'])  # 보유량
-                                    # if coin > 0: # 있다면 매도
-                                    #     sell_result = upbit.sell_market_order(sym, coin/3)
-                                    #     if sell_result is not None:
-                                    #         qty = get_balance(symbol_list[sym]['매도티커'])
-                                    #         symbol_list[sym]['total'] = current_price * qty
-                                    #         send_message(f"[{symbol_list[sym]['종목명']}] {coin} 1/3 매도했습니다~")
-                                    #     else:
-                                    #         send_message(f"[{symbol_list[sym]['매도티커']}] 매도실패 ({sell_result})")
-                                        #    continue
                                 
                                 b_60_goldencross = False
                                 b_60_deadcross = True
@@ -334,16 +314,8 @@ try:
 
                             # 잔여예산 탄력지급 로직
                             rate = greed_leverage
-                            # if symbol_list[sym]['잔여예산'] > 0:
-                            #     rate = (1 - (symbol_list[sym]['잔여예산'] / (symbol_list[sym]['total']+symbol_list[sym]['잔여예산']))) * greed_leverage
-                            #     rate = round(rate,2)
-                            #     if rate < 0.2: rate = 0.2
 
                             r_last_volume *= rate
-                            # else:
-                                # r_last_volume *= greed_leverage
-
-                            # r_last_volume *= greed_leverage
 
                             formatted_amount = "{:,.0f}원".format(r_last_volume)
                             message_list += f"{formatted_amount} 지급 (지급률 {rate}%) | "
@@ -365,8 +337,6 @@ try:
                                 qty = get_balance(symbol_list[sym]['매도티커'])
 
                                 symbol_list[sym]['total'] = current_price * qty
-                                # formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total'])
-                                # message_list += f"갱신: {formatted_amount}\n"
                             else:
                                 message_list += f"탐욕 매도 실패 ({sell_result})\n"
 
@@ -410,8 +380,6 @@ try:
                                 qty = get_balance(symbol_list[sym]['매도티커'])
 
                                 symbol_list[sym]['total'] = current_price * qty
-                                # formatted_amount = "{:,.0f}원".format(symbol_list[sym]['total']) 
-                                # message_list += f"갱신: {formatted_amount}\n"
                         
                                 time.sleep(0.02)
                                 avg_price = upbit.get_avg_buy_price(sym)
@@ -435,7 +403,6 @@ try:
             message_list += f"\n===========({last_min}분)===========\n"
 
             total_cash = get_balance("KRW") # 현금잔고 조회
-            cash_backup = total_cash
 
             formatted_amount = "{:,.2f}%".format(total/(total_cash+total)*100)
             message_list += f"코인 비중: {formatted_amount}\n"
@@ -450,31 +417,14 @@ try:
 
             result_rate = ((total_cash+total) / principal * 100) - 100
 
-            # 최초 한번 로스컷 세팅
-            # if once == False:
-            #     once = True
-            #     while lostcut > result_rate:    # 로스컷 보다 작다면,
-            #         lostcut -= lostcut_step
-            # else:
-            #     if lostcut+(lostcut_step*2) < result_rate:    # 로스컷 + 2단계 보다 크다면,
-            #         lostcut += lostcut_step
 
-            # 출금 필요액 갱신
-            profit = (total_cash+total)-principal
-            if profit > 0:
-                profit *= 1 - total_cash/principal
-                if withdrawal_need < profit:
-                    withdrawal_need = (profit // 10000) * 10000 
-                    # lostcut = -3  # 로스컷 초기화
-
-            formatted_amount0 = "{:,.0f}원".format(withdrawal_need)
             formatted_amount1 = "{:,.2f}%".format(more_last_result)
             formatted_amount2 = "{:,.2f}%".format(last_result)
             formatted_amount3 = "{:,.2f}%".format(result_rate)
             message_list += f"추이: {formatted_amount1} > {formatted_amount2} > '{formatted_amount3}'\n"
             message_list += f"평단가: {backup_avg}\n\n"
 
-            message_list += f"수익금: {formatted_amount0}\n"
+            # message_list += f"수익금: {formatted_amount0}\n"
             
             more_last_result = last_result
             last_result = result_rate
@@ -494,26 +444,6 @@ try:
                           
         # for문 끝 라인..
 
-        # if bbuy == 0 and lostcut > result_rate: #사이드브레이크
-            
-        #     formatted_amount = "{:,.2f}%".format(result_rate)
-        #     send_message("###########################################")
-        #     send_message("###########################################")
-        #     send_message(f"총 수익율 {formatted_amount} 도달로 1/5 매도합니다ㅠ")
-        #     send_message("###########################################")
-        #     send_message("###########################################")
-
-        #     lostcut -= lostcut_step
-        #     for sym in symbol_list: # 있으면 일괄 매도
-        #         coin = get_balance(symbol_list[sym]['매도티커'])  # 보유량
-        #         if coin > 0: # 있다면 매도
-        #             sell_result = upbit.sell_market_order(sym, coin/5)
-        #             if sell_result is not None:
-        #                 send_message(f"[{symbol_list[sym]['종목명']}] {coin} 1/5 매도했습니다~")
-        #             else:
-        #                 send_message(f"[{symbol_list[sym]['매도티커']}] 매도실패 ({sell_result})")
-            
-
         time.sleep(1) # 없거나 짧으면 -> [오류 발생]'NoneType' object has no attribute 'index'
 
 except Exception as e:
@@ -528,7 +458,7 @@ except Exception as e:
         if coin > 0: # 있다면 매도
             sell_result = upbit.sell_market_order(sym, coin/5)
             if sell_result is not None:
-                send_message(f"[{symbol_list[sym]['종목명']}] {coin} 1/2 매도했습니다~")
+                send_message(f"[{symbol_list[sym]['종목명']}] {coin} 1/5 매도했습니다~")
             else:
                 send_message(f"[{symbol_list[sym]['매도티커']}] 매도실패 ({sell_result})")
 
