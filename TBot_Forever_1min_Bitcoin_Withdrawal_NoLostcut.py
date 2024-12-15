@@ -67,14 +67,16 @@ try:
     buy_rate = 10000 #만원씩 거래
 
     panic_count = 1
+    
     panic_leverage = 1
-    panic_low = 0.2       # 탐욕
+    panic_low = 0.2    
     panic_mid = 0.3
-    panic_high = 0.4    # 공포
+    panic_high = 0.4
+
     greed_leverage = 1
-    greed_low = 0.1     # 탐욕
-    greed_mid = 0.2
-    greed_high = 0.3    # 공포
+    greed_low = 0.05     
+    greed_mid = 0.075
+    greed_high = 0.1   
     
     # 지급
     bsell = 1
