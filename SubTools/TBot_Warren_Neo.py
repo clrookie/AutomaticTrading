@@ -369,7 +369,7 @@ try:
 
         if today == 5 or today == 6 or get_holiday(today_date):  # 토,일 자동종료, 2024 공휴일 포함
             if holiday == False:
-                send_message("KOSPI 휴장일 입니다~")
+                send_message("KOSPI 휴장일")
                 holiday = True
             continue
         else:
@@ -399,7 +399,6 @@ try:
             #######################
             elif t_start < t_now and bStart_buy == False:
                 bStart_buy = True
-                bAccess_token = False
                 message_list = f"++++ 시가 조건매수 ++++\n"
 
                 # 있으면 일괄 매도
@@ -447,12 +446,12 @@ try:
             ####################### 
             elif t_start < t_now < t_end:  
                 for sym in symbol_list:
-                    time.sleep(0.2) # 유량 에러 대응
 
                     if symbol_list[sym]['보유'] == False:
                         continue
 
                     time.sleep(0.2) # 유량 에러 대응
+
                     current_price = get_current_price(sym)
                     avg_price = get_avg_balance(sym)
                     
@@ -502,7 +501,9 @@ try:
 
                                 symbol_list[sym]['보유'] = False
                         send_message(message_list)
- 
+
+                time.sleep(1) # 유량 에러 대응
+
                 # 구동중 체크
                 if t_now.minute == 30 and t_30: 
                     t_30 = False
@@ -524,6 +525,7 @@ try:
             ####################### 
             elif t_end < t_now and bEnd_sell == False:
                 bEnd_sell = True
+                bAccess_token = False
 
                 message_list = f"**** 데일리 일괄매도 ****\n"
                 stock_dict = get_stock_balance()
