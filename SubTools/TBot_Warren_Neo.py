@@ -289,7 +289,7 @@ def sell(code="005930", qty="1"):
 
 
 #############
-def get_target_price_new(code="005930"): # 음봉 윗꼬리 평균 + 보정
+def get_avg_price_15day(code="005930"): # 음봉 윗꼬리 평균 + 보정
     PATH = "uapi/domestic-stock/v1/quotations/inquire-daily-price"
     URL = f"{URL_BASE}/{PATH}"
     headers = {
@@ -321,44 +321,32 @@ def get_target_price_new(code="005930"): # 음봉 윗꼬리 평균 + 보정
 
     data_period = 15  # 최근 추출 기간
     Avg_price = 0  # 초기화
-    delta = 0  # 윗꼬리값
 
     for i in range(0, data_period):
-        stck_hgpr = int(data['output'][i]['stck_hgpr'])  # 고가
         stck_clpr = int(data['output'][i]['stck_clpr'])  # 종가
-        stck_oprc = int(data['output'][i]['stck_oprc'])  # 시가
-
         Avg_price += stck_clpr
 
     Avg_price /= 15  # 목표가 계산
 
     return Avg_price
 
-def main():
-    # 1. Access Token 발급
-
-    # 2. 일일 시세 데이터 조회
-    ticker = "005930"  # 삼성전자 종목 코드
-    raw_data = get_target_price_new(ticker)
-    if not raw_data:
-        return
 
 # 자동 매매 코드
 try:        
     send_message(f"=== Warren 초기화 ===\n")
     
+    bAccess_token = False
+    bStart_buy = False
+    bEnd_sell = False
     holiday = False
     t_0 = True
     t_30 = True
 
-    budget = 10000000 # 1000만원
-    buy_rate = 500000 # 50만원
+    buy_rate = 200000 # 20만원
         
-
     # 공용 데이터
     common_data ={
-    '잔여예산':0,
-    '공포적립':0,
+    '보유': False,
     }
 
     #개별 종목 데이터
@@ -380,91 +368,193 @@ try:
         today_date = datetime.datetime.today().strftime("%Y%m%d")
 
         if today == 5 or today == 6 or get_holiday(today_date):  # 토,일 자동종료, 2024 공휴일 포함
-
-            
-            ACCESS_TOKEN = get_access_token()
-          
-            ticker = "122630"  # 
-            raw_data = get_target_price_new(ticker)
-
             if holiday == False:
                 send_message("KOSPI 휴장일 입니다~")
                 holiday = True
             continue
-
         else:
             t_now = datetime.datetime.now()
-            
-            t_ready = t_now.replace(hour=8, minute=55, second=1, microsecond=0)
-            t_buy = t_now.replace(hour=9, minute=0, second=1, microsecond=0)
-            t_sell = t_now.replace(hour=15, minute=10, second=0,microsecond=0)
-            
+            t_ready = t_now.replace(hour=8, minute=50, second=0, microsecond=0)
+            t_start = t_now.replace(hour=9, minute=0, second=0, microsecond=5)
+            t_end = t_now.replace(hour=14, minute=40, second=0,microsecond=0)
+  
             # 매매 준비
-            if t_ready == t_now: 
+            if t_ready < t_now < t_start and bAccess_token == False: 
             
+                bAccess_token = True
+
+                bStart_buy = False
+                bEnd_sell = False
+                holiday = False
+
                 # 토큰 세팅
                 ACCESS_TOKEN = get_access_token()
                 send_message(f"=== Warren 토큰 구동 ({today_date})===\n\n")
                 
-                holiday = False
+                total_cash = get_balance() # 보유 현금 조회
+                stock_dict = get_stock_balance() # 보유 주식 조회        
+
+            #######################           
+            # 시가 조건 매수
+            #######################
+            elif t_start < t_now and bStart_buy == False:
+                bStart_buy = True
+                bAccess_token = False
+                message_list = f"++++ 시가 조건매수 ++++\n"
+
+                # 있으면 일괄 매도
+                stock_dict = get_stock_balance() # 보유 주식 조회
+                for sym, qty in stock_dict.items():
+                    time.sleep(0.2) # 유량 에러 대응
+
+                    current_price = get_current_price(sym)
+                    avg_price = get_avg_balance(sym)
+                    avg_price = float(avg_price)
+                    if avg_price == 9:
+                        message_list += f"[{symbol_list[sym]['종목명']}] : !!!! 평단가 리턴 실패 !!!!\n"
+
+                    if sell(sym, int(qty)):
+                        message_list += f"[{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(sym)} / 평단가 {avg_price}\n"
+                        message_list += f"[{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/avg_price,4)}% 일괄 매도 성공 !!\n"
+                    else:
+                        sell(sym, int(qty))
+                        message_list += f">>> retry [{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(sym)} / 평단가 {avg_price}\n"
+                        message_list += f">>> retry [{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/avg_price,4)}% 일괄 매도 성공 !!\n"
+
+                # 15일 평균선 < 시가 높은 경우 체크
+                for sym in symbol_list: 
+                    time.sleep(0.2) # 유량 에러 대응
+
+                    symbol_list[sym]['보유'] = False
+                    current_price = get_current_price(sym)
+                    avg_15day = get_avg_price_15day(sym)
+
+                    if current_price >= avg_15day: 
+                        
+                        qty = int(buy_rate/current_price) # 분할 매수
+                        message_list += f"[{symbol_list[sym]['종목명']}] 조건 만족 ({qty}개)\n"
+                        if buy(sym, qty):
+                            symbol_list[sym]['보유'] = True
+
+                    else:
+                        message_list += f"[{symbol_list[sym]['종목명']}] 조건 실패 \n"
                 
-                # total_cash = get_balance() # 보유 현금 조회
-                # stock_dict = get_stock_balance() # 보유 주식 조회                    
+                send_message(message_list)
 
-            # 탐욕 지급
-            if t_buy == t_now:  
-
+            
+            ####################### 
+            # 있으면, 조건 매도 (2% 익절, -2% 손절)
+            ####################### 
+            elif t_start < t_now < t_end:  
                 for sym in symbol_list:
-                    
+                    time.sleep(0.2) # 유량 에러 대응
+
+                    if symbol_list[sym]['보유'] == False:
+                        continue
+
                     time.sleep(0.2) # 유량 에러 대응
                     current_price = get_current_price(sym)
+                    avg_price = get_avg_balance(sym)
                     
-                    # 매도
+                    result = current_price / avg_price
+                    if result >= 1.02: #익절
+                        message_list = f"++++ 익절매 시도 ++++\n"
+                        stock_dict = get_stock_balance()
+                        for symtemp, qty in stock_dict.items(): # 있으면 일괄 매도
+                            if sym == symtemp:
+                                time.sleep(0.2) # 유량 에러 대응
 
+                                avg_price = get_avg_balance(sym)
+                                avg_price = float(avg_price)
+                                if avg_price == 9:
+                                    message_list += f"[{symbol_list[sym]['종목명']}] : !!!! 평단가 리턴 실패 !!!!\n"
+
+                                if sell(sym, int(qty)):
+                                    message_list += f"[{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(sym)} / 평단가 {avg_price}\n"
+                                    message_list += f"[{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/avg_price,4)}% 익절매^^\n"
+                                else:
+                                    sell(sym, int(qty))
+                                    message_list += f">>> retry [{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(sym)} / 평단가 {avg_price}\n"
+                                    message_list += f">>> retry [{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/avg_price,4)}% 익절매^^\n"
+                                
+                                symbol_list[sym]['보유'] = False
+                        send_message(message_list)
+
+                    elif result <= 0.98: #손절
+                        message_list = f"---- 손절매 시도 ----\n"
+                        stock_dict = get_stock_balance()
+                        for symtemp, qty in stock_dict.items(): # 있으면 일괄 매도
+                            if sym == symtemp:
+                                time.sleep(0.2) # 유량 에러 대응
+
+                                avg_price = get_avg_balance(sym)
+                                avg_price = float(avg_price)
+                                if avg_price == 9:
+                                    message_list += f"[{symbol_list[sym]['종목명']}] : !!!! 평단가 리턴 실패 !!!!\n"
+
+                                if sell(sym, int(qty)):
+                                    message_list += f"[{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(sym)} / 평단가 {avg_price}\n"
+                                    message_list += f"[{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/avg_price,4)}% 손절매ㅠ\n"
+                                else:
+                                    sell(sym, int(qty))
+                                    message_list += f">>> retry [{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(sym)} / 평단가 {avg_price}\n"
+                                    message_list += f">>> retry [{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/avg_price,4)}% 손절매ㅠ\n"
+
+                                symbol_list[sym]['보유'] = False
+                        send_message(message_list)
+ 
+                # 구동중 체크
+                if t_now.minute == 30 and t_30: 
+                    t_30 = False
+                    t_0 = True
+                    message_list =""
+                    message_list += "===30분===30분 (WarrenOn) 30분===30분===\n"
+                    message_list += "\n"
                     send_message(message_list)
+                if t_now.minute == 0 and t_0:
+                    t_0 = False
+                    t_30 = True
+                    message_list =""
+                    message_list += "===0분===0분 (WarrenOn) 0분===0분===\n"
+                    message_list += "\n"
+                    send_message(message_list) 
 
+            ####################### 
+            # 있으면, 종가 매도
+            ####################### 
+            elif t_end < t_now and bEnd_sell == False:
+                bEnd_sell = True
 
-            # 공포 예탁
-            if t_sell == t_now:  
-
-                for sym in symbol_list:
-                    
+                message_list = f"**** 데일리 일괄매도 ****\n"
+                stock_dict = get_stock_balance()
+                for sym, qty in stock_dict.items(): # 있으면 일괄 매도
                     time.sleep(0.2) # 유량 에러 대응
-                    current_price = get_current_price(sym)
-                    
-                    # 매수
 
-                    send_message(message_list)
+                    avg_price = get_avg_balance(sym)
+                    avg_price = float(avg_price)
+                    if avg_price == 9:
+                        message_list += f"[{symbol_list[sym]['종목명']}] : !!!! 평단가 리턴 실패 !!!!\n"
 
-
+                    if sell(sym, int(qty)):
+                        message_list += f"[{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(sym)} / 평단가 {avg_price}\n"
+                        message_list += f"[{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/avg_price,4)}% 매도합니다\n"
+                    else:
+                        sell(sym, int(qty))
+                        message_list += f">>> retry [{symbol_list[sym]['종목명']}]: 현재가 {get_current_price(sym)} / 평단가 {avg_price}\n"
+                        message_list += f">>> retry [{symbol_list[sym]['종목명']}]: {round(get_current_price(sym)/avg_price,4)}% 매도합니다\n"
+                
                 a,b = get_real_total()
                 
-                message_list = "[일간 손익]"
+                message_list += "[일간 손익]\n"
                 formatted_amount = "{:,.0f}원".format(a)
                 message_list += f"자산증감액: {formatted_amount}\n"
                 formatted_amount = "{:,.3f}%".format(b)
                 message_list += f"총수익율: {formatted_amount}\n"
                 message_list += "\n"
-                message_list += "=== 자동매매를 종료합니다 ==="
+                message_list += "=== 자동매매를 종료합니다 ===\n"
                 send_message(message_list)
 
-            if t_now.minute == 30 and t_30: 
-                t_30 = False
-                t_0 = True
-
-                message_list =""
-                message_list += "===30분===30분=(WarrenOn)=30분===30분===\n"
-                message_list += "\n"
-                send_message(message_list)
-
-            if t_now.minute == 0 and t_0:
-                t_0 = False
-                t_30 = True
-                
-                message_list =""
-                message_list += "===0분===0분=(WarrenOn)=0분===0분===\n"
-                message_list += "\n"
-                send_message(message_list)
+            
 
 except Exception as e:
     send_message(f"[오류 발생]{e}")
