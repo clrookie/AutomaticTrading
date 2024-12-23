@@ -69,9 +69,9 @@ try:
     panic_count = 1
     
     panic_leverage = 1
-    panic_low = 0.2    
-    panic_mid = 0.3
-    panic_high = 0.4
+    panic_low = 0.1    
+    panic_mid = 0.2
+    panic_high = 0.3
 
     greed_leverage = 1
     greed_low = 0.05     
