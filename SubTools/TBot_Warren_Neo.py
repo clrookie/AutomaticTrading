@@ -292,48 +292,50 @@ def sell(code="005930", qty="1"):
 def get_target_price_new(code="005930"): # 음봉 윗꼬리 평균 + 보정
     PATH = "uapi/domestic-stock/v1/quotations/inquire-daily-price"
     URL = f"{URL_BASE}/{PATH}"
-    headers = {"Content-Type":"application/json", 
+    headers = {
+        "Content-Type": "application/json",
         "authorization": f"Bearer {ACCESS_TOKEN}",
-        "appKey":APP_KEY,
-        "appSecret":APP_SECRET,
-        "tr_id":"FHKST01010400"}
-    params = {
-    "fid_cond_mrkt_div_code":"J",
-    "fid_input_iscd":code,
-    "fid_org_adj_prc":"1",
-    "fid_period_div_code":"D"
+        "appKey": APP_KEY,
+        "appSecret": APP_SECRET,
+        "tr_id": "FHKST01010400"
     }
+    params = {
+        "fid_cond_mrkt_div_code": "J",  # 코스피: "J", 코스닥: "Q"
+        "fid_input_iscd": code,         # 종목 코드 (삼성전자: "005930")
+        "fid_org_adj_prc": "1",         # 조정 가격 옵션
+        "fid_period_div_code": "D"      # 일봉
+    }
+
     res = requests.get(URL, headers=headers, params=params)
 
-    data_period = 30 # 최근 추출 기간
-    cnt = 0 # 음봉 카운트
-
-    target_price = 0 # 초기화
-    delta = 0 # 윗꼬리값
-
-    for i in range(0,data_period):
-        stck_hgpr = int(res.json()['output'][i]['stck_hgpr']) #고가
-        stck_clpr = int(res.json()['output'][i]['stck_clpr']) #종가
-        stck_oprc = int(res.json()['output'][i]['stck_oprc']) #시가
-
-        if stck_oprc >= stck_clpr : #음봉
-            delta += stck_hgpr - stck_oprc
-            cnt += 1
-
-    target_price = int(res.json()['output'][0]['stck_oprc']) #오늘 시가
+    # 응답을 확인하여 'output'이 존재하는지 확인
+    if res.status_code != 200:
+        print(f"API 요청 실패: {res.status_code}, Response: {res.text}")
     
-    if cnt > 0:
-        delta /= cnt # 평균
+    data = res.json()
 
-    target_price += delta
+    # 'output'이 데이터에 포함되지 않으면 오류 처리
+    if "output" not in data:
+        print("응답 데이터에서 'output' 필드를 찾을 수 없습니다.")
+        return None
 
-    return target_price
+    data_period = 15  # 최근 추출 기간
+    Avg_price = 0  # 초기화
+    delta = 0  # 윗꼬리값
+
+    for i in range(0, data_period):
+        stck_hgpr = int(data['output'][i]['stck_hgpr'])  # 고가
+        stck_clpr = int(data['output'][i]['stck_clpr'])  # 종가
+        stck_oprc = int(data['output'][i]['stck_oprc'])  # 시가
+
+        Avg_price += stck_clpr
+
+    Avg_price /= 15  # 목표가 계산
+
+    return Avg_price
 
 def main():
     # 1. Access Token 발급
-    ACCESS_TOKEN = get_access_token()
-    if not ACCESS_TOKEN:
-        return
 
     # 2. 일일 시세 데이터 조회
     ticker = "005930"  # 삼성전자 종목 코드
@@ -344,10 +346,6 @@ def main():
 # 자동 매매 코드
 try:        
     send_message(f"=== Warren 초기화 ===\n")
-
-    ticker = "005930.KQ"  # 삼성전자 종목 (Yahoo Finance 티커)
-    period = "7d"         # 최대 7일 데이터 (10분봉 기준)
-    interval = "90m"      # 10분봉 데이터
     
     holiday = False
     t_0 = True
@@ -383,7 +381,11 @@ try:
 
         if today == 5 or today == 6 or get_holiday(today_date):  # 토,일 자동종료, 2024 공휴일 포함
 
-            main()
+            
+            ACCESS_TOKEN = get_access_token()
+          
+            ticker = "122630"  # 
+            raw_data = get_target_price_new(ticker)
 
             if holiday == False:
                 send_message("KOSPI 휴장일 입니다~")
@@ -393,12 +395,12 @@ try:
         else:
             t_now = datetime.datetime.now()
             
-            t_start = t_now.replace(hour=9, minute=5, second=0, microsecond=0)
-            t_buy = t_now.replace(hour=9, minute=10, second=0, microsecond=0)
+            t_ready = t_now.replace(hour=8, minute=55, second=1, microsecond=0)
+            t_buy = t_now.replace(hour=9, minute=0, second=1, microsecond=0)
             t_sell = t_now.replace(hour=15, minute=10, second=0,microsecond=0)
             
             # 매매 준비
-            if t_start == t_now: 
+            if t_ready == t_now: 
             
                 # 토큰 세팅
                 ACCESS_TOKEN = get_access_token()
