@@ -364,6 +364,7 @@ try:
     # 공용 데이터
     common_data ={
     '보유': False,
+    '익절': False,
     }
 
     #개별 종목 데이터
@@ -406,6 +407,8 @@ try:
                 holiday = True
                 send_message(f"오늘은 KOSPI 휴장일!!({today_date})")
 
+            stock_dict = get_stock_balance() # 보유 주식 조회
+
         elif holiday == False: # 개장일
             t_now = datetime.datetime.now()
             t_start = t_now.replace(hour=9, minute=0, second=0, microsecond=0)
@@ -443,6 +446,7 @@ try:
                 # 15일 평균선 < 시가 높은 경우 체크
                 for sym in symbol_list: 
                     symbol_list[sym]['보유'] = False
+                    symbol_list[sym]['익절'] = False
                     current_price = get_current_price(sym)
                     avg_15day = get_avg_price_15day(sym)
 
@@ -485,7 +489,7 @@ try:
                     formatted_amount1 = "{:,.2f}%".format((current_price/avg_price)*100-100)
 
                     result = current_price / avg_price # 나누기 연산 시, float형
-                    if result >= profit_cut:
+                    if result >= profit_cut and symbol_list[sym]['익절'] == False:
                         message_list ="#익절\n"
                         stock_dict = get_stock_balance()
                         for symtemp, qty in stock_dict.items(): # 있으면 일괄 매도
@@ -502,7 +506,7 @@ try:
                                     sell(sym, int(qty))
                                     message_list += f">>> retry [{symbol_list[sym]['종목명']}]: {formatted_amount1} 1/2익절^^\n"
                                 
-                                symbol_list[sym]['보유'] = False
+                                symbol_list[sym]['익절'] = True
 
                         send_message(message_list)
 
