@@ -371,6 +371,7 @@ try:
             if holiday == False:
                 send_message("KOSPI 휴장일")
                 holiday = True
+                bAccess_token = False
             continue
         else:
             t_now = datetime.datetime.now()
