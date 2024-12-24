@@ -50,25 +50,41 @@ def hashkey(datas): # 사고팔때 필요함
     hashkey = res.json()["HASH"]
     return hashkey
 
-def get_holiday(day="YYYYMMDD"):
-    date = [
-    "20241225","20241231",
-    "20250101",
-    "20250128",
-    "20250129",
-    "20250130",
-    "20250303",
-    "20250501","20250505","20250506",
-    "20250606",
-    "20250815",
-    "20251003","20251006","20251007","20251008","20251009",
-    "20251225","20251231"]
-
-    i =""
-    for i in date:
-        if i == day:
-            return True
-    return False
+def check_Opening(day: str) -> bool:
+    """
+    특정 날짜가 휴장일인지 확인합니다.
+    :param date: YYYYMMDD 형식의 날짜 문자열
+    :return: True(휴장일) 또는 False(영업일)
+    """
+    PATH = "uapi/domestic-stock/v1/quotations/chk-holiday"
+    URL = f"{URL_BASE}/{PATH}"
+    headers = {
+        "content-type": "application/json",
+        "authorization": f"Bearer {ACCESS_TOKEN}",
+        "appkey": APP_KEY,
+        "appsecret": APP_SECRET,
+        "tr_id": "CTCA0903R",  # 휴장일 확인 API 호출 ID
+        "custtype":"P",
+    }
+    params = {
+        "BASS_DT": day,
+        "CTX_AREA_NK":"",
+        "CTX_AREA_FK":""
+        }
+    
+    res = requests.get(URL, headers=headers, params=params)
+    if res.status_code == 200:
+        data = res.json()
+        # 응답 데이터의 구조가 리스트라면 첫 번째 항목 참조
+        if isinstance(data["output"], list):
+            return data["output"][0]["opnd_yn"] == "Y"
+        # 딕셔너리라면 바로 참조
+        if isinstance(data["output"], dict):
+            return data["output"]["opnd_yn"] == "Y"
+        else:
+            raise ValueError("Unexpected output format in response")
+    else:
+        raise Exception(f"Failed to check holiday status: {res.json()}")
 
 def get_current_price(code="005930"):
     """현재가 조회"""
@@ -333,7 +349,8 @@ def get_avg_price_15day(code="005930"): # 음봉 윗꼬리 평균 + 보정
 try:        
     send_message(f"=== Warren 초기화 ===\n")
     
-    bAccess_token = False
+    last_date = 0
+
     bStart_buy = False
     bEnd_sell = False
     holiday = False
@@ -370,38 +387,35 @@ try:
         today = datetime.datetime.today().weekday()
         today_date = datetime.datetime.today().strftime("%Y%m%d")
 
-        if today == 5 or today == 6 or get_holiday(today_date):  # 토,일 자동종료, 2024 공휴일 포함
-            if holiday == False:
-                send_message(f"KOSPI 휴장일({today_date})")
+        if last_date != today_date:
+            last_date = today_date
+
+            ACCESS_TOKEN = get_access_token()
+            send_message(f"=== Warren 토큰 구동 ({today_date})===\n\n") 
+
+            time.sleep(1) # 유량 에러 대응
+
+            # 개장일
+            if check_Opening(today_date):
+                holiday = False
+                bStart_buy = False
+                bEnd_sell = False
+                send_message(f"오늘은 KOSPI 영업일^^({today_date})")
+            # 휴장일
+            else:
                 holiday = True
-                bAccess_token = False
-            continue
-        else:
+                send_message(f"오늘은 KOSPI 휴장일!!({today_date})")
+
+        elif holiday == False: # 개장일
             t_now = datetime.datetime.now()
-            t_init = t_now.replace(hour=8, minute=55, second=0, microsecond=0)
             t_start = t_now.replace(hour=9, minute=0, second=0, microsecond=0)
             t_0240 = t_now.replace(hour=14, minute=40, second=0,microsecond=0)
             t_end = t_now.replace(hour=15, minute=10, second=0,microsecond=0)
   
-            ####################### 
-            # 매매 준비
-            ####################### 
-            if t_init < t_now < t_start and bAccess_token == False: 
-            
-                bAccess_token = True
-
-                bStart_buy = False
-                bEnd_sell = False
-                holiday = False
-
-                # 토큰 세팅
-                ACCESS_TOKEN = get_access_token()
-                send_message(f"=== Warren 토큰 구동 ({today_date})===\n\n") 
-
             #######################           
             # 시가 조건 매수
             #######################
-            elif t_start < t_now < t_0240 and bStart_buy == False:
+            if t_start < t_now < t_0240 and bStart_buy == False:
                 bStart_buy = True
 
                 message_list =" #시가 매수\n"
@@ -450,6 +464,8 @@ try:
                 
                 send_message(message_list)
                 stock_dict = get_stock_balance() # 보유 주식 조회
+            
+
             
             ####################### 
             # 장중간 조건 매도
@@ -533,7 +549,6 @@ try:
             ####################### 
             elif t_0240 < t_now < t_end and bEnd_sell == False:
                 bEnd_sell = True
-                bAccess_token = False
 
                 stock_dict = get_stock_balance()
                 
