@@ -180,7 +180,7 @@ def get_stock_balance():
     stock_dict = {}
     
     message_list = ""
-    message_list += "\n====주식 보유잔고====\n"
+    message_list += "====주식 보유잔고====\n"
     for stock in stock_list:
         if int(stock['hldg_qty']) > 0:
             stock_dict[stock['pdno']] = stock['hldg_qty']
@@ -340,8 +340,7 @@ try:
     t_0 = True
     t_30 = True
 
-    buy_rate = 1500000.0 # 20만원
-    buy_rate = 50000.0 # 20만원
+    buy_rate = 1500000.0 # 150만원
         
     # 공용 데이터
     common_data ={
@@ -375,12 +374,13 @@ try:
             continue
         else:
             t_now = datetime.datetime.now()
+            t_init = t_now.replace(hour=8, minute=55, second=0, microsecond=0)
             t_start = t_now.replace(hour=9, minute=0, second=0, microsecond=0)
             t_0240 = t_now.replace(hour=14, minute=40, second=0,microsecond=0)
             t_end = t_now.replace(hour=15, minute=10, second=0,microsecond=0)
   
             # 매매 준비
-            if t_start < t_now < t_end and bAccess_token == False: 
+            if t_init < t_now < t_start and bAccess_token == False: 
             
                 bAccess_token = True
 
@@ -395,10 +395,10 @@ try:
             #######################           
             # 시가 조건 매수
             #######################
-            elif t_start < t_now < t_end and bStart_buy == False:
+            elif t_start < t_now < t_0240 and bStart_buy == False:
                 bStart_buy = True
 
-                message_list ="\n#시가 매수\n"
+                message_list =" #시가 매수\n"
 
                 # 있으면 일괄 매도
                 stock_dict = get_stock_balance() # 보유 주식 조회
@@ -419,7 +419,7 @@ try:
                         sell(sym, int(qty))
                         message_list += f">>> retry [{symbol_list[sym]['종목명']}]: {formatted_amount1} 일괄 매도 !!\n"
 
-                message_list += f"\n-------------------------------------\n\n"
+                message_list += f"-------------------------------------\n"
                 # 15일 평균선 < 시가 높은 경우 체크
                 for sym in symbol_list: 
                     symbol_list[sym]['보유'] = False
@@ -434,13 +434,13 @@ try:
                     if current_price >= avg_15day: 
                         
                         qty = int(buy_rate/current_price) # 분할 매수
-                        message_list += f"\n[{symbol_list[sym]['종목명']}] 조건 만족O {formatted_amount} (15선:{formatted_amount1})\n"
+                        message_list += f"[{symbol_list[sym]['종목명']}] 성공 O {formatted_amount} (15선:{formatted_amount1})\n"
                         if buy(sym, qty):
                             symbol_list[sym]['보유'] = True
-                            message_list +="+++ 시가 매수 +++\n"
+                            message_list +="+++ 시가 매수 +++\n\n"
 
                     else:
-                        message_list += f"\n[{symbol_list[sym]['종목명']}] 조건 실패X {formatted_amount} (15선:{formatted_amount1})\n"
+                        message_list += f"[{symbol_list[sym]['종목명']}] 실패 X {formatted_amount} (15선:{formatted_amount1})\n"
                 
                 send_message(message_list)
                 stock_dict = get_stock_balance() # 보유 주식 조회
@@ -530,7 +530,7 @@ try:
 
                 stock_dict = get_stock_balance()
                 
-                message_list = "\n**** 데일리 마감 ****\n"
+                message_list = " **** 데일리 마감 ****\n"
 
                 for sym, qty in stock_dict.items(): # 있으면 일괄 매도
                     current_price = get_current_price(sym)
