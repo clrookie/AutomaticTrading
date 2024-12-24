@@ -463,8 +463,8 @@ try:
                     formatted_amount1 = "{:,.2f}%".format((current_price/avg_price)*100-100)
 
                     result = current_price / avg_price # 나누기 연산 시, float형
-                    if result >= 1.02: #익절
-                        message_list ="#익절매\n"
+                    if result >= 1.02:
+                        message_list ="#익절\n"
                         stock_dict = get_stock_balance()
                         for symtemp, qty in stock_dict.items(): # 있으면 일괄 매도
                             if sym == symtemp:
@@ -475,10 +475,10 @@ try:
                                 qty = float(qty)
                                 qty = qty/2
                                 if sell(sym, int(qty)):
-                                    message_list += f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 1/2 익절매^^\n"
+                                    message_list += f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 1/2익절^^\n"
                                 else:
                                     sell(sym, int(qty))
-                                    message_list += f">>> retry [{symbol_list[sym]['종목명']}]: {formatted_amount1} 1/2 익절매^^\n"
+                                    message_list += f">>> retry [{symbol_list[sym]['종목명']}]: {formatted_amount1} 1/2익절^^\n"
                                 
                                 symbol_list[sym]['보유'] = False
 
@@ -493,10 +493,10 @@ try:
                                     message_list += f"[{symbol_list[sym]['종목명']}] : !!!! 평단가 리턴 실패 !!!!\n"
 
                                 if sell(sym, int(qty)):
-                                    message_list += f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 손절매ㅠ\n"
+                                    message_list += f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 손절ㅠ\n"
                                 else:
                                     sell(sym, int(qty))
-                                    message_list += f">>> retry [{symbol_list[sym]['종목명']}]: {formatted_amount1} 손절매ㅠ\n"
+                                    message_list += f">>> retry [{symbol_list[sym]['종목명']}]: {formatted_amount1} 손절ㅠ\n"
 
                                 symbol_list[sym]['보유'] = False
 
