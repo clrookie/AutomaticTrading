@@ -389,9 +389,7 @@ try:
 
                 # 토큰 세팅
                 ACCESS_TOKEN = get_access_token()
-                send_message(f"=== Warren 토큰 구동 ({today_date})===\n\n")
-                
-                stock_dict = get_stock_balance() # 보유 주식 조회        
+                send_message(f"=== Warren 토큰 구동 ({today_date})===\n\n") 
 
             #######################           
             # 시가 조건 매수
@@ -440,6 +438,7 @@ try:
                     else:
                         send_message(f"\n[{symbol_list[sym]['종목명']}] 조건 실패~ {formatted_amount} (15선:{formatted_amount1})")
                 
+                stock_dict = get_stock_balance() # 보유 주식 조회
             
             ####################### 
             # 있으면, 조건 매도 (2% 익절, -2% 손절)
