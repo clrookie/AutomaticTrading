@@ -341,6 +341,7 @@ try:
     t_30 = True
 
     buy_rate = 1500000.0 # 20만원
+    buy_rate = 50000.0 # 20만원
         
     # 공용 데이터
     common_data ={
@@ -542,7 +543,7 @@ try:
                         message_list += f"[{symbol_list[sym]['종목명']}] : !!!! 평단가 리턴 실패 !!!!\n"
 
                     if sell(sym, int(qty)):
-                        message_list += f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 일괄 매\n도"
+                        message_list += f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 일괄 매도\n"
                     else:
                         sell(sym, int(qty))
                         message_list += f">>> retry [{symbol_list[sym]['종목명']}]: {formatted_amount1} 일괄 매도\n"
