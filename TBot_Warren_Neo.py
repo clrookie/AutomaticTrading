@@ -341,6 +341,8 @@ try:
     t_30 = True
 
     buy_rate = 1500000.0 # 150만원
+    profit_cut = 1.02
+    lost_cut = 0.985
         
     # 공용 데이터
     common_data ={
@@ -381,7 +383,9 @@ try:
             t_0240 = t_now.replace(hour=14, minute=40, second=0,microsecond=0)
             t_end = t_now.replace(hour=15, minute=10, second=0,microsecond=0)
   
+            ####################### 
             # 매매 준비
+            ####################### 
             if t_init < t_now < t_start and bAccess_token == False: 
             
                 bAccess_token = True
@@ -448,7 +452,7 @@ try:
                 stock_dict = get_stock_balance() # 보유 주식 조회
             
             ####################### 
-            # 있으면, 조건 매도 (2% 익절, -2% 손절)
+            # 장중간 조건 매도
             ####################### 
             elif t_start < t_now < t_0240:  
                 
@@ -465,7 +469,7 @@ try:
                     formatted_amount1 = "{:,.2f}%".format((current_price/avg_price)*100-100)
 
                     result = current_price / avg_price # 나누기 연산 시, float형
-                    if result >= 1.02:
+                    if result >= profit_cut:
                         message_list ="#익절\n"
                         stock_dict = get_stock_balance()
                         for symtemp, qty in stock_dict.items(): # 있으면 일괄 매도
@@ -486,7 +490,7 @@ try:
 
                         send_message(message_list)
 
-                    elif result <= 0.98: #손절
+                    elif result <= lost_cut: #손절
                         message_list ="#손절\n"
                         stock_dict = get_stock_balance()
                         for symtemp, qty in stock_dict.items(): # 있으면 일괄 매도
@@ -525,7 +529,7 @@ try:
                     stock_dict = get_stock_balance() # 보유 주식 조회  
 
             ####################### 
-            # 있으면, 종가 매도
+            # 종가 일괄 매도
             ####################### 
             elif t_0240 < t_now < t_end and bEnd_sell == False:
                 bEnd_sell = True
