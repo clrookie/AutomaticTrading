@@ -349,17 +349,18 @@ try:
 
     #개별 종목 데이터
     symbol_list = {
-    '122630':{'종목명':'KODEX 레버리지',    **common_data},
-    '233740':{'종목명':'KOSDAQ 레버리지',   **common_data},
+    '122630':{'종목명':'KODEX 레버리지 #1',     **common_data},
+    '233740':{'종목명':'KOSDAQ 레버리지 #2',    **common_data},
     
-    '371460':{'종목명':'TIGER 차이나전기차', **common_data},
-    '192090':{'종목명':'TIGER 차이나CSI',   **common_data},
+    '371460':{'종목명':'TIGER 차이나전기 #3',   **common_data},
+    '192090':{'종목명':'TIGER 차이나CSI #4',    **common_data},
 
-    '462330':{'종목명':'KODEX 2차전지',     **common_data},
-    '471990':{'종목명':'KODEX AI반도체',    **common_data},
+    '462330':{'종목명':'KODEX 2차전지 #5',      **common_data},
+    '471990':{'종목명':'KODEX AI반도체 #6',     **common_data},
 
-    '252670':{'종목명':'KODEX 인버스',      **common_data},
-    '251340':{'종목명':'KOSDAQ 인버스',     **common_data},                      
+    '252670':{'종목명':'KODEX 인버스 #7',       **common_data},
+    '251340':{'종목명':'KOSDAQ 인버스 #8',      **common_data},
+    '465350':{'종목명':'RISE 2차전지 인버스 #9', **common_data},                       
     }
 
 
