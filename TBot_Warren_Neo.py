@@ -369,7 +369,7 @@ try:
 
         if today == 5 or today == 6 or get_holiday(today_date):  # 토,일 자동종료, 2024 공휴일 포함
             if holiday == False:
-                send_message("KOSPI 휴장일")
+                send_message(f"KOSPI 휴장일({today_date})")
                 holiday = True
                 bAccess_token = False
             continue
