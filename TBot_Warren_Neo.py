@@ -440,13 +440,13 @@ try:
                     if current_price >= avg_15day: 
                         
                         qty = int(buy_rate/current_price) # 분할 매수
-                        message_list += f"[{symbol_list[sym]['종목명']}] 성공 O {formatted_amount} (15선:{formatted_amount1})\n"
+                        message_list += f"[{symbol_list[sym]['종목명']}] 매수성공 O {formatted_amount} (15선:{formatted_amount1})\n"
                         if buy(sym, qty):
                             symbol_list[sym]['보유'] = True
                             message_list +="+++ 시가 매수 +++\n\n"
 
                     else:
-                        message_list += f"[{symbol_list[sym]['종목명']}] 실패 X {formatted_amount} (15선:{formatted_amount1})\n"
+                        message_list += f"[{symbol_list[sym]['종목명']}] 매수실패 X {formatted_amount} (15선:{formatted_amount1})\n"
                 
                 send_message(message_list)
                 stock_dict = get_stock_balance() # 보유 주식 조회
