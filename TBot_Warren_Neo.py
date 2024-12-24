@@ -253,10 +253,10 @@ def buy(code="005930", qty="1"):
     }
     res = requests.post(URL, headers=headers, data=json.dumps(data))
     if res.json()['rt_cd'] == '0':
-        send_message("-+-+-매수 성공-+-+-")
+        send_message("-+-+-매수 성공-+-+-\n")
         return True
     else:
-        send_message(f"[매수 실패]{str(res.json())}")
+        send_message(f"[매수 실패]{str(res.json())}\n")
         return False
 
 def sell(code="005930", qty="1"):
@@ -418,6 +418,7 @@ try:
                         sell(sym, int(qty))
                         send_message(f">>> retry [{symbol_list[sym]['종목명']}]: {formatted_amount1} 일괄 매도 !!")
 
+                send_message(f"\n-------------------------------------\n\n")
                 # 15일 평균선 < 시가 높은 경우 체크
                 for sym in symbol_list: 
                     symbol_list[sym]['보유'] = False
@@ -432,12 +433,12 @@ try:
                     if current_price >= avg_15day: 
                         
                         qty = int(buy_rate/current_price) # 분할 매수
-                        send_message(f"[{symbol_list[sym]['종목명']}] 조건 만족!! {formatted_amount} (15선:{formatted_amount1})")
+                        send_message(f"\n[{symbol_list[sym]['종목명']}] 조건 만족!! {formatted_amount} (15선:{formatted_amount1})")
                         if buy(sym, qty):
                             symbol_list[sym]['보유'] = True
 
                     else:
-                        send_message(f"[{symbol_list[sym]['종목명']}] 조건 실패~ {formatted_amount} (15선:{formatted_amount1})")
+                        send_message(f"\n[{symbol_list[sym]['종목명']}] 조건 실패~ {formatted_amount} (15선:{formatted_amount1})")
                 
             
             ####################### 
