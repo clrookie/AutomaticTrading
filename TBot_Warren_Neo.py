@@ -402,11 +402,11 @@ try:
                 holiday = False
                 bStart_buy = False
                 bEnd_sell = False
-                send_message(f"오늘은 KOSPI 영업일^^({today_date})")
+                send_message(f"오늘은 KOSPI 영업일^^")
             # 휴장일
             else:
                 holiday = True
-                send_message(f"오늘은 KOSPI 휴장일!!({today_date})")
+                send_message(f"오늘은 KOSPI 휴장일ㅠ")
 
             stock_dict = get_stock_balance() # 보유 주식 조회
             for sym, qty in stock_dict.items():
