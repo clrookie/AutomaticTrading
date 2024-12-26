@@ -365,8 +365,10 @@ try:
     # 공용 데이터
     common_data ={
     '보유': False,
+    '시가': 0.0,
     '물량': 0.0,
     '익절': False,
+
     }
 
     #개별 종목 데이터
@@ -457,6 +459,7 @@ try:
                     
                     # 초기화
                     symbol_list[sym]['보유'] = False
+                    symbol_list[sym]['시가'] = 0.0
                     symbol_list[sym]['물량'] = 0.0
                     symbol_list[sym]['익절'] = False
 
@@ -474,6 +477,7 @@ try:
                         message_list += f"[{symbol_list[sym]['종목명']}] 매수성공 O {formatted_amount} (15선:{formatted_amount1})\n"
                         if buy(sym, qty):
                             symbol_list[sym]['보유'] = True
+                            symbol_list[sym]['시가'] = current_price
                             symbol_list[sym]['물량'] = float(qty)
                             message_list +="+++ 시가 매수 +++\n\n"
 
@@ -517,8 +521,7 @@ try:
                         
                         symbol_list[sym]['익절'] = True
 
-
-                    elif result <= lost_cut: #손절
+                    elif result <= lost_cut or (symbol_list[sym]['익절'] == True and current_price < symbol_list[sym]['시가']) : #손절
                         
                         if sell(sym, int(symbol_list[sym]['물량'])):
                             send_message(f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 손절ㅠ")
