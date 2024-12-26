@@ -210,7 +210,7 @@ def get_stock_balance():
 
     formatted_amount = "{:,.0f}원".format(int(evaluation[0]['tot_evlu_amt']))
     message_list += f"총 평가 금액: {formatted_amount}\n"
-    message_list += "=================\n"
+    message_list += "==================================\n"
     message_list += "\n"
     send_message(message_list)
 
@@ -347,9 +347,10 @@ def get_avg_price_15day(code="005930"):
 
 # 자동 매매 코드
 try:        
-    send_message(f"=== Warren 초기화 ===\n")
+    send_message("=== Warren 초기화 ===")
     
     last_date = 0
+    last_hour = 0
 
     bStart_buy = False
     bEnd_sell = False
@@ -386,14 +387,18 @@ try:
 
 
     while True:
-        today = datetime.datetime.today().weekday()
         today_date = datetime.datetime.today().strftime("%Y%m%d")
+        t_now = datetime.datetime.now()
+
+        if last_hour != t_now.hour:
+            last_hour = t_now.hour
+            send_message(f"WarrenOn...({last_hour}시)")
 
         if last_date != today_date:
             last_date = today_date
 
             ACCESS_TOKEN = get_access_token()
-            send_message(f"=== Warren 토큰 구동 ({today_date})===\n\n") 
+            send_message(f"=== Warren 토큰 발급 ({today_date})===") 
 
             time.sleep(1) # 유량 에러 대응
 
@@ -402,11 +407,11 @@ try:
                 holiday = False
                 bStart_buy = False
                 bEnd_sell = False
-                send_message(f"오늘은 KOSPI 영업일^^")
+                send_message("오늘은 KOSPI 영업일^^")
             # 휴장일
             else:
                 holiday = True
-                send_message(f"오늘은 KOSPI 휴장일ㅠ")
+                send_message("오늘은 KOSPI 휴장일ㅠ")
 
             stock_dict = get_stock_balance() # 보유 주식 조회
             for sym, qty in stock_dict.items():
@@ -414,7 +419,6 @@ try:
                 symbol_list[sym]['물량'] = float(qty)
 
         elif holiday == False: # 개장일
-            t_now = datetime.datetime.now()
             t_start = t_now.replace(hour=9, minute=0, second=0, microsecond=0)
             t_0240 = t_now.replace(hour=14, minute=40, second=0,microsecond=0)
             t_end = t_now.replace(hour=15, minute=10, second=0,microsecond=0)
@@ -530,19 +534,13 @@ try:
                 # 구동중 체크
                 if t_now.minute == 30 and t_30: 
                     t_30 = False
-                    t_0 = True
-                    message_list =""
-                    message_list += "===30분===30분 (WarrenOn) 30분===30분===\n"
-                    message_list += "\n"
-                    send_message(message_list)
+                    t_0 = True                    
+                    send_message("===30분===30분 (WarrenOn) 30분===30분===")
                     stock_dict = get_stock_balance() # 보유 주식 조회  
                 if t_now.minute == 0 and t_0:
                     t_0 = False
                     t_30 = True
-                    message_list =""
-                    message_list += "===0분===0분 (WarrenOn) 0분===0분===\n"
-                    message_list += "\n"
-                    send_message(message_list)
+                    send_message("===0분===0분 (WarrenOn) 0분===0분===")
                     stock_dict = get_stock_balance() # 보유 주식 조회  
 
             ####################### 
