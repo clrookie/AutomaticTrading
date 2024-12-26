@@ -420,7 +420,7 @@ try:
 
         elif holiday == False: # 개장일
             t_start = t_now.replace(hour=9, minute=0, second=0, microsecond=0)
-            t_0240 = t_now.replace(hour=14, minute=40, second=0,microsecond=0)
+            t_0240 = t_now.replace(hour=14, minute=59, second=0,microsecond=0)
             t_end = t_now.replace(hour=15, minute=10, second=0,microsecond=0)
   
             #######################           
