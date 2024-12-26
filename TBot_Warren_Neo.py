@@ -196,7 +196,7 @@ def get_stock_balance():
     stock_dict = {}
     
     message_list = ""
-    message_list += "====주식 보유잔고====\n"
+    message_list += "\n====주식 보유잔고====\n"
     for stock in stock_list:
         if int(stock['hldg_qty']) > 0:
             stock_dict[stock['pdno']] = stock['hldg_qty']
@@ -358,7 +358,7 @@ try:
     t_30 = True
 
     buy_rate = 1500000.0 # 150만원
-    profit_cut = 1.02
+    profit_cut = 1.021
     lost_cut = 0.985
         
     # 공용 데이터
@@ -373,7 +373,7 @@ try:
     '122630':{'종목명':'KODEX 레버리지 #1',     **common_data},
     '233740':{'종목명':'KOSDAQ 레버리지 #2',    **common_data},
     
-    '371460':{'종목명':'TIGER 차이나전기 #3',   **common_data},
+    '371460':{'종목명':'TIGER 차이나전기차 #3',   **common_data},
     '192090':{'종목명':'TIGER 차이나CSI #4',    **common_data},
 
     '462330':{'종목명':'KODEX 2차전지 #5',      **common_data},
@@ -381,7 +381,7 @@ try:
 
     '252670':{'종목명':'KODEX 인버스 #7',       **common_data},
     '251340':{'종목명':'KOSDAQ 인버스 #8',      **common_data},
-    '465350':{'종목명':'RISE 2차전지 인버스 #9', **common_data},                       
+    '465350':{'종목명':'RISE 2차전 인버스 #9', **common_data},                       
     }
 
 
@@ -415,7 +415,7 @@ try:
 
         elif holiday == False: # 개장일
             t_now = datetime.datetime.now()
-            t_start = t_now.replace(hour=9, minute=0, second=0, microsecond=5)
+            t_start = t_now.replace(hour=9, minute=0, second=0, microsecond=0)
             t_0240 = t_now.replace(hour=14, minute=40, second=0,microsecond=0)
             t_end = t_now.replace(hour=15, minute=10, second=0,microsecond=0)
   
@@ -491,12 +491,11 @@ try:
                     if symbol_list[sym]['보유'] == False:
                         continue
 
-                    message_list =""
                     current_price = get_current_price(sym)
                     current_price = float(current_price)
                     avg_price = get_avg_balance(sym)
                     if avg_price == 9:
-                        message_list += f"[{symbol_list[sym]['종목명']}] : !!!! 평단가 리턴 실패 !!!!\n"
+                        send_message(f"[{symbol_list[sym]['종목명']}] : !!!! 평단가 리턴 실패 !!!!")
                     avg_price = float(avg_price)
                     
                     formatted_amount1 = "{:,.2f}%".format((current_price/avg_price)*100-100)
@@ -507,27 +506,24 @@ try:
                         symbol_list[sym]['물량'] = symbol_list[sym]['물량'] / 2 # 절반만 익절
 
                         if sell(sym, int(symbol_list[sym]['물량'])):
-                            message_list += f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 1/2익절^^\n"
+                            send_message(f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 1/2익절^^")
                         else:
                             sell(sym, int(symbol_list[sym]['물량']))
-                            message_list += f">>> retry [{symbol_list[sym]['종목명']}]: {formatted_amount1} 1/2익절^^\n"
+                            send_message(f">>> retry [{symbol_list[sym]['종목명']}]: {formatted_amount1} 1/2익절^^")
                         
                         symbol_list[sym]['익절'] = True
 
-                        send_message(message_list)
 
                     elif result <= lost_cut: #손절
                         
                         if sell(sym, int(symbol_list[sym]['물량'])):
-                            message_list += f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 손절ㅠ\n"
+                            send_message(f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 손절ㅠ")
                         else:
                             sell(sym, int(symbol_list[sym]['물량']))
-                            message_list += f">>> retry [{symbol_list[sym]['종목명']}]: {formatted_amount1} 손절ㅠ\n"
+                            send_message(f">>> retry [{symbol_list[sym]['종목명']}]: {formatted_amount1} 손절ㅠ")
 
                         symbol_list[sym]['보유'] = False
                         symbol_list[sym]['물량'] = 0.0
-
-                    send_message(message_list)
 
                 time.sleep(1) # 유량 에러 대응
 
