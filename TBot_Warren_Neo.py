@@ -392,7 +392,7 @@ try:
 
         if last_hour != t_now.hour:
             last_hour = t_now.hour
-            send_message(f"WarrenOn...({last_hour}시)")
+            send_message(f"WarrenOn... ({last_hour}시)")
 
         if last_date != today_date:
             last_date = today_date
@@ -420,13 +420,13 @@ try:
 
         elif holiday == False: # 개장일
             t_start = t_now.replace(hour=9, minute=0, second=0, microsecond=0)
-            t_0240 = t_now.replace(hour=14, minute=59, second=0,microsecond=0)
+            t_0301 = t_now.replace(hour=15, minute=1, second=0,microsecond=0)
             t_end = t_now.replace(hour=15, minute=10, second=0,microsecond=0)
   
             #######################           
             # 시가 조건 매수
             #######################
-            if t_start < t_now < t_0240 and bStart_buy == False:
+            if t_start < t_now < t_0301 and bStart_buy == False:
                 bStart_buy = True
 
                 message_list =" #시가 매수\n"
@@ -490,7 +490,7 @@ try:
             ####################### 
             # 장중간 조건 매도
             ####################### 
-            elif t_start < t_now < t_0240:  
+            elif t_start < t_now < t_0301:  
                 
                 for sym in symbol_list:
 
@@ -547,12 +547,12 @@ try:
             ####################### 
             # 종가 일괄 매도
             ####################### 
-            elif t_0240 < t_now < t_end and bEnd_sell == False:
+            elif t_0301 < t_now < t_end and bEnd_sell == False:
                 bEnd_sell = True
 
                 stock_dict = get_stock_balance()
                 
-                message_list = " **** 데일리 마감 ****\n"
+                message_list = "**** 데이 트레이딩 마감 ****\n"
 
                 for sym, qty in stock_dict.items(): # 있으면 일괄 매도
                     current_price = get_current_price(sym)
