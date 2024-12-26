@@ -195,8 +195,7 @@ def get_stock_balance():
     evaluation = res.json()['output2']
     stock_dict = {}
     
-    message_list = ""
-    message_list += "\n====주식 보유잔고====\n"
+    message_list = "====주식 보유잔고====\n"
     for stock in stock_list:
         if int(stock['hldg_qty']) > 0:
             stock_dict[stock['pdno']] = stock['hldg_qty']
@@ -239,8 +238,7 @@ def get_balance():
     res = requests.get(URL, headers=headers, params=params)
     cash = res.json()['output']['ord_psbl_cash']
     
-    message_list = ""
-    message_list += "===============================\n"
+    message_list = "===============================\n"
     formatted_amount = "{:,.0f}원".format(int(cash))
     message_list += f"현금 잔고: {formatted_amount}\n"
     send_message(message_list)
