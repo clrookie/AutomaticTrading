@@ -350,6 +350,10 @@ try:
     last_date = 0
     last_hour = 0
 
+    price_cache = {}
+    avg_price_cache = {}
+    avg_15day_cache = {}
+
     bStart_buy = False
     bEnd_sell = False
     holiday = False
@@ -400,12 +404,6 @@ try:
             ACCESS_TOKEN = get_access_token()
             send_message(f"=== Warren 토큰 발급 ({today_date})===") 
 
-
-            # 데이터 캐싱: 현재가, 평균가, 15일 평균가
-            price_cache = {sym: get_current_price(sym) for sym in symbol_list}
-            avg_price_cache = {sym: get_avg_balance(sym) for sym in symbol_list}
-            avg_15day_cache = {sym: get_avg_price_15day(sym) for sym in symbol_list}
-
             time.sleep(1) # 유량 에러 대응
 
             # 개장일
@@ -413,6 +411,11 @@ try:
                 holiday = False
                 bStart_buy = False
                 bEnd_sell = False
+
+                # 데이터 캐싱: 평균가, 15일 평균가
+                avg_price_cache = {sym: get_avg_balance(sym) for sym in symbol_list}
+                avg_15day_cache = {sym: get_avg_price_15day(sym) for sym in symbol_list}
+
                 send_message("오늘은 KOSPI 영업일^^")
             # 휴장일
             else:
@@ -438,10 +441,8 @@ try:
                 # 초기화
                 message_list = "#시가 매수\n"
 
-                # 데이터 캐싱: 현재가, 평균가, 15일 평균가
+                # 데이터 캐싱: 현재가
                 price_cache = {sym: get_current_price(sym) for sym in symbol_list}
-                avg_price_cache = {sym: get_avg_balance(sym) for sym in symbol_list}
-                avg_15day_cache = {sym: get_avg_price_15day(sym) for sym in symbol_list}
 
                 # 1. 보유 종목 일괄 매도
                 for sym, data in symbol_list.items():
@@ -451,12 +452,12 @@ try:
 
                         if avg_price == 9:
                             message_list += f"[{data['종목명']}] : !!!! 평단가 리턴 실패 !!!!\n"
-                            continue
 
                         profit_percent = "{:,.2f}%".format((current_price / avg_price) * 100 - 100)
                         if sell(sym, int(data['물량'])):
                             message_list += f"[{data['종목명']}]: {profit_percent} 일괄 매도 !!\n"
                         else:
+                            sell(sym, int(data['물량']))
                             message_list += f">>> retry [{data['종목명']}]: {profit_percent} 일괄 매도 !!\n"
 
                 message_list += "-------------------------------------\n"
