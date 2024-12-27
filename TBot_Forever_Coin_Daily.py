@@ -71,12 +71,20 @@ try:
     '매도티커':'XRP',
     **common_data},
     
-    'KRW-ETH':{'종목명':'이더리움 #3', #3
-    '매도티커':'ETH',
+    # 'KRW-ETH':{'종목명':'이더리움 #3', #3
+    # '매도티커':'ETH',
+    # **common_data},
+
+    # 'KRW-SOL':{'종목명':'솔라나 #4', #4
+    # '매도티커':'SOL',
+    # **common_data},
+
+    'KRW-GMT':{'종목명':'스테픈 #3', #3
+    '매도티커':'GMT',
     **common_data},
 
-    'KRW-SOL':{'종목명':'솔라나 #4', #4
-    '매도티커':'SOL',
+    'KRW-UXLINK':{'종목명':'유엑스링크 #4', #4
+    '매도티커':'UXLINK',
     **common_data},
 
     'KRW-DOGE':{'종목명':'도지 #5', #5 
@@ -213,10 +221,6 @@ try:
                 
                 else:
                     message_list += f"[{symbol_list[sym]['종목명']}] 매수실패 X {formatted_amount} (20선:{formatted_amount1})\n"
-    
-
-            
-                time.sleep(0.02)
 
                 
             message_list += f"===========(시가 매매 완료)=============\n\n\n"         
