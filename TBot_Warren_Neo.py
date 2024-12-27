@@ -665,6 +665,24 @@ try:
 
 except Exception as e:
     send_message(f"[오류 발생]{e}")
+    stock_dict = get_stock_balance()
+    for sym, qty in stock_dict.items(): # 있으면 일괄 매도
+        time.sleep(0.2) # 유량 에러 대응
+        current_price = get_current_price(sym)
+        current_price = float(current_price)
+        avg_price = get_avg_balance(sym)
+        if avg_price == 9:
+            message_list += f"[{symbol_list[sym]['종목명']}] : !!!! 평단가 리턴 실패 !!!!\n"
+        avg_price = float(avg_price)
+        
+        formatted_amount1 = "{:,.2f}%".format((current_price/avg_price)*100-100)
+
+        if sell(sym, int(qty)):
+            message_list += f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 에러 매도\n"
+        else:
+            sell(sym, int(qty))
+            message_list += f">>> retry [{symbol_list[sym]['종목명']}]: {formatted_amount1} 에러 매도\n"
+    
     time.sleep(1)
 
 
