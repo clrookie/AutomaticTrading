@@ -400,6 +400,12 @@ try:
             ACCESS_TOKEN = get_access_token()
             send_message(f"=== Warren 토큰 발급 ({today_date})===") 
 
+
+            # 데이터 캐싱: 현재가, 평균가, 15일 평균가
+            price_cache = {sym: get_current_price(sym) for sym in symbol_list}
+            avg_price_cache = {sym: get_avg_balance(sym) for sym in symbol_list}
+            avg_15day_cache = {sym: get_avg_price_15day(sym) for sym in symbol_list}
+
             time.sleep(1) # 유량 에러 대응
 
             # 개장일
@@ -424,69 +430,125 @@ try:
             t_end = t_now.replace(hour=15, minute=10, second=0,microsecond=0)
   
             #######################           
-            # 시가 조건 매수
+            # 시가 조건 매수 (리팩토링)
             #######################
             if t_start < t_now < t_0301 and bStart_buy == False:
                 bStart_buy = True
 
-                message_list =" #시가 매수\n"
+                # 초기화
+                message_list = "#시가 매수\n"
 
-                # 있으면 일괄 매도
-                for sym in symbol_list:
+                # 데이터 캐싱: 현재가, 평균가, 15일 평균가
+                price_cache = {sym: get_current_price(sym) for sym in symbol_list}
+                avg_price_cache = {sym: get_avg_balance(sym) for sym in symbol_list}
+                avg_15day_cache = {sym: get_avg_price_15day(sym) for sym in symbol_list}
 
-                    if symbol_list[sym]['보유'] == True:
-                        current_price = get_current_price(sym)
-                        current_price = float(current_price)
-                        avg_price = get_avg_balance(sym)
+                # 1. 보유 종목 일괄 매도
+                for sym, data in symbol_list.items():
+                    if data['보유']:
+                        current_price = float(price_cache[sym])
+                        avg_price = float(avg_price_cache.get(sym, 9))
+
                         if avg_price == 9:
-                            message_list += f"[{symbol_list[sym]['종목명']}] : !!!! 평단가 리턴 실패 !!!!\n"
-                        avg_price = float(avg_price)
-                        
-                        formatted_amount1 = "{:,.2f}%".format((current_price/avg_price)*100-100)
+                            message_list += f"[{data['종목명']}] : !!!! 평단가 리턴 실패 !!!!\n"
+                            continue
 
-                        if sell(sym, int(symbol_list[sym]['물량'])):
-                            message_list += f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 일괄 매도 !!\n"
+                        profit_percent = "{:,.2f}%".format((current_price / avg_price) * 100 - 100)
+                        if sell(sym, int(data['물량'])):
+                            message_list += f"[{data['종목명']}]: {profit_percent} 일괄 매도 !!\n"
                         else:
-                            sell(sym, int(symbol_list[sym]['물량']))
-                            message_list += f">>> retry [{symbol_list[sym]['종목명']}]: {formatted_amount1} 일괄 매도 !!\n"
+                            message_list += f">>> retry [{data['종목명']}]: {profit_percent} 일괄 매도 !!\n"
 
                 message_list += "-------------------------------------\n"
 
-                # 15일 평균선 < 시가 높은 경우 체크
-                for sym in symbol_list: 
-                    
-                    # 초기화
-                    symbol_list[sym]['보유'] = False
-                    symbol_list[sym]['시가'] = 0.0
-                    symbol_list[sym]['물량'] = 0.0
-                    symbol_list[sym]['익절'] = False
+                # 2. 신규 매수 처리
+                for sym, data in symbol_list.items():
+                    current_price = float(price_cache[sym])
+                    avg_15day = float(avg_15day_cache[sym])
 
-                    current_price = get_current_price(sym)
-                    avg_15day = get_avg_price_15day(sym)
+                    # 초기화 (매수 실패를 대비하여 기본값으로 초기화)
+                    data.update({'보유': False, '시가': 0.0, '물량': 0.0, '익절': False})
 
-                    current_price = float(current_price)
-                    avg_15day = float(avg_15day)
+                    formatted_current = "{:,.0f}원".format(current_price)
+                    formatted_avg = "{:,.0f}원".format(avg_15day)
 
-                    formatted_amount = "{:,.0f}원".format(current_price)
-                    formatted_amount1 = "{:,.0f}원".format(avg_15day)
-                    if current_price >= avg_15day: 
-                        
-                        qty = int(buy_rate/current_price) # 분할 매수
-                        message_list += f"[{symbol_list[sym]['종목명']}] 매수성공 O {formatted_amount} (15선:{formatted_amount1})\n"
+                    # 매수 조건 확인
+                    if current_price >= avg_15day:
+                        qty = int(buy_rate / current_price)  # 분할 매수 계산
                         if buy(sym, qty):
-                            symbol_list[sym]['보유'] = True
-                            symbol_list[sym]['시가'] = current_price
-                            symbol_list[sym]['물량'] = float(qty)
-                            message_list +="+++ 시가 매수 +++\n\n"
-
+                            data.update({'보유': True, '시가': current_price, '물량': float(qty)})
+                            message_list += f"[{data['종목명']}] 매수성공 O {formatted_current} (15선:{formatted_avg})\n"
+                            message_list += "+++ 시가 매수 +++\n\n"
+                        else:
+                            message_list += f"[{data['종목명']}] !!! 매수 실패 !!!\n\n"
                     else:
-                        message_list += f"[{symbol_list[sym]['종목명']}] 매수실패 X {formatted_amount} (15선:{formatted_amount1})\n"
-                
+                        message_list += f"[{data['종목명']}] 매수실패 X {formatted_current} (15선:{formatted_avg})\n"
+
+                # 3. 메시지 전송 및 현재 보유 주식 조회
                 send_message(message_list)
-                stock_dict = get_stock_balance() # 보유 주식 조회
+                stock_dict = get_stock_balance()  # 보유 주식 조회
             
 
+            ####################### 
+            # 장중간 조건 매도 (참고용) 기존 코드
+            ####################### 
+            # message_list =" #시가 매수\n"
+
+            # # 있으면 일괄 매도
+            # for sym in symbol_list:
+
+            #     if symbol_list[sym]['보유'] == True:
+            #         current_price = get_current_price(sym)
+            #         current_price = float(current_price)
+            #         avg_price = get_avg_balance(sym)
+            #         if avg_price == 9:
+            #             message_list += f"[{symbol_list[sym]['종목명']}] : !!!! 평단가 리턴 실패 !!!!\n"
+            #         avg_price = float(avg_price)
+                    
+            #         formatted_amount1 = "{:,.2f}%".format((current_price/avg_price)*100-100)
+
+            #         if sell(sym, int(symbol_list[sym]['물량'])):
+            #             message_list += f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 일괄 매도 !!\n"
+            #         else:
+            #             sell(sym, int(symbol_list[sym]['물량']))
+            #             message_list += f">>> retry [{symbol_list[sym]['종목명']}]: {formatted_amount1} 일괄 매도 !!\n"
+
+            # message_list += "-------------------------------------\n"
+
+            # # 15일 평균선 < 시가 높은 경우 체크
+            # for sym in symbol_list: 
+                
+            #     # 초기화
+            #     symbol_list[sym]['보유'] = False
+            #     symbol_list[sym]['시가'] = 0.0
+            #     symbol_list[sym]['물량'] = 0.0
+            #     symbol_list[sym]['익절'] = False
+
+            #     current_price = get_current_price(sym)
+            #     avg_15day = get_avg_price_15day(sym)
+
+            #     current_price = float(current_price)
+            #     avg_15day = float(avg_15day)
+
+            #     formatted_amount = "{:,.0f}원".format(current_price)
+            #     formatted_amount1 = "{:,.0f}원".format(avg_15day)
+            #     if current_price >= avg_15day: 
+                    
+            #         qty = int(buy_rate/current_price) # 분할 매수
+            #         message_list += f"[{symbol_list[sym]['종목명']}] 매수성공 O {formatted_amount} (15선:{formatted_amount1})\n"
+            #         if buy(sym, qty):
+            #             symbol_list[sym]['보유'] = True
+            #             symbol_list[sym]['시가'] = current_price
+            #             symbol_list[sym]['물량'] = float(qty)
+            #             message_list +="+++ 시가 매수 +++\n\n"
+            #         else: message_list +="!!! 매수 실패 !!! 매수 실패 !!! \n\n"
+
+            #     else:
+            #         message_list += f"[{symbol_list[sym]['종목명']}] 매수실패 X {formatted_amount} (15선:{formatted_amount1})\n"
             
+            # send_message(message_list)
+            # stock_dict = get_stock_balance() # 보유 주식 조회
+
             ####################### 
             # 장중간 조건 매도
             ####################### 
@@ -497,6 +559,7 @@ try:
                     if symbol_list[sym]['보유'] == False:
                         continue
 
+                    time.sleep(0.2) # 유량 에러 대응
                     current_price = get_current_price(sym)
                     current_price = float(current_price)
                     avg_price = get_avg_balance(sym)
@@ -538,11 +601,26 @@ try:
                     t_0 = True                    
                     send_message("===30분===30분 (WarrenOn) 30분===30분===")
                     stock_dict = get_stock_balance() # 보유 주식 조회  
+
+                    a,b = get_real_total()
+                    message_list += "\n[중간 손익]\n"
+                    formatted_amount = "{:,.0f}원".format(a)
+                    message_list += f"자산증감액: {formatted_amount}\n"
+                    formatted_amount = "{:,.3f}%".format(b)
+                    message_list += f"총수익율: {formatted_amount}\n\n"
+
                 if t_now.minute == 0 and t_0:
                     t_0 = False
                     t_30 = True
                     send_message("===0분===0분 (WarrenOn) 0분===0분===")
                     stock_dict = get_stock_balance() # 보유 주식 조회  
+
+                    a,b = get_real_total()
+                    message_list += "\n[중간 손익]\n"
+                    formatted_amount = "{:,.0f}원".format(a)
+                    message_list += f"자산증감액: {formatted_amount}\n"
+                    formatted_amount = "{:,.3f}%".format(b)
+                    message_list += f"총수익율: {formatted_amount}\n\n"
 
             ####################### 
             # 종가 일괄 매도
@@ -555,6 +633,7 @@ try:
                 message_list = "**** 데이 트레이딩 마감 ****\n"
 
                 for sym, qty in stock_dict.items(): # 있으면 일괄 매도
+                    time.sleep(0.2) # 유량 에러 대응
                     current_price = get_current_price(sym)
                     current_price = float(current_price)
                     avg_price = get_avg_balance(sym)
@@ -572,12 +651,12 @@ try:
                 
                 a,b = get_real_total()
                 
-                message_list += "\n[일간 손익]\n"
+                message_list += "\n[최종 일간 손익]\n"
                 formatted_amount = "{:,.0f}원".format(a)
                 message_list += f"자산증감액: {formatted_amount}\n"
                 formatted_amount = "{:,.3f}%".format(b)
-                message_list += f"총수익율: {formatted_amount}\n"
-                message_list += "\n"
+                message_list += f"총수익율: {formatted_amount}\n\n"
+
                 message_list += "=== 자동매매를 종료합니다 ===\n"
                 send_message(message_list)
 
