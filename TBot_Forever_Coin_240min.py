@@ -68,18 +68,18 @@ def update_symbol_list(top_tickers_df, common_data):
         }
     return symbol_list
 
-def get_240min_20ma(sym):
+def get_240min_10ma(sym):
     # 240분봉 데이터 가져오기
-    data = pyupbit.get_ohlcv(sym, interval="minute240", count=20)
+    data = pyupbit.get_ohlcv(sym, interval="minute240", count=10)
     
     # 데이터가 없으면 None 반환
     if data is None:
         return None
     
     # 20개 이동평균선 계산 (종가 기준)
-    average_price_20 = data['close'].mean()
+    average_price_10 = data['close'].mean()
     
-    return average_price_20
+    return average_price_10
 
 ###################################################
 ###################################################
@@ -99,10 +99,11 @@ try:
     bStart_buy = False
 
     last_hour = 77
-    last_240 = 77
+    last_240 = 0
+    last_total_balance_krw = 1
 
-    # buy_money = 1500000.0 # 150만원
-    buy_money = 50000.0 # 5만원
+    buy_money = 1500000.0 # 150만원
+    # buy_money = 50000.0 # 5만원
     profit_cut = 1.021
     lost_cut = 0.985
 
@@ -115,7 +116,7 @@ try:
     }
 
     #개별 코인 데이터
-    last_symbol_list = {}
+    last_symbol_list = {} # 백업용
     symbol_list = { 
     'KRW-BTC':{'종목명':'비트코인 #1', #1
     '매도티커':'BTC',
@@ -140,17 +141,14 @@ try:
     'KRW-USDT':{'종목명':'테더 #6', #6 
     '매도티커':'USDT',
     **common_data},
-
-
     }
 
     while True:
         
         t_now = datetime.datetime.now()
         
-
         #########################
-        # 1시간 마다 리포팅
+        # 1시간 주기 리포팅
         #########################
         if t_now.hour != last_hour:
             last_hour = t_now.hour
@@ -193,15 +191,20 @@ try:
                     total_balance_krw += total_value
 
             # 비중과 수익률 출력
-            message_list += f"총 보유 자산: {total_balance_krw:,.0f} KRW\n"
+            last_total_balance_krw = total_balance_krw
+            formatted_amount = 222
+            if last_total_balance_krw != 0:
+                formatted_amount = "{:,.0f}원".format((total_balance_krw - last_total_balance_krw) / last_total_balance_krw * 100)
+
+            message_list += f"총 보유 자산: {total_balance_krw:,.0f}원 ({formatted_amount})\n"
             message_list += "-------------------------------------------------\n"
             for data in coin_data:
                 allocation = (data['total_value'] / total_balance_krw) * 100
                 message_list += f"{data['coin']}:\n"
                 message_list += f"  보유수량: {data['amount']:.6f}\n"
-                message_list += f"  현재가: {data['current_price']:,.0f} KRW\n"
-                message_list += f"  매수평균가: {data['avg_buy_price']:,.0f} KRW\n"
-                message_list += f"  평가금액: {data['total_value']:,.0f} KRW\n"
+                message_list += f"  현재가: {data['current_price']:,.0f}원\n"
+                message_list += f"  매수평균가: {data['avg_buy_price']:,.0f}원\n"
+                message_list += f"  평가금액: {data['total_value']:,.0f}원\n"
                 message_list += f"  비중: {allocation:.2f}%\n"
                 message_list += f"  수익률: {data['profit_rate']:.2f}%\n"
                 message_list += "-------------------------------------------------\n"
@@ -227,7 +230,7 @@ try:
 
             time.sleep(0.2) # 데이터 갱신 보정
 
-            message_list = "\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n"
+            message_list = "\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n"
             message_list += f">>> 240분 갱신합니다 <<< ({last_240}시)\n\n"
             
             #########################
@@ -238,7 +241,6 @@ try:
                 # 20일 이평선
                 time.sleep(0.2) # 데이터 갱신 보정
                 current_price = get_current_price(sym)
-                average_price_240 = get_240min_20ma(sym)
                 
                 coin = get_balance(last_symbol_list[sym]['매도티커'])  # 보유량
                 if coin > 0:
@@ -248,20 +250,16 @@ try:
 
                     sell_result = upbit.sell_market_order(sym, coin)
                     if sell_result is not None:
-                        message_list += f"[{symbol_list[sym]['종목명']}] {round(current_price/avg_price*100-100,2)}% 청산 성공\n"
+                        message_list += f"[{symbol_list[sym]['종목명']}] {round(current_price/avg_price*100-100,2)}% 청산 매도\n"
                     else:
                         message_list += f"[{symbol_list[sym]['종목명']}] 청산 실패 ({sell_result})\n"
+
+            message_list += f"------(청산 완료)------\n\n" 
 
             for sym in symbol_list: # 초기화
                 
                 # 20일 이평선
                 time.sleep(0.2) # 데이터 갱신 보정
-                current_price = get_current_price(sym)
-                average_price_240 = get_240min_20ma(sym)
-
-                #########################
-                # 시가 매수 (20선 위)
-                #########################
                 
                 # 초기화
                 symbol_list[sym]['보유'] = False
@@ -269,11 +267,47 @@ try:
                 symbol_list[sym]['물량'] = 0.0
                 symbol_list[sym]['익절'] = False
 
+                #########################
+                # 시가 매수 (10선 위)
+                #########################
+                
+                current_price = get_current_price(sym)
+                average_price_240_10ma = get_240min_10ma(sym)
                 formatted_amount = "{:,.0f}원".format(current_price)
-                formatted_amount1 = "{:,.0f}원".format(average_price_240)
+                formatted_amount1 = "{:,.0f}원".format(average_price_240_10ma)
 
-                if current_price >= average_price_240:
+                # 240분봉 데이터 가져오기 (최근 20봉)
+                data = pyupbit.get_ohlcv(sym, interval="minute240", count=20)
+                if data is None: continue
+
+                # 직전 캔들의 시가와 종가 확인
+                prev_candle = data.iloc[-2]  # 직전 캔들
+                open_price = prev_candle['open']
+                close_price = prev_candle['close']
+
+                # 양봉/음봉 판별
+                stick_plus = False
+                if close_price > open_price: # 양봉
+                    stick_plus = True
+
+                # 평균 거래량
+                average_volume = data['volume'].mean()
+                # 직전 캔들의 거래량
+                prev_volume = data.iloc[-2]['volume']  # 직전 캔들
+
+                volume_2x = False
+                if prev_volume >= (average_volume*2):
+                    volume_2x = True
+
+                
+                if current_price >= average_price_240_10ma:
+                    # 시가 매수 훼피 (직전 + 이평선 위 + 양봉 + 거래량 2배)
+                    if stick_plus and volume_2x:
+                        message_list += f"\n[{symbol_list[sym]['종목명']}] !!! 매수 훼피 !!! (10선위+양봉+2배)\n"
+                        continue
+
                     time.sleep(0.02)
+
                     # 예산만큼 매수
                     total_cash = get_balance("KRW")
                     if buy_money > total_cash:
@@ -291,7 +325,29 @@ try:
                         message_list += f"+++ 실패 +++ ({buy_result})\n\n"
                 
                 else:
-                    message_list += f"[{symbol_list[sym]['종목명']}] 매수실패 X {formatted_amount} (20선:{formatted_amount1})\n"
+                    # 시가 매수 신호 (직전 + 이평선 아래 + 음봉 + 거래량 2배)
+                    if stick_plus and volume_2x:
+                        time.sleep(0.02)
+
+                        # 예산만큼 매수
+                        total_cash = get_balance("KRW")
+                        if buy_money > total_cash:
+                            formatted_amount2 = "{:,.0f}원".format(total_cash)
+                            message_list += f"[{symbol_list[sym]['종목명']}] 잔액 부족 (잔액: {formatted_amount2})\n"
+                            continue
+                        message_list += f"[\n{symbol_list[sym]['종목명']}] @@@ 매수 신호 @@@ (10선아래+음봉+2배)\n"
+                        message_list += f"[{symbol_list[sym]['종목명']}] 매수성공 O {formatted_amount} (20선:{formatted_amount1})\n"
+                        buy_result = upbit.buy_market_order(sym, buy_money) # 현금
+                        if buy_result is not None:
+                            symbol_list[sym]['보유'] = True
+                            symbol_list[sym]['시가'] = current_price
+                            symbol_list[sym]['물량'] = get_balance(symbol_list[sym]['매도티커'])
+                            message_list +="+++ 시가 매수 +++\n\n"          
+                        else:
+                            message_list += f"+++ 실패 +++ ({buy_result})\n\n"
+
+                    else:
+                        message_list += f"[{symbol_list[sym]['종목명']}] 매수실패 X {formatted_amount} (20선:{formatted_amount1})\n"
 
                 
             message_list += f"===========(시가 매매 완료)=============\n\n\n"         
