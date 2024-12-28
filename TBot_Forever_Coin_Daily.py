@@ -3,7 +3,7 @@ import pyupbit
 from datetime import datetime, timedelta
 import datetime
 import requests
-import math
+import pandas as pd
 
 def send_message(msg):
     """디스코드 메세지 전송"""
@@ -34,7 +34,60 @@ def get_current_price(ticker):
     """현재가 조회"""
     return pyupbit.get_orderbook(ticker=ticker)["orderbook_units"][0]["ask_price"]
 
+def get_top_tickers():
+    """업비트 현시점 거래대금 상위 6개 티커 가져오기"""
+    url_markets = "https://api.upbit.com/v1/market/all"
+    url_ticker = "https://api.upbit.com/v1/ticker"
+
+    # 모든 KRW-마켓 티커 가져오기
+    markets = requests.get(url_markets).json()
+    krw_markets = [market['market'] for market in markets if market['market'].startswith('KRW-')]
+
+    # 실시간 거래 데이터 가져오기
+    ticker_data = requests.get(url_ticker, params={"markets": ','.join(krw_markets)}).json()
+
+    # 데이터프레임 생성 및 정렬
+    df = pd.DataFrame(ticker_data)
+    df = df[['market', 'acc_trade_price_24h']].sort_values(by='acc_trade_price_24h', ascending=False).head(6)
+    return df
+
+def update_symbol_list(top_tickers_df, common_data):
+    """
+    상위 6개 티커 정보를 기반으로 symbol_list 생성
+    :param top_tickers_df: 상위 6개 티커 DataFrame
+    :param common_data: 공통 데이터
+    :return: 갱신된 symbol_list
+    """
+    symbol_list = {}
+    for idx, row in enumerate(top_tickers_df.itertuples(), start=1):
+        market = row.market
+        symbol_list[market] = {
+            '종목명': f"{market.split('-')[-1]} #{idx}",
+            '매도티커': market.split('-')[-1],
+            **common_data
+        }
+    return symbol_list
+
+def get_240min_20ma(sym):
+    # 240분봉 데이터 가져오기
+    data = pyupbit.get_ohlcv(sym, interval="minute240", count=20)
+    
+    # 데이터가 없으면 None 반환
+    if data is None:
+        return None
+    
+    # 20개 이동평균선 계산 (종가 기준)
+    average_price_20 = data['close'].mean()
+    
+    return average_price_20
+
+###################################################
+###################################################
+###################################################
 # COIN 자동매매 구동
+###################################################
+###################################################
+###################################################
 try:
     
     # 로그인
@@ -46,10 +99,10 @@ try:
     bStart_buy = False
 
     last_hour = 77
-    last_min = 77
+    last_240 = 77
 
     # buy_money = 1500000.0 # 150만원
-    buy_money = 150000.0 # 15만원
+    buy_money = 50000.0 # 5만원
     profit_cut = 1.021
     lost_cut = 0.985
 
@@ -61,7 +114,7 @@ try:
     '익절': False,
     }
 
-    #개별 종목 데이터
+    #개별 코인 데이터
     symbol_list = { 
     'KRW-BTC':{'종목명':'비트코인 #1', #1
     '매도티커':'BTC',
@@ -70,14 +123,6 @@ try:
     'KRW-XRP':{'종목명':'리플 #2', #2
     '매도티커':'XRP',
     **common_data},
-    
-    # 'KRW-ETH':{'종목명':'이더리움 #3', #3
-    # '매도티커':'ETH',
-    # **common_data},
-
-    # 'KRW-SOL':{'종목명':'솔라나 #4', #4
-    # '매도티커':'SOL',
-    # **common_data},
 
     'KRW-GMT':{'종목명':'스테픈 #3', #3
     '매도티커':'GMT',
@@ -102,6 +147,10 @@ try:
         
         t_now = datetime.datetime.now()
         
+
+        #########################
+        # 1시간 마다 리포팅
+        #########################
         if t_now.hour != last_hour:
             last_hour = t_now.hour
             message_list = f"ForeverOn... ({last_hour}시)\n\n"
@@ -127,6 +176,7 @@ try:
                     amount = float(balance['balance'])  # 보유 수량
                     avg_buy_price = float(balance['avg_buy_price'])  # 매수평균가
                     total_value = current_price * amount  # 평가금액
+                    if total_value < 5000: continue # 소액이면 스킵!
                     profit_rate = ((current_price - avg_buy_price) / avg_buy_price) * 100  # 수익률(%)
 
                     coin_data.append({
@@ -144,36 +194,43 @@ try:
             message_list += "-------------------------------------------------\n"
             for data in coin_data:
                 allocation = (data['total_value'] / total_balance_krw) * 100
-                message_list += "{data['coin']}:\n"
-                message_list += "  보유수량: {data['amount']:.6f}\n"
-                message_list += "  현재가: {data['current_price']:,.0f} KRW\n"
-                message_list += "  매수평균가: {data['avg_buy_price']:,.0f} KRW\n"
-                message_list += "  평가금액: {data['total_value']:,.0f} KRW\n"
-                message_list += "  비중: {allocation:.2f}%\n"
+                message_list += f"{data['coin']}:\n"
+                message_list += f"  보유수량: {data['amount']:.6f}\n"
+                message_list += f"  현재가: {data['current_price']:,.0f} KRW\n"
+                message_list += f"  매수평균가: {data['avg_buy_price']:,.0f} KRW\n"
+                message_list += f"  평가금액: {data['total_value']:,.0f} KRW\n"
+                message_list += f"  비중: {allocation:.2f}%\n"
                 message_list += f"  수익률: {data['profit_rate']:.2f}%\n"
-                message_list += "-------------------------------------------------"
+                message_list += "-------------------------------------------------\n"
 
             send_message(message_list)
 
-        if t_now.hour == 8 : bStart_buy = False
-        if t_now.hour == 9 and bStart_buy == False: # 일봉 갱신
-            bStart_buy = True
+        #########################
+        # 240시간 주기 매매
+        #########################
+
+        df = pyupbit.get_ohlcv("KRW-BTC", interval="minute240", count=1)
+        if df is None: continue
+
+        if df.index[0].hour != last_240:    # 240분 캔들 갱신
+
+            last_240 = df.index[0].hour
+
+            common_data ={'보유': False,'시가': 0.0,'물량': 0.0,'익절': False,}
+            top_tickers = get_top_tickers()
+            symbol_list = update_symbol_list(top_tickers, common_data)
 
             time.sleep(0.2) # 데이터 갱신 보정
 
             message_list = "\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n"
-            message_list += f">>> 일봉 갱신합니다 <<< ({t_now.hour}시)\n"
-            message_list += "\n>>> "
+            message_list += f">>> 240분 갱신합니다 <<< ({last_240}시)\n\n"
             
 
             for sym in symbol_list: # 초기화
                 
                 # 20일 이평선
-                data = pyupbit.get_ohlcv(sym, interval="day", count=20)
-                if data is None: continue
-                
-                average_price_20 = data['close'].mean()
                 current_price = get_current_price(sym)
+                average_price_240 = get_240min_20ma(sym)
 
                 #########################
                 # 있으면 일단 청산
@@ -199,9 +256,9 @@ try:
                 symbol_list[sym]['익절'] = False
 
                 formatted_amount = "{:,.0f}원".format(current_price)
-                formatted_amount1 = "{:,.0f}원".format(average_price_20)
+                formatted_amount1 = "{:,.0f}원".format(average_price_240)
 
-                if current_price >= average_price_20:
+                if current_price >= average_price_240:
                     time.sleep(0.02)
                     # 예산만큼 매수
                     total_cash = get_balance("KRW")
@@ -227,59 +284,54 @@ try:
             send_message(message_list)
 
         else: # 가지고 있다면
-            df = pyupbit.get_ohlcv("KRW-BTC", interval="minute1", count=1)
-            if df is None: continue
+            
+            for sym in symbol_list: # 초기화
 
-            if df.index[0].minute != last_min:    # 일봉 갱신
-                last_min = df.index[0].minute
+                if symbol_list[sym]['보유'] == False:
+                    continue
+                
+                time.sleep(0.2) # 데이터 갱신 보정
+                current_price = get_current_price(sym)
+                avg_price = upbit.get_avg_buy_price(sym)
 
-                for sym in symbol_list: # 초기화
+                #########################
+                # 장중간 조건 매도
+                #########################
+                result = current_price / avg_price
 
-                    if symbol_list[sym]['보유'] == False:
-                        continue
-                    
-                    time.sleep(0.2) # 데이터 갱신 보정
-                    current_price = get_current_price(sym)
-                    avg_price = upbit.get_avg_buy_price(sym)
+                if result >= profit_cut and symbol_list[sym]['익절'] == False:
 
-                    #########################
-                    # 장중간 조건 매도
-                    #########################
-                    result = current_price / avg_price
+                    symbol_list[sym]['물량'] = symbol_list[sym]['물량'] / 2 # 절반만 익절
 
-                    if result >= profit_cut and symbol_list[sym]['익절'] == False:
-
-                        symbol_list[sym]['물량'] = symbol_list[sym]['물량'] / 2 # 절반만 익절
-
-                        sell_result = upbit.sell_market_order(sym, symbol_list[sym]['물량'])
-                        if sell_result is not None:
-                            
-                            formatted_amount1 = "{:,.2f}%".format((current_price/avg_price)*100-100)
-                            send_message(f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 1/2익절^^")
-
-                        else:
-                            send_message(f"익절 실패 ({sell_result})")
-
-                        symbol_list[sym]['익절'] = True
-
-                    elif result <= lost_cut or (symbol_list[sym]['익절'] == True and current_price < symbol_list[sym]['시가']) : #손절
+                    sell_result = upbit.sell_market_order(sym, symbol_list[sym]['물량'])
+                    if sell_result is not None:
                         
-                        sell_result = upbit.sell_market_order(sym, symbol_list[sym]['물량'])
-                        if sell_result is not None:
-                            
-                            formatted_amount1 = "{:,.2f}%".format((current_price/avg_price)*100-100)
-                            send_message(f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 손절ㅠ")
+                        formatted_amount1 = "{:,.2f}%".format((current_price/avg_price)*100-100)
+                        send_message(f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 1/2익절^^")
 
-                        else:
-                            send_message(f"익절 실패 ({sell_result})")
+                    else:
+                        send_message(f"익절 실패 ({sell_result})")
 
-                        symbol_list[sym]['보유'] = False
-                        symbol_list[sym]['물량'] = 0.0
+                    symbol_list[sym]['익절'] = True
+
+                elif result <= lost_cut or (symbol_list[sym]['익절'] == True and current_price < symbol_list[sym]['시가']) : #손절
+                    
+                    sell_result = upbit.sell_market_order(sym, symbol_list[sym]['물량'])
+                    if sell_result is not None:
+                        
+                        formatted_amount1 = "{:,.2f}%".format((current_price/avg_price)*100-100)
+                        send_message(f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 손절ㅠ")
+
+                    else:
+                        send_message(f"익절 실패 ({sell_result})")
+
+                    symbol_list[sym]['보유'] = False
+                    symbol_list[sym]['물량'] = 0.0
             
                 
         # for문 끝 라인..
 
-        time.sleep(1) # 없거나 짧으면 -> [오류 발생]'NoneType' object has no attribute 'index'
+        time.sleep(2) # 없거나 짧으면 -> [오류 발생]'NoneType' object has no attribute 'index'
 
 except Exception as e:
     print(e)
