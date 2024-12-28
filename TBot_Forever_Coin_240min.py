@@ -99,12 +99,13 @@ try:
     bStart_buy = False
 
     last_hour = 77
-    last_240 = 0
+    last_240 = 17
     last_total_balance_krw = 1
 
     buy_money = 1500000.0 # 150만원
     # buy_money = 50000.0 # 5만원
-    profit_cut = 1.021
+    profit_cut222 = 1.021
+    profit_cut555 = 1.051
     lost_cut = 0.985
 
     # 공용 데이터
@@ -112,7 +113,8 @@ try:
     '보유': False,
     '시가': 0.0,
     '물량': 0.0,
-    '익절': False,
+    '익절222': False,
+    '익절555': False,
     }
 
     #개별 코인 데이터
@@ -191,10 +193,11 @@ try:
                     total_balance_krw += total_value
 
             # 비중과 수익률 출력
-            last_total_balance_krw = total_balance_krw
             formatted_amount = 222
             if last_total_balance_krw != 0:
-                formatted_amount = "{:,.0f}원".format((total_balance_krw - last_total_balance_krw) / last_total_balance_krw * 100)
+                formatted_amount = "{:,.0f}%".format((total_balance_krw - last_total_balance_krw) / last_total_balance_krw * 100)
+            
+            last_total_balance_krw = total_balance_krw
 
             message_list += f"총 보유 자산: {total_balance_krw:,.0f}원 ({formatted_amount})\n"
             message_list += "-------------------------------------------------\n"
@@ -222,7 +225,7 @@ try:
 
             last_240 = df.index[0].hour
 
-            common_data ={'보유': False,'시가': 0.0,'물량': 0.0,'익절': False,}
+            common_data ={'보유': False,'시가': 0.0,'물량': 0.0,'익절222': False,'익절555': False,}
             top_tickers = get_top_tickers()
 
             last_symbol_list = symbol_list
@@ -256,6 +259,9 @@ try:
 
             message_list += f"------(청산 완료)------\n\n" 
 
+            #########################
+            # 시가 매수 (10선 위)
+            #########################
             for sym in symbol_list: # 초기화
                 
                 # 20일 이평선
@@ -265,11 +271,8 @@ try:
                 symbol_list[sym]['보유'] = False
                 symbol_list[sym]['시가'] = 0.0
                 symbol_list[sym]['물량'] = 0.0
-                symbol_list[sym]['익절'] = False
-
-                #########################
-                # 시가 매수 (10선 위)
-                #########################
+                symbol_list[sym]['익절222'] = False
+                symbol_list[sym]['익절555'] = False
                 
                 current_price = get_current_price(sym)
                 average_price_240_10ma = get_240min_10ma(sym)
@@ -301,10 +304,10 @@ try:
 
                 
                 if current_price >= average_price_240_10ma:
-                    # 시가 매수 훼피 (직전 + 이평선 위 + 양봉 + 거래량 2배)
-                    if stick_plus and volume_2x:
-                        message_list += f"\n[{symbol_list[sym]['종목명']}] !!! 매수 훼피 !!! (10선위+양봉+2배)\n"
-                        continue
+                    # # 시가 매수 훼피 (직전 + 이평선 위 + 양봉 + 거래량 2배)
+                    # if stick_plus and volume_2x:
+                    #     message_list += f"\n[{symbol_list[sym]['종목명']}] !!! 매수 훼피 !!! (10선↑+양봉+2배)\n"
+                    #     continue
 
                     time.sleep(0.02)
 
@@ -314,7 +317,7 @@ try:
                         formatted_amount2 = "{:,.0f}원".format(total_cash)
                         message_list += f"[{symbol_list[sym]['종목명']}] 잔액 부족 (잔액: {formatted_amount2})\n"
                         continue
-                    message_list += f"[{symbol_list[sym]['종목명']}] 매수성공 O {formatted_amount} (20선:{formatted_amount1})\n"
+                    message_list += f"[{symbol_list[sym]['종목명']}] 매수성공 O {formatted_amount} (10선:{formatted_amount1})\n"
                     buy_result = upbit.buy_market_order(sym, buy_money) # 현금
                     if buy_result is not None:
                         symbol_list[sym]['보유'] = True
@@ -326,7 +329,7 @@ try:
                 
                 else:
                     # 시가 매수 신호 (직전 + 이평선 아래 + 음봉 + 거래량 2배)
-                    if stick_plus and volume_2x:
+                    if stick_plus == False and volume_2x:
                         time.sleep(0.02)
 
                         # 예산만큼 매수
@@ -335,7 +338,7 @@ try:
                             formatted_amount2 = "{:,.0f}원".format(total_cash)
                             message_list += f"[{symbol_list[sym]['종목명']}] 잔액 부족 (잔액: {formatted_amount2})\n"
                             continue
-                        message_list += f"[\n{symbol_list[sym]['종목명']}] @@@ 매수 신호 @@@ (10선아래+음봉+2배)\n"
+                        message_list += f"[\n{symbol_list[sym]['종목명']}] @@@ 매수 신호 @@@ (10선↓+음봉+2배)\n"
                         message_list += f"[{symbol_list[sym]['종목명']}] 매수성공 O {formatted_amount} (20선:{formatted_amount1})\n"
                         buy_result = upbit.buy_market_order(sym, buy_money) # 현금
                         if buy_result is not None:
@@ -350,7 +353,7 @@ try:
                         message_list += f"[{symbol_list[sym]['종목명']}] 매수실패 X {formatted_amount} (20선:{formatted_amount1})\n"
 
                 
-            message_list += f"===========(시가 매매 완료)=============\n\n\n"         
+            message_list += f"\n===========(시가 매매 완료)=============\n\n\n"         
             send_message(message_list)
 
         else: # 가지고 있다면
@@ -370,7 +373,8 @@ try:
                 #########################
                 result = current_price / avg_price
 
-                if result >= profit_cut and symbol_list[sym]['익절'] == False:
+                # 2% 익절
+                if result >= profit_cut222 and symbol_list[sym]['익절222'] == False:
 
                     symbol_list[sym]['물량'] = symbol_list[sym]['물량'] / 2 # 절반만 익절
 
@@ -378,14 +382,30 @@ try:
                     if sell_result is not None:
                         
                         formatted_amount1 = "{:,.2f}%".format((current_price/avg_price)*100-100)
-                        send_message(f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 1/2익절^^")
+                        send_message(f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 1차 익절^^")
 
                     else:
                         send_message(f"익절 실패 ({sell_result})")
 
-                    symbol_list[sym]['익절'] = True
+                    symbol_list[sym]['익절222'] = True
 
-                elif result <= lost_cut or (symbol_list[sym]['익절'] == True and current_price < symbol_list[sym]['시가']) : #손절
+                # 5% 익절
+                elif result >= profit_cut555 and symbol_list[sym]['익절555'] == False:
+
+                    symbol_list[sym]['물량'] = symbol_list[sym]['물량'] / 2 # 절반만 익절
+
+                    sell_result = upbit.sell_market_order(sym, symbol_list[sym]['물량'])
+                    if sell_result is not None:
+                        
+                        formatted_amount1 = "{:,.2f}%".format((current_price/avg_price)*100-100)
+                        send_message(f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 2차 익절^^")
+
+                    else:
+                        send_message(f"익절 실패 ({sell_result})")
+
+                    symbol_list[sym]['익절555'] = True
+
+                elif result <= lost_cut or (symbol_list[sym]['익절222'] == True and current_price < symbol_list[sym]['시가']) : #손절
                     
                     sell_result = upbit.sell_market_order(sym, symbol_list[sym]['물량'])
                     if sell_result is not None:
