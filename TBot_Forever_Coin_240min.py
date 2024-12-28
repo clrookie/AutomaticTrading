@@ -176,6 +176,8 @@ try:
                     
                     amount = float(balance['balance'])  # 보유 수량
                     avg_buy_price = float(balance['avg_buy_price'])  # 매수평균가
+                    if avg_buy_price <= 0 : continue
+
                     total_value = current_price * amount  # 평가금액
                     if total_value < 5000: continue # 소액이면 스킵!
                     profit_rate = ((current_price - avg_buy_price) / avg_buy_price) * 100  # 수익률(%)
@@ -242,6 +244,8 @@ try:
                 if coin > 0:
                     time.sleep(0.02)
                     avg_price = upbit.get_avg_buy_price(sym)
+                    if avg_price <= 0 : continue
+
                     sell_result = upbit.sell_market_order(sym, coin)
                     if sell_result is not None:
                         message_list += f"[{symbol_list[sym]['종목명']}] {round(current_price/avg_price*100-100,2)}% 청산 성공\n"
@@ -296,6 +300,7 @@ try:
                 time.sleep(0.2) # 데이터 갱신 보정
                 current_price = get_current_price(sym)
                 avg_price = upbit.get_avg_buy_price(sym)
+                if avg_price <= 0 : continue
 
                 #########################
                 # 장중간 조건 매도
