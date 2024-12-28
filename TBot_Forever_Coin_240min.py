@@ -346,12 +346,11 @@ try:
                 
         # for문 끝 라인..
 
-        time.sleep(2) # 없거나 짧으면 -> [오류 발생]'NoneType' object has no attribute 'index'
+        time.sleep(10) # 없거나 짧으면 -> [오류 발생]'NoneType' object has no attribute 'index'
 
 except Exception as e:
     print(e)
     
-    send_message("#########################################")
     send_message("#########################################")
     send_message(f"[오류 발생]{e}")
     
