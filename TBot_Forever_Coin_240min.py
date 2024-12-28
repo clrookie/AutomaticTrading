@@ -230,16 +230,16 @@ try:
             message_list = "\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n"
             message_list += f">>> 240분 갱신합니다 <<< ({last_240}시)\n\n"
             
-
-            for sym in symbol_list: # 초기화
+            #########################
+            # 있으면 일단 청산
+            #########################
+            for sym in last_symbol_list: # 초기화
                 
                 # 20일 이평선
+                time.sleep(0.2) # 데이터 갱신 보정
                 current_price = get_current_price(sym)
                 average_price_240 = get_240min_20ma(sym)
-
-                #########################
-                # 있으면 일단 청산
-                #########################
+                
                 coin = get_balance(last_symbol_list[sym]['매도티커'])  # 보유량
                 if coin > 0:
                     time.sleep(0.02)
@@ -251,6 +251,13 @@ try:
                         message_list += f"[{symbol_list[sym]['종목명']}] {round(current_price/avg_price*100-100,2)}% 청산 성공\n"
                     else:
                         message_list += f"[{symbol_list[sym]['종목명']}] 청산 실패 ({sell_result})\n"
+
+            for sym in symbol_list: # 초기화
+                
+                # 20일 이평선
+                time.sleep(0.2) # 데이터 갱신 보정
+                current_price = get_current_price(sym)
+                average_price_240 = get_240min_20ma(sym)
 
                 #########################
                 # 시가 매수 (20선 위)
