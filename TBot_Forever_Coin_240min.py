@@ -208,7 +208,7 @@ try:
             # 비중과 수익률 출력
             formatted_amount = 222
             if last_total_balance_krw != 0:
-                formatted_amount = "{:,.0f}%".format((total_balance_krw - last_total_balance_krw) / last_total_balance_krw * 100)
+                formatted_amount = "{:,.2f}%".format((total_balance_krw - last_total_balance_krw) / last_total_balance_krw * 100)
             
             last_total_balance_krw = total_balance_krw
 
