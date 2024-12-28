@@ -115,6 +115,7 @@ try:
     }
 
     #개별 코인 데이터
+    last_symbol_list = {}
     symbol_list = { 
     'KRW-BTC':{'종목명':'비트코인 #1', #1
     '매도티커':'BTC',
@@ -218,6 +219,8 @@ try:
 
             common_data ={'보유': False,'시가': 0.0,'물량': 0.0,'익절': False,}
             top_tickers = get_top_tickers()
+
+            last_symbol_list = symbol_list
             symbol_list = update_symbol_list(top_tickers, common_data)
 
             time.sleep(0.2) # 데이터 갱신 보정
@@ -235,7 +238,7 @@ try:
                 #########################
                 # 있으면 일단 청산
                 #########################
-                coin = get_balance(symbol_list[sym]['매도티커'])  # 보유량
+                coin = get_balance(last_symbol_list[sym]['매도티커'])  # 보유량
                 if coin > 0:
                     time.sleep(0.02)
                     avg_price = upbit.get_avg_buy_price(sym)
