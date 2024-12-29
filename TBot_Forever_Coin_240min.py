@@ -219,11 +219,7 @@ try:
             for data in coin_data:
                 allocation = (data['total_value'] / total_balance_krw) * 100
                 message_list += f"{data['coin']}:\n"
-                message_list += f"  보유수량: {data['amount']:.6f}\n"
-                message_list += f"  현재가: {data['current_price']:,.0f}원\n"
-                message_list += f"  매수평균가: {data['avg_buy_price']:,.0f}원\n"
                 message_list += f"  평가금액: {data['total_value']:,.0f}원\n"
-                message_list += f"  비중: {allocation:.2f}%\n"
                 message_list += f"  수익률: {data['profit_rate']:.2f}%\n"
                 message_list += "-------------------------------------------------\n"
 
