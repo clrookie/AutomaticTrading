@@ -112,7 +112,7 @@ try:
     bStart_buy = False
 
     last_hour = 77
-    last_240 = 17
+    last_240 = 13
     last_total_balance_krw = 1
 
     buy_money = 1500000.0 # 150만원
