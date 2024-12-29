@@ -154,7 +154,7 @@ try:
     '매도티커':'SOL',
     **common_data},
 
-    'KRW-DOGE':{'종목명':'도지 #5', #5 
+    'KRW-DOGE':{'종목명':'도지 #6', #5 
     '매도티커':'DOGE',
     **common_data},
     }
@@ -211,9 +211,10 @@ try:
             if last_total_balance_krw != 0:
                 formatted_amount = "{:,.2f}%".format((total_balance_krw - last_total_balance_krw) / last_total_balance_krw * 100)
             
+            temp_money = total_balance_krw-last_total_balance_krw
             last_total_balance_krw = total_balance_krw
 
-            message_list += f"총 보유 자산: {total_balance_krw:,.0f}원 {formatted_amount}({(total_balance_krw-last_total_balance_krw):,.0f}원))\n"
+            message_list += f"총 보유 자산: {total_balance_krw:,.0f}원 {formatted_amount}({(temp_money):,.0f}원))\n"
             message_list += "-------------------------------------------------\n"
             for data in coin_data:
                 allocation = (data['total_value'] / total_balance_krw) * 100
