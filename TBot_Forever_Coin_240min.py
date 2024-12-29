@@ -137,24 +137,24 @@ try:
     '매도티커':'BTC',
     **common_data},
 
-    'KRW-XRP':{'종목명':'리플 #2', #2
+    'KRW-ETH':{'종목명':'이더리움 #2', #3
+    '매도티커':'ETH',
+    **common_data},
+
+    'KRW-USDT':{'종목명':'테더 #3', #6 
+    '매도티커':'USDT',
+    **common_data},
+
+    'KRW-XRP':{'종목명':'리플 #4', #2
     '매도티커':'XRP',
     **common_data},
 
-    'KRW-GMT':{'종목명':'스테픈 #3', #3
-    '매도티커':'GMT',
-    **common_data},
-
-    'KRW-UXLINK':{'종목명':'유엑스링크 #4', #4
-    '매도티커':'UXLINK',
+    'KRW-SOL':{'종목명':'솔라나 #5', #4
+    '매도티커':'SOL',
     **common_data},
 
     'KRW-DOGE':{'종목명':'도지 #5', #5 
     '매도티커':'DOGE',
-    **common_data},
-
-    'KRW-USDT':{'종목명':'테더 #6', #6 
-    '매도티커':'USDT',
     **common_data},
     }
 
@@ -238,11 +238,13 @@ try:
 
             last_240 = df.index[0].hour
 
-            common_data ={'보유': False,'시가': 0.0,'물량': 0.0,'익절222': False,'익절555': False,}
-            top_tickers = get_top_tickers()
 
             last_symbol_list = symbol_list
-            symbol_list = update_symbol_list(top_tickers, common_data)
+            
+            # 잠시 보류
+            # common_data ={'보유': False,'시가': 0.0,'물량': 0.0,'익절222': False,'익절555': False,}
+            # top_tickers = get_top_tickers()
+            # symbol_list = update_symbol_list(top_tickers, common_data)
 
             time.sleep(0.2) # 데이터 갱신 보정
 
@@ -288,9 +290,9 @@ try:
                 symbol_list[sym]['익절555'] = False
                 
                 current_price = get_current_price(sym)
-                average_price_240_20ma = get_240min_20ma(sym)
+                average_price_240_ma = get_240min_10ma(sym)
                 formatted_amount = "{:,.0f}원".format(current_price)
-                formatted_amount1 = "{:,.0f}원".format(average_price_240_20ma)
+                formatted_amount1 = "{:,.0f}원".format(average_price_240_ma)
 
                 # 240분봉 데이터 가져오기 (최근 20봉)
                 data = pyupbit.get_ohlcv(sym, interval="minute240", count=20)
@@ -315,7 +317,7 @@ try:
                     volume_2x = True
 
                 
-                if current_price >= average_price_240_20ma:
+                if current_price >= average_price_240_ma:
                     # # 시가 매수 훼피 (직전 + 이평선 위 + 양봉 + 거래량 2배)
                     # if stick_plus and volume_2x:
                     #     message_list += f"\n[{symbol_list[sym]['종목명']}] !!! 매수 훼피 !!! (20선↑+양봉+2배)\n"
