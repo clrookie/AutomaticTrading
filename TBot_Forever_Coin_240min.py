@@ -116,9 +116,9 @@ try:
     last_total_balance_krw = 1
 
     buy_money = 1500000.0 # 150만원
-    profit_cut222 = 1.021
-    profit_cut555 = 1.051
-    profit_cut888 = 1.081
+    profit_cut222 = 1.031
+    profit_cut555 = 1.061
+    profit_cut888 = 1.091
     lost_cut = 0.985
 
     # 공용 데이터
