@@ -213,7 +213,7 @@ try:
             
             last_total_balance_krw = total_balance_krw
 
-            message_list += f"총 보유 자산: {total_balance_krw:,.0f}원 ({formatted_amount})\n"
+            message_list += f"총 보유 자산: {total_balance_krw:,.0f}원 {formatted_amount}({(total_balance_krw-last_total_balance_krw):,.0f}원))\n"
             message_list += "-------------------------------------------------\n"
             for data in coin_data:
                 allocation = (data['total_value'] / total_balance_krw) * 100
