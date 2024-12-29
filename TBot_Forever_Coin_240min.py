@@ -241,7 +241,7 @@ try:
 
             last_symbol_list = symbol_list
             
-            # 잠시 보류
+            # 잠시 보류 (순환매 돌아올 때 다시?)
             # common_data ={'보유': False,'시가': 0.0,'물량': 0.0,'익절222': False,'익절555': False,}
             # top_tickers = get_top_tickers()
             # symbol_list = update_symbol_list(top_tickers, common_data)
