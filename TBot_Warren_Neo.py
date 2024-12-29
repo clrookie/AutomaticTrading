@@ -583,7 +583,7 @@ try:
                         
                         symbol_list[sym]['익절'] = True
 
-                    elif result <= lost_cut or (symbol_list[sym]['익절'] == True and current_price < symbol_list[sym]['시가']) : #손절
+                    elif result <= lost_cut or (symbol_list[sym]['익절'] == True and current_price < avg_price) : #손절
                         
                         if sell(sym, int(symbol_list[sym]['물량'])):
                             send_message(f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 손절ㅠ")

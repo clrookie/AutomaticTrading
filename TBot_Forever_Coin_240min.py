@@ -284,7 +284,9 @@ try:
 
                 have = current_price * coin
                 if have > 5000:
-                    symbol_list[sym]['보유'] = True     
+                    symbol_list[sym]['보유'] = True
+                    symbol_list[sym]['물량'] = coin
+                    
                     formatted_amount = "{:,.0f}원".format(have)             
                     avg_price = upbit.get_avg_buy_price(sym)
                     message_list += f"[{symbol_list[sym]['종목명']}] 보유중.. {formatted_amount}({round(current_price/avg_price*100-100,2)}%)\n"
