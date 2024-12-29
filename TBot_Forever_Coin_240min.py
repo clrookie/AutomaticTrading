@@ -124,13 +124,11 @@ try:
     # 공용 데이터
     common_data ={
     '보유': False,
-    '시가': 0.0,
     '1차익절가': 0.0,
     '물량': 0.0,
     '익절222': False,
     '익절555': False,
     '익절888': False,
-    '청산': False,
     }
 
     #개별 코인 데이터
@@ -282,7 +280,6 @@ try:
                 # 20일 이평선
                 time.sleep(0.2) # 데이터 갱신 보정
                 current_price = get_current_price(sym)
-                symbol_list[sym]['시가'] = current_price
                 coin = get_balance(symbol_list[sym]['매도티커'])  # 보유량
 
                 have = current_price * coin
@@ -308,13 +305,11 @@ try:
                 
                 # 초기화
                 symbol_list[sym]['보유'] = False
-                symbol_list[sym]['시가'] = 0.0
                 symbol_list[sym]['1차익절가'] = 0.0
                 symbol_list[sym]['물량'] = 0.0
                 symbol_list[sym]['익절222'] = False
                 symbol_list[sym]['익절555'] = False
                 symbol_list[sym]['익절888'] = False
-                symbol_list[sym]['청산'] = False
                 
                 current_price = get_current_price(sym)
                 average_price_240_ma = get_240min_10ma(sym)
@@ -363,7 +358,6 @@ try:
                     buy_result = upbit.buy_market_order(sym, buy) # 현금
                     if buy_result is not None:
                         symbol_list[sym]['보유'] = True
-                        symbol_list[sym]['시가'] = current_price
                         symbol_list[sym]['물량'] = get_balance(symbol_list[sym]['매도티커'])
                         message_list +="+++ 시가 매수 +++\n\n"          
                     else:
@@ -386,7 +380,6 @@ try:
                         buy_result = upbit.buy_market_order(sym, buy) # 현금
                         if buy_result is not None:
                             symbol_list[sym]['보유'] = True
-                            symbol_list[sym]['시가'] = current_price
                             symbol_list[sym]['물량'] = get_balance(symbol_list[sym]['매도티커'])
                             message_list +="+++ 시가 매수 +++\n\n"          
                         else:
@@ -405,28 +398,28 @@ try:
 
                 if symbol_list[sym]['보유'] == False:
                     
-                    # 청산 이후 시가 위를 넘어설 때
-                    if symbol_list[sym]['청산'] == True and (symbol_list[sym]['시가'] < get_current_price(sym)):
+                    # # 청산 이후 시가 위를 넘어설 때
+                    # if symbol_list[sym]['청산'] == True and (symbol_list[sym]['시가'] < get_current_price(sym)):
 
-                        time.sleep(0.02)
-                        current_price = get_current_price(sym)
+                    #     time.sleep(0.02)
+                    #     current_price = get_current_price(sym)
 
-                        # 예산만큼 매수
-                        total_cash = get_balance("KRW")
-                        buy = buy_money
-                        if buy_money > total_cash:
-                            formatted_amount2 = "{:,.0f}원".format(total_cash)
-                            message_list += f"[{symbol_list[sym]['종목명']}] 잔액 부족 매수 (잔액: {formatted_amount2})\n"
-                            buy = total_cash
-                        message_list += f"[\n{symbol_list[sym]['종목명']}] ### 청산후 시가 재매수 ###\n"
-                        buy_result = upbit.buy_market_order(sym, buy) # 현금
-                        if buy_result is not None:
-                            symbol_list[sym]['보유'] = True
-                            symbol_list[sym]['청산'] == False
-                            symbol_list[sym]['물량'] = get_balance(symbol_list[sym]['매도티커'])
-                            message_list +="+++ 매수 성공 +++\n\n"          
-                        else:
-                            message_list += f"+++ 매수 실패 +++ ({buy_result})\n\n"
+                    #     # 예산만큼 매수
+                    #     total_cash = get_balance("KRW")
+                    #     buy = buy_money
+                    #     if buy_money > total_cash:
+                    #         formatted_amount2 = "{:,.0f}원".format(total_cash)
+                    #         message_list += f"[{symbol_list[sym]['종목명']}] 잔액 부족 매수 (잔액: {formatted_amount2})\n"
+                    #         buy = total_cash
+                    #     message_list += f"[\n{symbol_list[sym]['종목명']}] ### 청산후 시가 재매수 ###\n"
+                    #     buy_result = upbit.buy_market_order(sym, buy) # 현금
+                    #     if buy_result is not None:
+                    #         symbol_list[sym]['보유'] = True
+                    #         symbol_list[sym]['청산'] == False
+                    #         symbol_list[sym]['물량'] = get_balance(symbol_list[sym]['매도티커'])
+                    #         message_list +="+++ 매수 성공 +++\n\n"          
+                    #     else:
+                    #         message_list += f"+++ 매수 실패 +++ ({buy_result})\n\n"
 
                     continue
                 
@@ -485,6 +478,7 @@ try:
                         send_message(f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 청산 익절^^")
                         
                         symbol_list[sym]['보유'] = False
+                        symbol_list[sym]['물량'] = 0.0
                         symbol_list[sym]['익절888'] = True
 
                     else:
@@ -493,7 +487,7 @@ try:
 
                 # 청산 손절 처리 ##############
                 elif (result <= lost_cut
-                    or (symbol_list[sym]['익절222'] == True and current_price < symbol_list[sym]['시가'])
+                    or (symbol_list[sym]['익절222'] == True and current_price < avg_price)
                     or (symbol_list[sym]['익절555'] == True and current_price < symbol_list[sym]['1차익절가'])):
                     
                     sell_result = upbit.sell_market_order(sym, symbol_list[sym]['물량'])
@@ -504,10 +498,9 @@ try:
                         
                         symbol_list[sym]['보유'] = False
                         symbol_list[sym]['물량'] = 0.0
-                        symbol_list[sym]['청산'] = True
 
                     else:
-                        send_message(f"익절 실패 ({sell_result})")
+                        send_message(f"손절 실패 ({sell_result})")
 
                 
         # for문 끝 라인..
