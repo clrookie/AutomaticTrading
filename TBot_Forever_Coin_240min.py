@@ -112,26 +112,29 @@ try:
     bStart_buy = False
 
     last_hour = 77
-    last_240 = 21
+    last_240 = 17
     last_total_balance_krw = 1
 
     buy_money = 1500000.0 # 150만원
-    # buy_money = 50000.0 # 5만원
     profit_cut222 = 1.021
     profit_cut555 = 1.051
+    profit_cut888 = 1.081
     lost_cut = 0.985
 
     # 공용 데이터
     common_data ={
     '보유': False,
     '시가': 0.0,
+    '1차익절가': 0.0,
     '물량': 0.0,
     '익절222': False,
     '익절555': False,
+    '익절888': False,
+    '청산': False,
     }
 
     #개별 코인 데이터
-    last_symbol_list = {} # 백업용
+    # last_symbol_list = {} # 백업용
     symbol_list = { 
     'KRW-BTC':{'종목명':'비트코인 #1', #1
     '매도티커':'BTC',
@@ -238,46 +241,66 @@ try:
 
             last_240 = df.index[0].hour
 
+            time.sleep(0.2) # 데이터 갱신 보정
+            message_list = "\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n"
+            message_list += f">>> 240분 갱신합니다 <<< ({last_240}시)\n\n"
 
-            last_symbol_list = symbol_list
-            
-            # 잠시 보류 (순환매 돌아올 때 다시?)
+            # 거래대금 TOP6 잠시 보류 (순환매 돌아올 때 다시?)
+            # last_symbol_list = symbol_list
             # common_data ={'보유': False,'시가': 0.0,'물량': 0.0,'익절222': False,'익절555': False,}
             # top_tickers = get_top_tickers()
             # symbol_list = update_symbol_list(top_tickers, common_data)
 
-            time.sleep(0.2) # 데이터 갱신 보정
-
-            message_list = "\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n"
-            message_list += f">>> 240분 갱신합니다 <<< ({last_240}시)\n\n"
-            
             #########################
             # 있으면 일단 청산
             #########################
-            for sym in last_symbol_list: # 초기화
+            # for sym in symbol_list: # 초기화
+                
+            #     # 20일 이평선
+            #     time.sleep(0.2) # 데이터 갱신 보정
+            #     current_price = get_current_price(sym)
+                
+            #     coin = get_balance(symbol_list[sym]['매도티커'])  # 보유량
+            #     if coin > 0:
+            #         time.sleep(0.02)
+            #         avg_price = upbit.get_avg_buy_price(sym)
+            #         if avg_price <= 0 : continue
+
+            #         sell_result = upbit.sell_market_order(sym, coin)
+            #         if sell_result is not None:
+            #             message_list += f"[{symbol_list[sym]['종목명']}] {round(current_price/avg_price*100-100,2)}% 청산 매도\n"
+            #         else:
+            #             message_list += f"[{symbol_list[sym]['종목명']}] 청산 실패 ({sell_result})\n"
+
+            # message_list += f"------(청산 완료)------\n\n" 
+
+            #########################
+            # 롤오버 체크 (이익 길게~)
+            #########################
+            for sym in symbol_list: # 초기화
                 
                 # 20일 이평선
                 time.sleep(0.2) # 데이터 갱신 보정
                 current_price = get_current_price(sym)
-                
-                coin = get_balance(last_symbol_list[sym]['매도티커'])  # 보유량
-                if coin > 0:
-                    time.sleep(0.02)
+                coin = get_balance(symbol_list[sym]['매도티커'])  # 보유량
+
+                have = current_price * coin
+                if have > 5000:
+                    symbol_list[sym]['보유'] = True     
+                    formatted_amount = "{:,.0f}원".format(have)             
                     avg_price = upbit.get_avg_buy_price(sym)
-                    if avg_price <= 0 : continue
+                    message_list += f"[{symbol_list[sym]['종목명']}] 보유중.. {formatted_amount}({round(current_price/avg_price*100-100,2)}%)\n"
 
-                    sell_result = upbit.sell_market_order(sym, coin)
-                    if sell_result is not None:
-                        message_list += f"[{symbol_list[sym]['종목명']}] {round(current_price/avg_price*100-100,2)}% 청산 매도\n"
-                    else:
-                        message_list += f"[{symbol_list[sym]['종목명']}] 청산 실패 ({sell_result})\n"
-
-            message_list += f"------(청산 완료)------\n\n" 
+            message_list += f"------(보유 체크 완료)------\n\n" 
 
             #########################
             # 시가 매수 (10선 위)
             #########################
             for sym in symbol_list: # 초기화
+                
+                if symbol_list[sym]['보유'] == True: # 보유중이면 시가 매수 안함
+                    message_list += f"[{symbol_list[sym]['종목명']}] 보유중 매수 스킵..\n"
+                    continue
                 
                 # 20일 이평선
                 time.sleep(0.2) # 데이터 갱신 보정
@@ -285,9 +308,12 @@ try:
                 # 초기화
                 symbol_list[sym]['보유'] = False
                 symbol_list[sym]['시가'] = 0.0
+                symbol_list[sym]['1차익절가'] = 0.0
                 symbol_list[sym]['물량'] = 0.0
                 symbol_list[sym]['익절222'] = False
                 symbol_list[sym]['익절555'] = False
+                symbol_list[sym]['익절888'] = False
+                symbol_list[sym]['청산'] = False
                 
                 current_price = get_current_price(sym)
                 average_price_240_ma = get_240min_10ma(sym)
@@ -327,12 +353,13 @@ try:
 
                     # 예산만큼 매수
                     total_cash = get_balance("KRW")
+                    buy = buy_money
                     if buy_money > total_cash:
                         formatted_amount2 = "{:,.0f}원".format(total_cash)
-                        message_list += f"[{symbol_list[sym]['종목명']}] 잔액 부족 (잔액: {formatted_amount2})\n"
-                        continue
+                        message_list += f"[{symbol_list[sym]['종목명']}] 잔액 부족 매수 (잔액: {formatted_amount2})\n"
+                        buy = total_cash
                     message_list += f"[{symbol_list[sym]['종목명']}] 매수성공 O {formatted_amount} (10선:{formatted_amount1})\n"
-                    buy_result = upbit.buy_market_order(sym, buy_money) # 현금
+                    buy_result = upbit.buy_market_order(sym, buy) # 현금
                     if buy_result is not None:
                         symbol_list[sym]['보유'] = True
                         symbol_list[sym]['시가'] = current_price
@@ -348,13 +375,14 @@ try:
 
                         # 예산만큼 매수
                         total_cash = get_balance("KRW")
+                        buy = buy_money
                         if buy_money > total_cash:
                             formatted_amount2 = "{:,.0f}원".format(total_cash)
-                            message_list += f"[{symbol_list[sym]['종목명']}] 잔액 부족 (잔액: {formatted_amount2})\n"
-                            continue
+                            message_list += f"[{symbol_list[sym]['종목명']}] 잔액 부족 매수 (잔액: {formatted_amount2})\n"
+                            buy = total_cash
                         message_list += f"[\n{symbol_list[sym]['종목명']}] @@@ 매수 신호 @@@ (10선↓+음봉+2배)\n"
                         message_list += f"[{symbol_list[sym]['종목명']}] 매수성공 O {formatted_amount} (10선:{formatted_amount1})\n"
-                        buy_result = upbit.buy_market_order(sym, buy_money) # 현금
+                        buy_result = upbit.buy_market_order(sym, buy) # 현금
                         if buy_result is not None:
                             symbol_list[sym]['보유'] = True
                             symbol_list[sym]['시가'] = current_price
@@ -367,7 +395,7 @@ try:
                         message_list += f"[{symbol_list[sym]['종목명']}] 매수실패 X {formatted_amount} (10선:{formatted_amount1})\n"
 
                 
-            message_list += f"\n===========(시가 매매 완료)=============\n\n\n"         
+            message_list += f"\n===========(시가 매매 완료)=============\n\n\n"    
             send_message(message_list)
 
         else: # 가지고 있다면
@@ -375,6 +403,30 @@ try:
             for sym in symbol_list: # 초기화
 
                 if symbol_list[sym]['보유'] == False:
+                    
+                    # 청산 이후 시가 위를 넘어설 때
+                    if symbol_list[sym]['청산'] == True and (symbol_list[sym]['시가'] < get_current_price(sym)):
+
+                        time.sleep(0.02)
+                        current_price = get_current_price(sym)
+
+                        # 예산만큼 매수
+                        total_cash = get_balance("KRW")
+                        buy = buy_money
+                        if buy_money > total_cash:
+                            formatted_amount2 = "{:,.0f}원".format(total_cash)
+                            message_list += f"[{symbol_list[sym]['종목명']}] 잔액 부족 매수 (잔액: {formatted_amount2})\n"
+                            buy = total_cash
+                        message_list += f"[\n{symbol_list[sym]['종목명']}] ### 청산후 시가 재매수 ###\n"
+                        buy_result = upbit.buy_market_order(sym, buy) # 현금
+                        if buy_result is not None:
+                            symbol_list[sym]['보유'] = True
+                            symbol_list[sym]['청산'] == False
+                            symbol_list[sym]['물량'] = get_balance(symbol_list[sym]['매도티커'])
+                            message_list +="+++ 매수 성공 +++\n\n"          
+                        else:
+                            message_list += f"+++ 매수 실패 +++ ({buy_result})\n\n"
+
                     continue
                 
                 time.sleep(0.2) # 데이터 갱신 보정
@@ -397,11 +449,13 @@ try:
                         
                         formatted_amount1 = "{:,.2f}%".format((current_price/avg_price)*100-100)
                         send_message(f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 1차 익절^^")
+            
+                        symbol_list[sym]['익절222'] = True
+                        symbol_list[sym]['1차익절가'] = current_price
 
                     else:
-                        send_message(f"익절 실패 ({sell_result})")
+                        send_message(f"1차 익절 실패 ({sell_result})")
 
-                    symbol_list[sym]['익절222'] = True
 
                 # 5% 익절
                 elif result >= profit_cut555 and symbol_list[sym]['익절555'] == False:
@@ -413,29 +467,49 @@ try:
                         
                         formatted_amount1 = "{:,.2f}%".format((current_price/avg_price)*100-100)
                         send_message(f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 2차 익절^^")
+                        
+                        symbol_list[sym]['익절555'] = True
 
                     else:
-                        send_message(f"익절 실패 ({sell_result})")
+                        send_message(f"2차 익절 실패 ({sell_result})")
 
-                    symbol_list[sym]['익절555'] = True
 
-                elif result <= lost_cut or (symbol_list[sym]['익절222'] == True and current_price < symbol_list[sym]['시가']) : #손절
+                # 8% 청산 익절
+                elif result >= profit_cut888 and symbol_list[sym]['익절888'] == False:
+
+                    sell_result = upbit.sell_market_order(sym, symbol_list[sym]['물량'])
+                    if sell_result is not None:
+                        
+                        formatted_amount1 = "{:,.2f}%".format((current_price/avg_price)*100-100)
+                        send_message(f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 청산 익절^^")
+                        
+                        symbol_list[sym]['보유'] = False
+                        symbol_list[sym]['익절888'] = True
+
+                    else:
+                        send_message(f"청산 익절 실패 ({sell_result})")
+
+
+                # 청산 손절 처리 ##############
+                elif (result <= lost_cut
+                    or (symbol_list[sym]['익절222'] == True and current_price < symbol_list[sym]['시가'])
+                    or (symbol_list[sym]['익절555'] == True and current_price < symbol_list[sym]['1차익절가'])):
                     
                     sell_result = upbit.sell_market_order(sym, symbol_list[sym]['물량'])
                     if sell_result is not None:
                         
                         formatted_amount1 = "{:,.2f}%".format((current_price/avg_price)*100-100)
-                        send_message(f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 손절ㅠ")
+                        send_message(f"[{symbol_list[sym]['종목명']}]: {formatted_amount1} 청산 손절ㅠ")
+                        
+                        symbol_list[sym]['보유'] = False
+                        symbol_list[sym]['물량'] = 0.0
+                        symbol_list[sym]['청산'] = True
 
                     else:
                         send_message(f"익절 실패 ({sell_result})")
 
-                    symbol_list[sym]['보유'] = False
-                    symbol_list[sym]['물량'] = 0.0
-            
                 
         # for문 끝 라인..
-
         time.sleep(10) # 없거나 짧으면 -> [오류 발생]'NoneType' object has no attribute 'index'
 
 except Exception as e:
