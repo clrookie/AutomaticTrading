@@ -390,7 +390,7 @@ try:
                 # 2% 익절
                 if result >= profit_cut222 and symbol_list[sym]['익절222'] == False:
 
-                    symbol_list[sym]['물량'] = symbol_list[sym]['물량'] / 2 # 절반만 익절
+                    symbol_list[sym]['물량'] = symbol_list[sym]['물량'] / 3 # 33% 익절
 
                     sell_result = upbit.sell_market_order(sym, symbol_list[sym]['물량'])
                     if sell_result is not None:
@@ -406,7 +406,7 @@ try:
                 # 5% 익절
                 elif result >= profit_cut555 and symbol_list[sym]['익절555'] == False:
 
-                    symbol_list[sym]['물량'] = symbol_list[sym]['물량'] / 2 # 절반만 익절
+                    symbol_list[sym]['물량'] = symbol_list[sym]['물량'] / 2 # 33% 익절
 
                     sell_result = upbit.sell_market_order(sym, symbol_list[sym]['물량'])
                     if sell_result is not None:
