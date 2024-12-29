@@ -112,7 +112,7 @@ try:
     bStart_buy = False
 
     last_hour = 77
-    last_240 = 13
+    last_240 = 9
     last_total_balance_krw = 1
 
     buy_money = 1500000.0 # 150만원
@@ -282,6 +282,7 @@ try:
                 # 20일 이평선
                 time.sleep(0.2) # 데이터 갱신 보정
                 current_price = get_current_price(sym)
+                symbol_list[sym]['시가'] = current_price
                 coin = get_balance(symbol_list[sym]['매도티커'])  # 보유량
 
                 have = current_price * coin
