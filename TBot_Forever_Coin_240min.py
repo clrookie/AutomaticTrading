@@ -438,9 +438,10 @@ try:
                 # 2% 익절
                 if result >= profit_cut222 and symbol_list[sym]['익절222'] == False:
 
-                    symbol_list[sym]['물량'] = symbol_list[sym]['물량'] / 3 # 33% 익절
+                    sell = symbol_list[sym]['물량'] / 3 # 33% 
+                    symbol_list[sym]['물량'] = symbol_list[sym]['물량'] - sell
 
-                    sell_result = upbit.sell_market_order(sym, symbol_list[sym]['물량'])
+                    sell_result = upbit.sell_market_order(sym, sell)
                     if sell_result is not None:
                         
                         formatted_amount1 = "{:,.2f}%".format((current_price/avg_price)*100-100)
