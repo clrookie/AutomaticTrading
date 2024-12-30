@@ -374,7 +374,7 @@ try:
                             formatted_amount2 = "{:,.0f}원".format(total_cash)
                             message_list += f"[{symbol_list[sym]['종목명']}] 잔액 부족 매수 (잔액: {formatted_amount2})\n"
                             buy = total_cash
-                        message_list += f"[\n{symbol_list[sym]['종목명']}] @@@ 매수 신호 @@@ (10선↓+음봉+2배)\n"
+                        message_list += f"\n[{symbol_list[sym]['종목명']}] @@@ 매수 신호 @@@ (10선↓+음봉+2배)\n"
                         message_list += f"[{symbol_list[sym]['종목명']}] 매수성공 O {formatted_amount} (10선:{formatted_amount1})\n"
                         buy_result = upbit.buy_market_order(sym, buy) # 현금
                         if buy_result is not None:
@@ -383,7 +383,6 @@ try:
                             message_list +="+++ 시가 매수 +++\n\n"          
                         else:
                             message_list += f"+++ 실패 +++ ({buy_result})\n\n"
-
                     else:
                         message_list += f"[{symbol_list[sym]['종목명']}] 매수실패 X {formatted_amount} (10선:{formatted_amount1})\n"
 
