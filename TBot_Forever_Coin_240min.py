@@ -142,20 +142,24 @@ try:
     '매도티커':'ETH',
     **common_data},
 
-    'KRW-USDT':{'종목명':'테더 #3', #6 
-    '매도티커':'USDT',
-    **common_data},
+    # 'KRW-USDT':{'종목명':'테더 #3', #6 
+    # '매도티커':'USDT',
+    # **common_data},
 
-    'KRW-XRP':{'종목명':'리플 #4', #2
+    'KRW-XRP':{'종목명':'리플 #3', #2
     '매도티커':'XRP',
     **common_data},
 
-    'KRW-SOL':{'종목명':'솔라나 #5', #4
+    'KRW-SOL':{'종목명':'솔라나 #4', #4
     '매도티커':'SOL',
     **common_data},
 
-    'KRW-DOGE':{'종목명':'도지 #6', #5 
+    'KRW-DOGE':{'종목명':'도지 #5', #5 
     '매도티커':'DOGE',
+    **common_data},
+
+    'KRW-SHIB':{'종목명':'시바이누 #6', #5 
+    '매도티커':'SHIB',
     **common_data},
     }
 
