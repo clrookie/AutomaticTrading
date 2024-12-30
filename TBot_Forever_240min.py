@@ -115,7 +115,7 @@ try:
     last_240 = 9
     last_total_balance_krw = 1
 
-    buy_money = 1500000.0 # 150만원
+    buy_money = 2500000.0 # 150만원
     profit_cut222 = 1.031
     profit_cut555 = 1.061
     profit_cut888 = 1.091
@@ -138,9 +138,9 @@ try:
     '매도티커':'BTC',
     **common_data},
 
-    'KRW-ETH':{'종목명':'이더리움 #2', #3
-    '매도티커':'ETH',
-    **common_data},
+    # 'KRW-ETH':{'종목명':'이더리움 #2', #3
+    # '매도티커':'ETH',
+    # **common_data},
 
     # 'KRW-USDT':{'종목명':'테더 #3', #6 
     # '매도티커':'USDT',
@@ -154,13 +154,13 @@ try:
     '매도티커':'SOL',
     **common_data},
 
-    'KRW-DOGE':{'종목명':'도지 #5', #5 
-    '매도티커':'DOGE',
-    **common_data},
+    # 'KRW-DOGE':{'종목명':'도지 #5', #5 
+    # '매도티커':'DOGE',
+    # **common_data},
 
-    'KRW-SHIB':{'종목명':'시바이누 #6', #5 
-    '매도티커':'SHIB',
-    **common_data},
+    # 'KRW-SHIB':{'종목명':'시바이누 #6', #5 
+    # '매도티커':'SHIB',
+    # **common_data},
     }
 
     while True:
