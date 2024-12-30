@@ -599,10 +599,12 @@ try:
             elif t_0301 < t_now < t_end and bEnd_sell == False:
                 bEnd_sell = True
 
+                message_list = "**** 데이 트레이딩 마감 ****\n"
+
                 stock_dict = get_stock_balance()
                 
-                message_list = "**** 데이 트레이딩 마감 ****\n"
-                
+                message_list += "---------------------------------------\n"
+
                 a,b = get_real_total()
                 
                 message_list += "\n[최종 일간 손익]\n"
