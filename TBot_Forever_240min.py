@@ -115,7 +115,7 @@ try:
     last_240 = 17
     last_total_balance_krw = 1
 
-    buy_money = 2500000.0 # 150만원
+    buy_money = 2500000.0 # 250만원
     profit_cut222 = 1.051
     profit_cut555 = 1.101
     profit_cut888 = 1.151
@@ -138,28 +138,28 @@ try:
     '매도티커':'BTC',
     **common_data},
 
-    # 'KRW-ETH':{'종목명':'이더리움 #2', #3
-    # '매도티커':'ETH',
-    # **common_data},
-
-    # 'KRW-USDT':{'종목명':'테더 #3', #6 
-    # '매도티커':'USDT',
-    # **common_data},
-
-    'KRW-XRP':{'종목명':'리플 #3', #2
+    'KRW-XRP':{'종목명':'리플 #2', #2
     '매도티커':'XRP',
+    **common_data},
+
+    'KRW-DOGE':{'종목명':'도지 #3', #5 
+    '매도티커':'DOGE',
     **common_data},
 
     # 'KRW-SOL':{'종목명':'솔라나 #4', #4
     # '매도티커':'SOL',
     # **common_data},
 
-    'KRW-DOGE':{'종목명':'도지 #5', #5 
-    '매도티커':'DOGE',
-    **common_data},
-
     # 'KRW-SHIB':{'종목명':'시바이누 #6', #5 
     # '매도티커':'SHIB',
+    # **common_data},
+
+    # 'KRW-ETH':{'종목명':'이더리움 #2', #3
+    # '매도티커':'ETH',
+    # **common_data},
+
+    # 'KRW-USDT':{'종목명':'테더 #3', #6 
+    # '매도티커':'USDT',
     # **common_data},
     }
 
