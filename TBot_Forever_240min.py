@@ -154,9 +154,9 @@ try:
     # '매도티커':'SOL',
     # **common_data},
 
-    'KRW-DOGE':{'종목명':'도지 #5', #5 
-    '매도티커':'DOGE',
-    **common_data},
+    # 'KRW-DOGE':{'종목명':'도지 #5', #5 
+    # '매도티커':'DOGE',
+    # **common_data},
 
     # 'KRW-SHIB':{'종목명':'시바이누 #6', #5 
     # '매도티커':'SHIB',
