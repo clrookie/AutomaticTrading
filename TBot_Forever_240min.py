@@ -116,9 +116,9 @@ try:
     last_total_balance_krw = 1
 
     buy_money = 2500000.0 # 150만원
-    profit_cut222 = 1.031
-    profit_cut555 = 1.061
-    profit_cut888 = 1.091
+    profit_cut222 = 1.051
+    profit_cut555 = 1.0101
+    profit_cut888 = 1.0151
     lost_cut = 0.970
 
     # 공용 데이터
@@ -150,13 +150,13 @@ try:
     '매도티커':'XRP',
     **common_data},
 
-    'KRW-SOL':{'종목명':'솔라나 #4', #4
-    '매도티커':'SOL',
-    **common_data},
-
-    # 'KRW-DOGE':{'종목명':'도지 #5', #5 
-    # '매도티커':'DOGE',
+    # 'KRW-SOL':{'종목명':'솔라나 #4', #4
+    # '매도티커':'SOL',
     # **common_data},
+
+    'KRW-DOGE':{'종목명':'도지 #5', #5 
+    '매도티커':'DOGE',
+    **common_data},
 
     # 'KRW-SHIB':{'종목명':'시바이누 #6', #5 
     # '매도티커':'SHIB',
@@ -472,7 +472,7 @@ try:
 
 
                 # 8% 청산 익절
-                elif result >= profit_cut888 and symbol_list[sym]['익절888'] == False:
+                elif result >= profit_cut888:
 
                     sell_result = upbit.sell_market_order(sym, symbol_list[sym]['물량'])
                     if sell_result is not None:
@@ -482,7 +482,10 @@ try:
                         
                         symbol_list[sym]['보유'] = False
                         symbol_list[sym]['물량'] = 0.0
-                        symbol_list[sym]['익절888'] = True
+                        
+                        symbol_list[sym]['익절222'] = False
+                        symbol_list[sym]['익절555'] = False
+                        symbol_list[sym]['1차익절가'] = 0.0
 
                     else:
                         send_message(f"청산 익절 실패 ({sell_result})")
@@ -501,6 +504,10 @@ try:
                         
                         symbol_list[sym]['보유'] = False
                         symbol_list[sym]['물량'] = 0.0
+
+                        symbol_list[sym]['익절222'] = False
+                        symbol_list[sym]['익절555'] = False
+                        symbol_list[sym]['1차익절가'] = 0.0
 
                     else:
                         send_message(f"손절 실패 ({sell_result})")

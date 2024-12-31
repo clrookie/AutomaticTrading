@@ -538,7 +538,7 @@ try:
 
 
                     # 8% 청산 익절
-                    elif result >= profit_cut888 and symbol_list[sym]['익절888'] == False:
+                    elif result >= profit_cut888:
 
                         if sell(sym, int(symbol_list[sym]['물량'])):
                             
@@ -547,7 +547,10 @@ try:
                             
                             symbol_list[sym]['보유'] = False
                             symbol_list[sym]['물량'] = 0.0
-                            symbol_list[sym]['익절888'] = True
+                            
+                            symbol_list[sym]['익절222'] = False
+                            symbol_list[sym]['익절555'] = False
+                            symbol_list[sym]['1차익절가'] = 0.0
 
 
                     # 청산 손절 처리 ##############
@@ -562,6 +565,10 @@ try:
                             
                             symbol_list[sym]['보유'] = False
                             symbol_list[sym]['물량'] = 0.0
+                            
+                            symbol_list[sym]['익절222'] = False
+                            symbol_list[sym]['익절555'] = False
+                            symbol_list[sym]['1차익절가'] = 0.0
 
 
                 time.sleep(1) # 유량 에러 대응
