@@ -117,8 +117,8 @@ try:
 
     buy_money = 2500000.0 # 150만원
     profit_cut222 = 1.051
-    profit_cut555 = 1.0101
-    profit_cut888 = 1.0151
+    profit_cut555 = 1.101
+    profit_cut888 = 1.151
     lost_cut = 0.970
 
     # 공용 데이터
@@ -154,9 +154,9 @@ try:
     # '매도티커':'SOL',
     # **common_data},
 
-    # 'KRW-DOGE':{'종목명':'도지 #5', #5 
-    # '매도티커':'DOGE',
-    # **common_data},
+    'KRW-DOGE':{'종목명':'도지 #5', #5 
+    '매도티커':'DOGE',
+    **common_data},
 
     # 'KRW-SHIB':{'종목명':'시바이누 #6', #5 
     # '매도티커':'SHIB',
@@ -399,30 +399,6 @@ try:
             for sym in symbol_list: # 초기화
 
                 if symbol_list[sym]['보유'] == False:
-                    
-                    # # 청산 이후 시가 위를 넘어설 때
-                    # if symbol_list[sym]['청산'] == True and (symbol_list[sym]['시가'] < get_current_price(sym)):
-
-                    #     time.sleep(0.02)
-                    #     current_price = get_current_price(sym)
-
-                    #     # 예산만큼 매수
-                    #     total_cash = get_balance("KRW")
-                    #     buy = buy_money
-                    #     if buy_money > total_cash:
-                    #         formatted_amount2 = "{:,.0f}원".format(total_cash)
-                    #         message_list += f"[{symbol_list[sym]['종목명']}] 잔액 부족 매수 (잔액: {formatted_amount2})\n"
-                    #         buy = total_cash
-                    #     message_list += f"[\n{symbol_list[sym]['종목명']}] ### 청산후 시가 재매수 ###\n"
-                    #     buy_result = upbit.buy_market_order(sym, buy) # 현금
-                    #     if buy_result is not None:
-                    #         symbol_list[sym]['보유'] = True
-                    #         symbol_list[sym]['청산'] == False
-                    #         symbol_list[sym]['물량'] = get_balance(symbol_list[sym]['매도티커'])
-                    #         message_list +="+++ 매수 성공 +++\n\n"          
-                    #     else:
-                    #         message_list += f"+++ 매수 실패 +++ ({buy_result})\n\n"
-
                     continue
                 
                 time.sleep(0.2) # 데이터 갱신 보정
