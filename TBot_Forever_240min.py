@@ -465,7 +465,7 @@ try:
                                     symbol_list[sym]['물량'] = get_balance(symbol_list[sym]['매도티커'])
                                     message_list +="!!! 매도 성공 !!!\n\n"  
                                 else:
-                                    message_list += f"!!! 매도 실패 !!! ({buy_result})\n\n"
+                                    message_list += f"!!! 매도 실패 !!! ({sell_result})\n\n"
 
                         #매수신호
                         elif(current_price < average_price_40) and (close_price < open_price): 
@@ -478,7 +478,7 @@ try:
                                 message_list += f"+++ 매수 실패 +++ ({buy_result})\n\n"
 
                         else: #나가리
-                            message_list += f"+++ 조건 실패로 트레이딩 실패 +++ ({buy_result})\n\n"
+                            message_list += f"+++ 조건 실패로 트레이딩 실패 +++\n\n"
 
                     send_message(message_list)
 
