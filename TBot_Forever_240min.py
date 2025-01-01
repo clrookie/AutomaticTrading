@@ -478,7 +478,9 @@ try:
                                 message_list += f"+++ 매수 실패 +++ ({buy_result})\n\n"
 
                         else: #나가리
-                            message_list += f"+++ 조건 실패로 트레이딩 실패 +++\n\n"
+                            message_list += f"+++ 음봉/양봉 조건 실패 +++\n\n"
+                    else: #나가리
+                        message_list += f"+++ 거래량 미달 +++\n\n"
 
                 send_message(message_list)
 
