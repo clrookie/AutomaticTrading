@@ -442,7 +442,7 @@ try:
                     prev_volume = data_20.iloc[-2]['volume']  # 직전 캔들
 
                     message_list += f"[{symbol_list[sym]['종목명']}]\n"
-                    message_list += f"  시가({open_price:,.0f}), 종가({close_price:,.2f})\n"
+                    message_list += f"  시가({open_price:,.2f}), 종가({close_price:,.2f})\n"
                     message_list += f"  40 이평선({average_price_40:,.2f})\n"
                     message_list += f"  20 거래량({average_volume_10min:,.2f}), 직전 거래량({prev_volume:,.2f})\n"
 
@@ -481,9 +481,7 @@ try:
                                 message_list += f"+++ 매수 실패 +++ ({buy_result})\n\n"
 
                         else: #나가리
-                            message_list += f"+++ 음봉/양봉 조건 실패 +++\n\n"
-                    else: #나가리
-                        message_list += f"+++ 거래량 미달 +++\n\n"
+                            message_list += f"+++ 거래량 만족 + 음봉/양봉 실패 +++\n\n"
 
                 send_message(message_list)
 
