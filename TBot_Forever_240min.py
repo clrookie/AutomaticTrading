@@ -415,7 +415,7 @@ try:
 
                 time.sleep(0.2) # 데이터 갱신 보정
                 message_list = "\n---------------------------------------------\n"
-                message_list += f">>> 10분 단위 트레이딩 체크 <<< ({last_10}분)\n\n"
+                message_list += f">>> 10분 트레이딩 <<< ({last_10}분)\n\n"
 
                 for sym in symbol_list:
                     # 없으면 스킵
@@ -442,8 +442,8 @@ try:
                     prev_volume = data_20.iloc[-2]['volume']  # 직전 캔들
 
                     message_list += f"[{symbol_list[sym]['종목명']}]\n"
-                    message_list += f"  시가({open_price:,.2f}), 종가({close_price:,.2f}), 40선({average_price_40:,.2f})\n"
-                    message_list += f"  직전거래량({prev_volume:,.2f}), 20거래량({average_volume_10min:,.2f})\n"
+                    message_list += f"  종가({close_price:,.0f}), 40선({average_price_40:,.0f})\n"
+                    message_list += f"  직전거래량({prev_volume:,.0f}), 20거래량({average_volume_10min:,.0f})\n"
 
                     if prev_volume >= average_volume_10min: # 거래량 증가 신호
 
