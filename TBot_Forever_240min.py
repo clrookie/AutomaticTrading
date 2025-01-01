@@ -111,8 +111,9 @@ try:
 
     bStart_buy = False
 
+    last_240 = 9
+
     last_hour = 77
-    last_240 = 17
     last_total_balance_krw = 1
 
     buy_money = 2500000.0 # 250만원
@@ -338,15 +339,15 @@ try:
                 prev_volume = data.iloc[-2]['volume']  # 직전 캔들
 
                 volume_2x = False
-                if prev_volume >= (average_volume*2):
+                if prev_volume >= (average_volume*2.2):
                     volume_2x = True
 
                 
                 if current_price >= average_price_240_ma:
-                    # # 시가 매수 훼피 (직전 + 이평선 위 + 양봉 + 거래량 2배)
-                    # if stick_plus and volume_2x:
-                    #     message_list += f"\n[{symbol_list[sym]['종목명']}] !!! 매수 훼피 !!! (10선↑+양봉+2배)\n"
-                    #     continue
+                    # 시가 매수 훼피 (직전 + 이평선 위 + 양봉 + 거래량 2배)
+                    if stick_plus and volume_2x:
+                        message_list += f"\n[{symbol_list[sym]['종목명']}] !!! 매수 훼피 !!! (10선↑+양봉+2배)\n"
+                        continue
 
                     time.sleep(0.02)
 
