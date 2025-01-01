@@ -81,18 +81,18 @@ def get_240min_10ma(sym):
     
     return average_price_10
 
-def get_240min_20ma(sym):
+def get_10min_40ma(sym):
     # 240분봉 데이터 가져오기
-    data = pyupbit.get_ohlcv(sym, interval="minute240", count=20)
+    data = pyupbit.get_ohlcv(sym, interval="minute10", count=40)
     
     # 데이터가 없으면 None 반환
     if data is None:
         return None
     
     # 20개 이동평균선 계산 (종가 기준)
-    average_price_20 = data['close'].mean()
+    average_price_40 = data['close'].mean()
     
-    return average_price_20
+    return average_price_40
 
 ###################################################
 ###################################################
@@ -113,10 +113,15 @@ try:
 
     last_240 = 9
 
+    last_10 = 77
     last_hour = 77
+
     last_total_balance_krw = 1
 
     buy_money = 2500000.0 # 250만원
+    
+    trading_money = 100000 # 10만원
+
     profit_cut222 = 1.051
     profit_cut555 = 1.101
     profit_cut888 = 1.151
@@ -143,7 +148,7 @@ try:
     '매도티커':'XRP',
     **common_data},
 
-    'KRW-DOGE':{'종목명':'도지 #3', #5 
+    'KRW-DOGE':{'종목명':'도지코인 #3', #5 
     '매도티커':'DOGE',
     **common_data},
 
@@ -182,6 +187,7 @@ try:
             coin_data = []
 
             # 각 코인의 현재 가격, 평가금액, 매수평균가 계산
+            krw_balance = 0
             for balance in balances:
                 coin = balance['currency']
                 if coin == "KRW":
@@ -220,6 +226,7 @@ try:
             last_total_balance_krw = total_balance_krw
 
             message_list += f"총 보유 자산: {total_balance_krw:,.0f}원 {formatted_amount}({(temp_money):,.0f}원)\n"
+            message_list += f"잔여 현금: {krw_balance:,.0f}원\n"
             message_list += "-------------------------------------------------\n"
             for data in coin_data:
                 allocation = (data['total_value'] / total_balance_krw) * 100
@@ -397,8 +404,90 @@ try:
 
         else: # 가지고 있다면
             
-            for sym in symbol_list: # 초기화
+            #########################
+            # 10분 주기 트레이딩
+            #########################
+            df = pyupbit.get_ohlcv("KRW-BTC", interval="minute10", count=1)
+            if df is None: continue
 
+            if df.index[0].minute != last_10:    # 10분 캔들 갱신
+                last_10 = df.index[0].minute
+
+                time.sleep(0.2) # 데이터 갱신 보정
+                message_list = "\n---------------------------------------------\n"
+                message_list += f">>> 10분 단위 트레이딩 체크 <<< ({last_10}분)\n\n"
+
+                for sym in symbol_list:
+                    # 없으면 스킵
+                    if symbol_list[sym]['보유'] == False:
+                        continue
+                    
+                    time.sleep(0.2) # 데이터 갱신 보정
+
+                    # 시가 기준선 위치
+                    # 10분봉 데이터 가져오기 (최근 20봉)
+                    data = pyupbit.get_ohlcv(sym, interval="minute10", count=40)
+                    if data is None: continue
+
+                    # 직전 캔들 시가와 종가 확인
+                    prev_candle = data.iloc[-2]  # 직전 캔들
+                    open_price = prev_candle['open']
+                    close_price = prev_candle['close']
+
+                    # 평균/직전 거래량
+                    average_volume = data['volume'].mean()
+                    prev_volume = data.iloc[-2]['volume']  # 직전 캔들
+
+                    message_list += f"[{symbol_list[sym]['종목명']}\n"
+                    message_list += f"  시가({open_price}), 종가({close_price})\n"
+                    message_list += f"  40ma({average_volume}), 직전ma({prev_volume})\n"
+
+                    if prev_volume >= average_volume: # 거래량 증가 신호
+
+                        average_price_40 = data['close'].mean() # 40선 이평선
+                        current_price = get_current_price(sym)
+
+                        total_cash = get_balance("KRW")
+                        buy = trading_money # 예산만큼 매수
+                        if trading_money > total_cash:
+                            formatted_amount2 = "{:,.0f}원".format(total_cash)
+                            message_list += f"[{symbol_list[sym]['종목명']}] 잔액 부족 매수 (잔액: {formatted_amount2})\n"
+                            buy = total_cash
+
+                        # 매도신호
+                        if (current_price > average_price_40) and (close_price > open_price): 
+                            message_list += f"[{symbol_list[sym]['종목명']}] !! 트레이팅 매도 !! ({trading_money:,.0f}원) \n"
+                            
+                            sell_quantity = buy / current_price
+                            if coin > 0: # 있다면 매도
+                                sell_result = upbit.sell_market_order(sym, sell_quantity)
+                                if sell_result is not None:
+                                    symbol_list[sym]['물량'] = get_balance(symbol_list[sym]['매도티커'])
+                                    message_list +="!!! 매도 성공 !!!\n\n"  
+                                else:
+                                    message_list += f"!!! 매도 실패 !!! ({buy_result})\n\n"
+
+                        #매수신호
+                        elif(current_price < average_price_40) and (close_price < open_price): 
+                            message_list += f"[{symbol_list[sym]['종목명']}] @@ 트레이팅 매수 @@ ({buy:,.0f}원) \n"
+                            buy_result = upbit.buy_market_order(sym, buy)
+                            if buy_result is not None:
+                                symbol_list[sym]['물량'] = get_balance(symbol_list[sym]['매도티커'])
+                                message_list +="+++ 매수 성공 +++\n\n"          
+                            else:
+                                message_list += f"+++ 매수 실패 +++ ({buy_result})\n\n"
+
+                        else: #나가리
+                            message_list += f"+++ 조건 실패로 트레이딩 실패 +++ ({buy_result})\n\n"
+
+                    send_message(message_list)
+
+            #########################
+            # 장중간 조건 매도
+            #########################
+            for sym in symbol_list:
+
+                # 없으면 스킵
                 if symbol_list[sym]['보유'] == False:
                     continue
                 
@@ -407,9 +496,7 @@ try:
                 avg_price = upbit.get_avg_buy_price(sym)
                 if avg_price <= 0 : continue
 
-                #########################
-                # 장중간 조건 매도
-                #########################
+                
                 result = current_price / avg_price
 
                 # 2% 익절
