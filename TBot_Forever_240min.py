@@ -338,14 +338,14 @@ try:
                 average_volume = data['volume'].mean()
                 prev_volume = data.iloc[-2]['volume']  # 직전 캔들
 
-                volume_2x = False
-                if prev_volume >= (average_volume*2.2):
-                    volume_2x = True
+                volume_3x = False
+                if prev_volume >= (average_volume*3):
+                    volume_3x = True
 
                 
                 if current_price >= average_price_240_ma:
                     # 시가 매수 훼피 (직전 + 이평선 위 + 양봉 + 거래량 2배)
-                    if stick_plus and volume_2x:
+                    if stick_plus and volume_3x:
                         message_list += f"\n[{symbol_list[sym]['종목명']}] !!! 매수 훼피 !!! (10선↑+양봉+2배)\n"
                         continue
 
@@ -369,7 +369,7 @@ try:
                 
                 else:
                     # 시가 매수 신호 (직전 + 이평선 아래 + 음봉 + 거래량 2배)
-                    if stick_plus == False and volume_2x:
+                    if stick_plus == False and volume_3x:
                         time.sleep(0.02)
 
                         # 예산만큼 매수
