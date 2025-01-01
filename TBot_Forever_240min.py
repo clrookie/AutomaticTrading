@@ -438,7 +438,7 @@ try:
                     average_volume = data['volume'].mean()
                     prev_volume = data.iloc[-2]['volume']  # 직전 캔들
 
-                    message_list += f"[{symbol_list[sym]['종목명']}\n"
+                    message_list += f"[{symbol_list[sym]['종목명']}]\n"
                     message_list += f"  시가({open_price}), 종가({close_price})\n"
                     message_list += f"  40ma({average_volume}), 직전ma({prev_volume})\n"
 
@@ -480,7 +480,7 @@ try:
                         else: #나가리
                             message_list += f"+++ 조건 실패로 트레이딩 실패 +++\n\n"
 
-                    send_message(message_list)
+                send_message(message_list)
 
             #########################
             # 장중간 조건 매도
