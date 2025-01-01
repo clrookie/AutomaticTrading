@@ -118,7 +118,7 @@ try:
 
     last_total_balance_krw = 1
 
-    buy_money = 2500000.0 # 250만원
+    buy_money = 1500000.0 # 250만원
     
     trading_money = 100000 # 10만원
 
