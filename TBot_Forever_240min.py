@@ -426,25 +426,28 @@ try:
 
                     # 시가 기준선 위치
                     # 10분봉 데이터 가져오기 (최근 20봉)
-                    data = pyupbit.get_ohlcv(sym, interval="minute10", count=40)
-                    if data is None: continue
+                    data_40 = pyupbit.get_ohlcv(sym, interval="minute10", count=40)
+                    if data_40 is None: continue
 
                     # 직전 캔들 시가와 종가 확인
-                    prev_candle = data.iloc[-2]  # 직전 캔들
+                    prev_candle = data_40.iloc[-2]  # 직전 캔들
                     open_price = prev_candle['open']
                     close_price = prev_candle['close']
+                    average_price_40 = data_40['close'].mean() # 40선 이평선
 
+                    data_20 = pyupbit.get_ohlcv(sym, interval="minute10", count=20)
+                    if data_20 is None: continue
                     # 평균/직전 거래량
-                    average_volume = data['volume'].mean()
-                    prev_volume = data.iloc[-2]['volume']  # 직전 캔들
+                    average_volume_10min = data_20['volume'].mean()
+                    prev_volume = data_20.iloc[-2]['volume']  # 직전 캔들
 
                     message_list += f"[{symbol_list[sym]['종목명']}]\n"
-                    message_list += f"  시가({open_price}), 종가({close_price})\n"
-                    message_list += f"  40ma({average_volume}), 직전ma({prev_volume})\n"
+                    message_list += f"  시가({open_price:,.0f}), 종가({close_price:,.0f})\n"
+                    message_list += f"  40 이평선({average_price_40:,.0f})\n"
+                    message_list += f"  20 거래량({average_volume_10min:,.0f}), 직전 거래량({prev_volume:,.0f})\n"
 
-                    if prev_volume >= average_volume: # 거래량 증가 신호
+                    if prev_volume >= average_volume_10min: # 거래량 증가 신호
 
-                        average_price_40 = data['close'].mean() # 40선 이평선
                         current_price = get_current_price(sym)
 
                         total_cash = get_balance("KRW")
@@ -456,7 +459,7 @@ try:
 
                         # 매도신호
                         if (current_price > average_price_40) and (close_price > open_price): 
-                            message_list += f"[{symbol_list[sym]['종목명']}] !! 트레이팅 매도 !! ({trading_money:,.0f}원) \n"
+                            message_list += f"[{symbol_list[sym]['종목명']}] !! 트레이팅 매도 !! ({buy:,.0f}원) \n"
                             
                             sell_quantity = buy / current_price
                             if coin > 0: # 있다면 매도
