@@ -442,9 +442,8 @@ try:
                     prev_volume = data_20.iloc[-2]['volume']  # 직전 캔들
 
                     message_list += f"[{symbol_list[sym]['종목명']}]\n"
-                    message_list += f"  시가({open_price:,.2f}), 종가({close_price:,.2f})\n"
-                    message_list += f"  40 이평선({average_price_40:,.2f})\n"
-                    message_list += f"  20 거래량({average_volume_10min:,.2f}), 직전 거래량({prev_volume:,.2f})\n"
+                    message_list += f"  시가({open_price:,.2f}), 종가({close_price:,.2f}), 40선({average_price_40:,.2f})\n"
+                    message_list += f"  직전거래량({prev_volume:,.2f}), 20거래량({average_volume_10min:,.2f})\n"
 
                     if prev_volume >= average_volume_10min: # 거래량 증가 신호
 
