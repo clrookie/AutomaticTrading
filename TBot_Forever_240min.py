@@ -140,12 +140,12 @@ try:
     #개별 코인 데이터
     # last_symbol_list = {} # 백업용
     symbol_list = { 
-    'KRW-BTC':{'종목명':'비트코인 #1', #1
-    '매도티커':'BTC',
+    'KRW-XRP':{'종목명':'리플 #1', #2
+    '매도티커':'XRP',
     **common_data},
 
-    'KRW-XRP':{'종목명':'리플 #2', #2
-    '매도티커':'XRP',
+    'KRW-BTC':{'종목명':'비트코인 #2', #1
+    '매도티커':'BTC',
     **common_data},
 
     'KRW-DOGE':{'종목명':'도지코인 #3', #5 
@@ -442,9 +442,9 @@ try:
                     prev_volume = data_20.iloc[-2]['volume']  # 직전 캔들
 
                     message_list += f"[{symbol_list[sym]['종목명']}]\n"
-                    message_list += f"  시가({open_price:,.0f}), 종가({close_price:,.0f})\n"
-                    message_list += f"  40 이평선({average_price_40:,.0f})\n"
-                    message_list += f"  20 거래량({average_volume_10min:,.0f}), 직전 거래량({prev_volume:,.0f})\n"
+                    message_list += f"  시가({open_price:,.0f}), 종가({close_price:,.2f})\n"
+                    message_list += f"  40 이평선({average_price_40:,.2f})\n"
+                    message_list += f"  20 거래량({average_volume_10min:,.2f}), 직전 거래량({prev_volume:,.2f})\n"
 
                     if prev_volume >= average_volume_10min: # 거래량 증가 신호
 
