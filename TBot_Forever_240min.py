@@ -442,8 +442,8 @@ try:
                     prev_volume = data_20.iloc[-2]['volume']  # 직전 캔들
 
                     message_list += f"[{symbol_list[sym]['종목명']}]\n"
-                    message_list += f"  종가({close_price:,.0f}), 40선({average_price_40:,.0f})\n"
-                    message_list += f"  직전거래량({prev_volume:,.0f}), 20거래량({average_volume_10min:,.0f})\n"
+                    message_list += f"  종가({close_price:,.0f}) / 40선({average_price_40:,.0f})\n"
+                    message_list += f"  직전거래량({prev_volume:,.0f}) / 20거래량({average_volume_10min:,.0f})\n"
 
                     if prev_volume >= average_volume_10min: # 거래량 증가 신호
 
@@ -457,7 +457,7 @@ try:
                             buy = total_cash
 
                         # 매도신호
-                        if (current_price > average_price_40) and (close_price > open_price): 
+                        if (current_price > average_price_40) and (close_price > open_price) and (open_price > average_price_40): 
                             message_list += f"[{symbol_list[sym]['종목명']}] !! 트레이팅 매도 !! ({buy:,.0f}원) \n"
                             
                             sell_quantity = buy / current_price
@@ -470,7 +470,7 @@ try:
                                     message_list += f"!!! 매도 실패 !!! ({sell_result})\n\n"
 
                         #매수신호
-                        elif(current_price < average_price_40) and (close_price < open_price): 
+                        elif(current_price < average_price_40) and (close_price < open_price) and (open_price < average_price_40): 
                             message_list += f"[{symbol_list[sym]['종목명']}] @@ 트레이팅 매수 @@ ({buy:,.0f}원) \n"
                             buy_result = upbit.buy_market_order(sym, buy)
                             if buy_result is not None:
@@ -480,7 +480,7 @@ try:
                                 message_list += f"+++ 매수 실패 +++ ({buy_result})\n\n"
 
                         else: #나가리
-                            message_list += f"+++ 거래량 만족 + 음봉/양봉 실패 +++\n\n"
+                            message_list += f"+++ 거래량 만족 + 시가/음봉/양봉 실패 +++\n\n"
 
                 send_message(message_list)
 
