@@ -457,17 +457,16 @@ try:
                 # 초기화
                 message_list = "#시가 매수\n"
 
-                if symbol_list[sym]['보유'] == True: # 보유중이면 시가 매수 안함
-                    message_list += f"[{symbol_list[sym]['종목명']}] 보유중 매수 스킵..\n"
-                    continue
-                
-
-                # 데이터 캐싱: 현재가
-                price_cache = {sym: get_current_price(sym) for sym in symbol_list}
-
-                # 1. 보유 종목 일괄 매도 (제거)
-                # 2. 신규 매수 처리
                 for sym, data in symbol_list.items():
+                    if data['보유'] == True:  # 보유중이면 시가 매수 안함
+                        message_list += f"[{data['종목명']}] 보유중 매수 스킵..\n"
+                        continue
+
+                    # 데이터 캐싱: 현재가
+                    price_cache = {sym: get_current_price(sym) for sym in symbol_list}
+
+                    # 1. 보유 종목 일괄 매도 (제거)
+                    # 2. 신규 매수 처리
                     current_price = float(price_cache[sym])
                     avg_15day = float(avg_15day_cache[sym])
 
@@ -480,7 +479,7 @@ try:
                     # 매수 조건 확인
                     if current_price >= avg_15day:
                         qty = int(buy_rate / current_price)  # 분할 매수 계산
-                        if buy(sym, qty):
+                        if buy(sym, qty):  # 매수 성공 여부 확인
                             data.update({'보유': True, '물량': float(qty)})
                             message_list += f"[{data['종목명']}] 매수성공 O {formatted_current} (15선:{formatted_avg})\n"
                             message_list += "+++ 시가 매수 +++\n\n"
@@ -493,6 +492,7 @@ try:
                 # 3. 메시지 전송 및 현재 보유 주식 조회
                 send_message(message_list)
                 stock_dict = get_stock_balance()  # 보유 주식 조회
+                
             
 
             ####################### 
@@ -611,7 +611,7 @@ try:
                     message_list += f"총수익율: {formatted_amount}\n\n"
 
             ####################### 
-            # 종가 일괄 매도
+            # 트레이딩 마감
             ####################### 
             elif t_0301 < t_now < t_end and bEnd_sell == False:
                 bEnd_sell = True
