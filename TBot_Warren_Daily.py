@@ -199,16 +199,18 @@ def get_stock_balance():
     for stock in stock_list:
         if int(stock['hldg_qty']) > 0:
             stock_dict[stock['pdno']] = stock['hldg_qty']
-            message_list += f"{stock['prdt_name']}: {stock['evlu_pfls_rt']}%\n"
+            message_list += f"  {stock['prdt_name']}: {stock['evlu_pfls_rt']}%\n"
     
+    
+    message_list += "----------------\n"
     formatted_amount = "{:,.0f}원".format(int(evaluation[0]['scts_evlu_amt']))
-    message_list += f"주식 평가 금액: {formatted_amount}\n"
+    message_list += f"- 주식 평가 금액: {formatted_amount}\n"
 
     formatted_amount = "{:,.0f}원".format(int(evaluation[0]['evlu_pfls_smtl_amt']))
-    message_list += f"평가 손익 합계: {formatted_amount}\n"
+    message_list += f"- 평가 손익 합계: {formatted_amount}\n"
 
     formatted_amount = "{:,.0f}원".format(int(evaluation[0]['tot_evlu_amt']))
-    message_list += f"총 평가 금액: {formatted_amount}\n"
+    message_list += f"- 총 평가 금액: {formatted_amount}\n"
     message_list += "==================================\n"
     message_list += "\n"
     send_message(message_list)
