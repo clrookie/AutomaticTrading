@@ -243,7 +243,7 @@ try:
                 else:
                     symbol_list[sym]['240'] = False
 
-                message_list += f"[{symbol_list[sym]['종목명']}] 240선 ↑: {symbol_list[sym]['240']}\n"
+                message_list += f"[{symbol_list[sym]['종목명']}] 240선↑ : {symbol_list[sym]['240']}\n"
                  
             send_message(message_list)
 
@@ -283,7 +283,7 @@ try:
 
                     message_list += f"[{symbol_list[sym]['종목명']}]\n"
                     message_list += f"  종가({close_price:,.0f}) / 10선({average_price_10:,.0f})\n"
-                    message_list += f"  직전({prev_volume:,.0f}) / 10거래량({average_volume_40min:,.0f})\n"
+                    message_list += f"  직전({prev_volume:,.0f}) / 40거래량({average_volume_40min:,.0f})\n"
 
                     if prev_volume >= average_volume_40min: # 거래량 증가 신호
 
@@ -298,7 +298,7 @@ try:
                             if symbol_list[sym]['240'] == False: # 240 하방이면 2배씩 매도
                                 sell *= 2
 
-                            message_list += f"[{symbol_list[sym]['종목명']}] --- 트레이팅 매도 --- ({sell:,.0f}원) \n"
+                            message_list += f"  --- 트레이딩 매도 --- ({sell:,.0f}원) \n\n"
 
                             sell_quantity = sell / current_price
                             coin = get_balance(symbol_list[sym]['매도티커'])
@@ -321,7 +321,7 @@ try:
                                 message_list += f"[{symbol_list[sym]['종목명']}] 잔액 부족 매수 (잔액: {total_cash:,.0f})\n"
                                 buy = total_cash
                             
-                            message_list += f"[{symbol_list[sym]['종목명']}] +++ 트레이팅 매수 +++ ({buy:,.0f}원) \n"
+                            message_list += f"  +++ 트레이딩 매수 +++ ({buy:,.0f}원) \n\n"
 
                             buy_result = upbit.buy_market_order(sym, buy)
                             if buy_result is not None:
