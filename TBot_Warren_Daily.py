@@ -362,7 +362,7 @@ try:
     t_0 = True
     t_30 = True
 
-    buy_rate = 1000000.0 # 150만원
+    buy_rate = 50000.0 # 100만원
     profit_cut222 = 1.031
     profit_cut555 = 1.061
     profit_cut888 = 1.091
