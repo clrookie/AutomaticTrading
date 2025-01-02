@@ -292,11 +292,11 @@ try:
                         # 매도신호
                         if (current_price > average_price_10) and (close_price > open_price) and (open_price > average_price_10): 
 
-                            message_list += f"[{symbol_list[sym]['종목명']}] --- 트레이팅 매도 --- ({buy:,.0f}원) \n"
-
                             sell = trading_sell
                             if symbol_list[sym]['240'] == False: # 240 하방이면 2배씩 매도
                                 sell *= 2
+
+                            message_list += f"[{symbol_list[sym]['종목명']}] --- 트레이팅 매도 --- ({sell:,.0f}원) \n"
 
                             sell_quantity = sell / current_price
                             if coin > 0: # 있다면 매도
@@ -310,13 +310,13 @@ try:
                         #매수신호 (240아래 매수안함!!)
                         elif symbol_list[sym]['240'] and (current_price < average_price_10) and (close_price < open_price) and (open_price < average_price_10): 
                             
-                            message_list += f"[{symbol_list[sym]['종목명']}] +++ 트레이팅 매수 +++ ({buy:,.0f}원) \n"
-
                             total_cash = float(get_balance("KRW"))
                             buy = float(trading_buy) # 예산만큼 매수
                             if buy > total_cash:
                                 message_list += f"[{symbol_list[sym]['종목명']}] 잔액 부족 매수 (잔액: {total_cash:,.0f})\n"
                                 buy = total_cash
+                            
+                            message_list += f"[{symbol_list[sym]['종목명']}] +++ 트레이팅 매수 +++ ({buy:,.0f}원) \n"
 
                             buy_result = upbit.buy_market_order(sym, buy)
                             if buy_result is not None:
