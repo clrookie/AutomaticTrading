@@ -111,7 +111,7 @@ try:
     send_message("=== 코인거래 초기화 ===")
     send_message("======================")
 
-    last_240 = 9
+    last_240 = 77
     last_hour = 77
     last_10 = 77
 
