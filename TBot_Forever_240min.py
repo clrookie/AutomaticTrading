@@ -243,7 +243,7 @@ try:
                 else:
                     symbol_list[sym]['240'] = False
 
-                message_list += f"[{symbol_list[sym]['종목명']}] 240up: {symbol_list[sym]['240']}\n"
+                message_list += f"[{symbol_list[sym]['종목명']}] 240선 ↑: {symbol_list[sym]['240']}\n"
                  
             send_message(message_list)
 
@@ -290,7 +290,9 @@ try:
                         current_price = float(get_current_price(sym))
 
                         # 매도신호
-                        if (current_price > average_price_10) and (close_price > open_price) and (open_price > average_price_10): 
+                        if ((current_price > average_price_10)
+                            and (close_price > open_price)
+                            and (open_price > average_price_10)): 
 
                             sell = trading_sell
                             if symbol_list[sym]['240'] == False: # 240 하방이면 2배씩 매도
@@ -299,16 +301,19 @@ try:
                             message_list += f"[{symbol_list[sym]['종목명']}] --- 트레이팅 매도 --- ({sell:,.0f}원) \n"
 
                             sell_quantity = sell / current_price
+                            coin = get_balance(symbol_list[sym]['매도티커'])
                             if coin > 0: # 있다면 매도
                                 sell_result = upbit.sell_market_order(sym, sell_quantity)
                                 if sell_result is not None:
-                                    symbol_list[sym]['물량'] = get_balance(symbol_list[sym]['매도티커'])
                                     message_list +="!!! 매도 성공 !!!\n\n"  
                                 else:
                                     message_list += f"!!! 매도 실패 !!! ({sell_result})\n\n"
 
                         #매수신호 (240아래 매수안함!!)
-                        elif symbol_list[sym]['240'] and (current_price < average_price_10) and (close_price < open_price) and (open_price < average_price_10): 
+                        elif (symbol_list[sym]['240'] == True
+                              and (current_price < average_price_10)
+                              and (close_price < open_price)
+                              and (open_price < average_price_10)): 
                             
                             total_cash = float(get_balance("KRW"))
                             buy = float(trading_buy) # 예산만큼 매수
@@ -320,7 +325,6 @@ try:
 
                             buy_result = upbit.buy_market_order(sym, buy)
                             if buy_result is not None:
-                                symbol_list[sym]['물량'] = get_balance(symbol_list[sym]['매도티커'])
                                 message_list +="+++ 매수 성공 +++\n\n"          
                             else:
                                 message_list += f"+++ 매수 실패 +++ ({buy_result})\n\n"
