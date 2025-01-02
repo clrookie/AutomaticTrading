@@ -431,15 +431,17 @@ try:
 
                     # 직전 캔들 시가와 종가 확인
                     prev_candle = data_40.iloc[-2]  # 직전 캔들
-                    open_price = prev_candle['open']
-                    close_price = prev_candle['close']
-                    average_price_40 = data_40['close'].mean() # 40선 이평선
+                    open_price = float(prev_candle['open'])
+                    close_price = float(prev_candle['close'])
+                    average_price_40 = float(data_40['close'].mean()) # 40선 이평선
+
+                    # 숫자형으로 변환
 
                     data_20 = pyupbit.get_ohlcv(sym, interval="minute10", count=20)
                     if data_20 is None: continue
                     # 평균/직전 거래량
-                    average_volume_10min = data_20['volume'].mean()
-                    prev_volume = data_20.iloc[-2]['volume']  # 직전 캔들
+                    average_volume_10min = float(data_20['volume'].mean())
+                    prev_volume = float(data_20.iloc[-2]['volume'])  # 직전 캔들
 
                     message_list += f"[{symbol_list[sym]['종목명']}]\n"
                     message_list += f"  종가({close_price:,.0f}) / 40선({average_price_40:,.0f})\n"
@@ -447,10 +449,10 @@ try:
 
                     if prev_volume >= average_volume_10min: # 거래량 증가 신호
 
-                        current_price = get_current_price(sym)
+                        current_price = float(get_current_price(sym))
 
-                        total_cash = get_balance("KRW")
-                        buy = trading_money # 예산만큼 매수
+                        total_cash = float(get_balance("KRW"))
+                        buy = float(trading_money) # 예산만큼 매수
                         if trading_money > total_cash:
                             formatted_amount2 = "{:,.0f}원".format(total_cash)
                             message_list += f"[{symbol_list[sym]['종목명']}] 잔액 부족 매수 (잔액: {formatted_amount2})\n"
@@ -591,9 +593,9 @@ except Exception as e:
     for sym in symbol_list: # 있으면 일괄 매도
         coin = get_balance(symbol_list[sym]['매도티커'])  # 보유량
         if coin > 0: # 있다면 매도
-            sell_result = upbit.sell_market_order(sym, coin)
+            sell_result = upbit.sell_market_order(sym, coin/2)
             if sell_result is not None:
-                send_message(f"[{symbol_list[sym]['종목명']}] 에러 전량 매도")
+                send_message(f"[{symbol_list[sym]['종목명']}] 에러 1/2 매도")
             else:
                 send_message(f"[{symbol_list[sym]['매도티커']}] 매도실패 ({sell_result})")
 

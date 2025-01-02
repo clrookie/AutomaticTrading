@@ -349,6 +349,7 @@ try:
     
     last_date = 0
     last_hour = 0
+    bStart_10hour = False
 
     price_cache = {}
     avg_price_cache = {}
@@ -422,6 +423,10 @@ try:
                 avg_15day_cache = {sym: get_avg_price_15day(sym) for sym in symbol_list}
 
                 send_message("오늘은 KOSPI 영업일^^")
+                if today_date == "20250102" or today_date == "20251114": # 새해첫날, 수능일
+                    bStart_10hour = True
+                    send_message("개장시간 10시 (새해첫날or수능일)")
+                else : bStart_10hour = False
             # 휴장일
             else:
                 holiday = True
@@ -433,8 +438,13 @@ try:
                 symbol_list[sym]['물량'] = float(qty)
 
         elif holiday == False: # 개장일
-            t_start = t_now.replace(hour=9, minute=0, second=0, microsecond=0)
-            t_0301 = t_now.replace(hour=15, minute=1, second=0,microsecond=0)
+            
+            if bStart_10hour == False:
+                t_start = t_now.replace(hour=9, minute=0, second=0, microsecond=0)
+            else:
+                t_start = t_now.replace(hour=10, minute=0, second=0, microsecond=0) # 새해첫날, 수능일
+            
+            t_0301 = t_now.replace(hour=15, minute=0, second=0,microsecond=0)
             t_end = t_now.replace(hour=15, minute=10, second=0,microsecond=0)
   
             
