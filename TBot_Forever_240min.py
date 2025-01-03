@@ -265,27 +265,28 @@ try:
                     
                     time.sleep(0.2) # 데이터 갱신 보정
 
-                    # 10분봉 데이터 (최근 10개)
-                    data_10 = pyupbit.get_ohlcv(sym, interval="minute10", count=10)
-                    if data_10 is None: continue
-
-                    # 직전 캔들 시가와 종가 확인
-                    prev_candle = data_10.iloc[-2]  # 직전 캔들
-                    open_price = float(prev_candle['open'])
-                    close_price = float(prev_candle['close'])
-                    average_price_10 = float(data_10['close'].mean()) # 10선 이평선
-
                     # 평균/직전 거래량
                     data_40 = pyupbit.get_ohlcv(sym, interval="minute10", count=40)
                     if data_40 is None: continue
                     average_volume_40min = float(data_40['volume'].mean())
                     prev_volume = float(data_40.iloc[-2]['volume'])  # 직전 캔들
 
-                    message_list += f"[{symbol_list[sym]['종목명']}]\n"
-                    message_list += f"  종가({close_price:,.0f}) / 10선({average_price_10:,.0f})\n"
-                    message_list += f"  직전({prev_volume:,.0f}) / 40거래량({average_volume_40min:,.0f})\n"
-
                     if prev_volume >= average_volume_40min: # 거래량 증가 신호
+
+                        # 10분봉 데이터 (최근 10개)
+                        data_10 = pyupbit.get_ohlcv(sym, interval="minute10", count=10)
+                        if data_10 is None: continue
+
+                        # 직전 캔들 시가와 종가 확인
+                        prev_candle = data_10.iloc[-2]  # 직전 캔들
+                        open_price = float(prev_candle['open'])
+                        close_price = float(prev_candle['close'])
+                        average_price_10 = float(data_10['close'].mean()) # 10선 이평선
+
+                        # data log
+                        # message_list += f"[{symbol_list[sym]['종목명']}]\n"
+                        # message_list += f"  종가({close_price:,.0f}) / 10선({average_price_10:,.0f})\n"
+                        # message_list += f"  직전({prev_volume:,.0f}) / 40거래량({average_volume_40min:,.0f})\n"
 
                         #거래량 비례 매매
                         trading_x_n = 1.0
@@ -306,16 +307,16 @@ try:
                             if symbol_list[sym]['240'] == False: # 240 하방이면 2배씩 매도
                                 sell *= 2
 
-                            message_list += f"  --- 트레이딩 매도({sell:,.0f}원) ---  \n\n"
+                            message_list += f"[{symbol_list[sym]['종목명']}] 매도({sell:,.0f}원) -"
 
                             sell_quantity = sell / current_price
                             coin = get_balance(symbol_list[sym]['매도티커'])
                             if coin > 0: # 있다면 매도
                                 sell_result = upbit.sell_market_order(sym, sell_quantity)
                                 if sell_result is not None:
-                                    message_list +="!!! 매도 성공 !!!\n\n"  
+                                    message_list +=" 완료!\n\n"  
                                 else:
-                                    message_list += f"!!! 매도 실패({sell_result}) !!! \n\n"
+                                    message_list += f" 에러({sell_result})\n\n"
 
                         #매수신호 (240아래 매수안함!!)
                         elif (symbol_list[sym]['240'] == True
@@ -329,16 +330,17 @@ try:
                                 message_list += f"[{symbol_list[sym]['종목명']}] 잔액 부족 매수 (잔액: {total_cash:,.0f})\n"
                                 buy = total_cash
                             
-                            message_list += f"  +++ 트레이딩 매수({buy:,.0f}원) +++  \n\n"
+                            message_list += f"[{symbol_list[sym]['종목명']}] 매수({buy:,.0f}원) -"
 
                             buy_result = upbit.buy_market_order(sym, buy)
                             if buy_result is not None:
-                                message_list +="+++ 매수 성공 +++\n\n"          
+                                message_list +=" 완료!\n\n"          
                             else:
-                                message_list += f"+++ 매수 실패({buy_result}) +++ \n\n"
+                                message_list += f"에러({buy_result})\n\n"
 
-                        else: #나가리
-                            message_list += f"+++ 거래량 만족 + (240아래 or 시가/음봉/양봉 실패) +++\n\n"
+                        # else: #나가리
+                        #     message_list += f"[{symbol_list[sym]['종목명']}] +++ 트레이딩 나가리 +++\n\n"
+                        #     # message_list += f"+++ 거래량 만족 + (240아래 or 시가/음봉/양봉 실패) +++\n\n"
 
                 send_message(message_list)
 
