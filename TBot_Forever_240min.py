@@ -256,7 +256,7 @@ try:
                 last_10 = df.index[0].minute
 
                 message_list = "\n---------------------------------------------\n"
-                message_list += f">>> 10분 트레이딩 ({last_10}분)\n"
+                message_list += f">>> {last_10}분 트레이딩 \n"
 
                 for sym in symbol_list:
                     
@@ -304,7 +304,7 @@ try:
                             if symbol_list[sym]['240'] == False: # 240 하방이면 2배씩 매도
                                 sell *= 2
 
-                            message_list += f"[{symbol_list[sym]['종목명']}] 매도({sell:,.0f}원) -"
+                            message_list += f"[{symbol_list[sym]['종목명']}] Sell({sell:,.0f}원) -"
 
                             sell_quantity = sell / current_price
                             coin = get_balance(symbol_list[sym]['매도티커'])
@@ -327,7 +327,7 @@ try:
                                 message_list += f"[{symbol_list[sym]['종목명']}] 잔액 부족 매수 (잔액: {total_cash:,.0f})\n"
                                 buy = total_cash
                             
-                            message_list += f"[{symbol_list[sym]['종목명']}] 매수({buy:,.0f}원) -"
+                            message_list += f"[{symbol_list[sym]['종목명']}] Buy({buy:,.0f}원) -"
 
                             buy_result = upbit.buy_market_order(sym, buy)
                             if buy_result is not None:
