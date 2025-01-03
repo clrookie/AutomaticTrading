@@ -295,7 +295,7 @@ try:
 
                         current_price = float(get_current_price(sym))
 
-                        # 매도신호
+                        # Sell 신호
                         if ((current_price > average_price_10)
                             and (close_price > open_price)
                             and (open_price > average_price_10)): 
@@ -314,8 +314,10 @@ try:
                                     message_list +=" 완료!\n"  
                                 else:
                                     message_list += f" 에러({sell_result})\n"
+                            else:
+                                message_list += f" 물량 없음" 
 
-                        #매수신호 (240아래 매수안함!!)
+                        # Buy 신호 (240아래 매수안함!!)
                         elif (symbol_list[sym]['240'] == True
                               and (current_price < average_price_10)
                               and (close_price < open_price)
@@ -324,9 +326,13 @@ try:
                             total_cash = float(get_balance("KRW"))
                             buy = trading_buy*trading_x_n # 예산만큼 매수
                             if buy > total_cash:
-                                message_list += f"[{symbol_list[sym]['종목명']}] 잔액 부족 매수 (잔액: {total_cash:,.0f})\n"
+                                message_list += f"[{symbol_list[sym]['종목명']}] 잔액 buy ({total_cash:,.0f})\n"
                                 buy = total_cash
-                            
+
+                            if buy <= 0:
+                                message_list += f"[{symbol_list[sym]['종목명']}] 잔액 0원 Buy 취소 !!"    
+                                continue 
+
                             message_list += f"[{symbol_list[sym]['종목명']}] Buy({buy:,.0f}원) -"
 
                             buy_result = upbit.buy_market_order(sym, buy)
