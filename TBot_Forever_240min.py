@@ -308,6 +308,8 @@ try:
 
                             sell_quantity = sell / current_price
                             coin = get_balance(symbol_list[sym]['매도티커'])
+                            if sell_quantity > coin: sell_quantity = coin
+
                             if coin > 0: # 있다면 매도
                                 sell_result = upbit.sell_market_order(sym, sell_quantity)
                                 if sell_result is not None:
