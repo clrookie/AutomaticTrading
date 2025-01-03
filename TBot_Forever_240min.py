@@ -153,7 +153,8 @@ try:
         #########################
         if t_now.hour != last_hour:
             last_hour = t_now.hour
-            message_list = f"ForeverOn... ({last_hour}시)\n\n"
+            message_list = "\n***************************************************\n"
+            message_list = f">>> 수익율 현황 ({last_hour}시)\n\n"
 
             # 전체 잔고 가져오기
             balances = upbit.get_balances()
@@ -204,11 +205,7 @@ try:
             message_list += f"잔여 현금: {krw_balance:,.0f}원\n"
             message_list += "-------------------------------------------------\n"
             for data in coin_data:
-                allocation = (data['total_value'] / total_balance_krw) * 100
-                message_list += f"{data['coin']}:\n"
-                message_list += f"  평가금액: {data['total_value']:,.0f}원\n"
-                message_list += f"  수익률: {data['profit_rate']:.2f}%\n"
-                message_list += "-------------------------------------------------\n"
+                message_list += f"{data['coin']}: {data['total_value']:,.0f}원 ({data['profit_rate']:.2f}%)\n"
 
             send_message(message_list)
 
@@ -225,7 +222,7 @@ try:
 
             time.sleep(0.2) # 데이터 갱신 보정
             message_list = "\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n"
-            message_list += f">>> 240분 갱신합니다 <<< ({last_240}시)\n\n"
+            message_list += f">>> 240분 갱신 ({last_240}시)\n\n"
 
             #########################
             # 240분봉 10선 위/아래 체크
@@ -259,7 +256,7 @@ try:
                 last_10 = df.index[0].minute
 
                 message_list = "\n---------------------------------------------\n"
-                message_list += f">>> 10분 트레이딩 <<< ({last_10}분)\n"
+                message_list += f">>> 10분 트레이딩 ({last_10}분)\n"
 
                 for sym in symbol_list:
                     
