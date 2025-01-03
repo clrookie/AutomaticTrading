@@ -154,7 +154,7 @@ try:
         if t_now.hour != last_hour:
             last_hour = t_now.hour
             message_list = "\n***************************************************\n"
-            message_list = f">>> 수익율 현황 ({last_hour}시)\n"
+            message_list += f">>> 수익율 현황 ({last_hour}시)\n"
 
             # 전체 잔고 가져오기
             balances = upbit.get_balances()
@@ -203,7 +203,7 @@ try:
 
             message_list += f"총 보유 자산: {total_balance_krw:,.0f}원 {formatted_amount}({(temp_money):,.0f}원)\n"
             message_list += f"잔여 현금: {krw_balance:,.0f}원\n"
-            message_list += "-------------------------------------------------\n"
+            message_list += "-------------\n"
             for data in coin_data:
                 message_list += f"{data['coin']}: {data['total_value']:,.0f}원 ({data['profit_rate']:.2f}%)\n"
 
@@ -221,7 +221,7 @@ try:
             last_240 = df.index[0].hour
 
             time.sleep(0.2) # 데이터 갱신 보정
-            message_list = "\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n"
+            message_list = "\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n"
             message_list += f">>> 240분 갱신 ({last_240}시)\n"
 
             #########################
@@ -255,7 +255,7 @@ try:
             if df.index[0].minute != last_10:    # 10분 캔들 갱신
                 last_10 = df.index[0].minute
 
-                message_list = "\n---------------------------------------------\n"
+                message_list = "\n----------------------------\n"
                 message_list += f">>> 트레이딩 시도 ({last_10}분)\n"
 
                 for sym in symbol_list:
