@@ -153,7 +153,7 @@ try:
         #########################
         if t_now.hour != last_hour:
             last_hour = t_now.hour
-            message_list = "\n***************************************************\n"
+            message_list = "\n+++++++++++++++++++++++++++++++++++++++++++++\n"
             message_list += f">>> 수익율 현황 ({last_hour}시)\n"
 
             # 전체 잔고 가져오기
@@ -255,7 +255,7 @@ try:
             if df.index[0].minute != last_10:    # 10분 캔들 갱신
                 last_10 = df.index[0].minute
 
-                message_list = "\n----------------------------\n"
+                message_list = "\n==============================\n"
                 message_list += f">>> 트레이딩 시도 ({last_10}분)\n"
 
                 for sym in symbol_list:
