@@ -117,7 +117,7 @@ try:
 
     last_total_balance_krw = 1
     
-    trading_buy = 50000.0 # 10만원
+    trading_buy = 50000.0 # 5만원
     trading_sell = 50000.0 # 5만원
 
     # 공용 데이터
@@ -259,7 +259,7 @@ try:
                 last_10 = df.index[0].minute
 
                 message_list = "\n---------------------------------------------\n"
-                message_list += f">>> 10분 트레이딩 <<< ({last_10}분)\n\n"
+                message_list += f">>> 10분 트레이딩 <<< ({last_10}분)\n"
 
                 for sym in symbol_list:
                     
@@ -314,9 +314,9 @@ try:
                             if coin > 0: # 있다면 매도
                                 sell_result = upbit.sell_market_order(sym, sell_quantity)
                                 if sell_result is not None:
-                                    message_list +=" 완료!\n\n"  
+                                    message_list +=" 완료!\n"  
                                 else:
-                                    message_list += f" 에러({sell_result})\n\n"
+                                    message_list += f" 에러({sell_result})\n"
 
                         #매수신호 (240아래 매수안함!!)
                         elif (symbol_list[sym]['240'] == True
@@ -334,9 +334,9 @@ try:
 
                             buy_result = upbit.buy_market_order(sym, buy)
                             if buy_result is not None:
-                                message_list +=" 완료!\n\n"          
+                                message_list +=" 완료!\n"          
                             else:
-                                message_list += f"에러({buy_result})\n\n"
+                                message_list += f"에러({buy_result})\n"
 
                         # else: #나가리
                         #     message_list += f"[{symbol_list[sym]['종목명']}] +++ 트레이딩 나가리 +++\n\n"
