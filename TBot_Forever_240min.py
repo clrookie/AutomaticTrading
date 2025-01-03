@@ -118,7 +118,7 @@ try:
     last_total_balance_krw = 1
     
     trading_buy = 50000.0 # 5만원
-    trading_sell = 50000.0 # 5만원
+    trading_sell = 25000.0 # 5만원
 
     # 공용 데이터
     common_data ={
