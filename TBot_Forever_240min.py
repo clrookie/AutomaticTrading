@@ -117,8 +117,8 @@ try:
 
     last_total_balance_krw = 1
     
-    trading_buy = 100000 # 10만원
-    trading_sell = 50000 # 5만원
+    trading_buy = 50000.0 # 10만원
+    trading_sell = 50000.0 # 5만원
 
     # 공용 데이터
     common_data ={
@@ -287,6 +287,14 @@ try:
 
                     if prev_volume >= average_volume_40min: # 거래량 증가 신호
 
+                        #거래량 비례 매매
+                        trading_x_n = 1.0
+                        if prev_volume > (average_volume_40min*3.0):
+                            trading_x_n = 2.0
+                        elif prev_volume > (average_volume_40min*2.0):
+                            trading_x_n = 1.5
+
+
                         current_price = float(get_current_price(sym))
 
                         # 매도신호
@@ -294,11 +302,11 @@ try:
                             and (close_price > open_price)
                             and (open_price > average_price_10)): 
 
-                            sell = trading_sell
+                            sell = trading_sell * trading_x_n
                             if symbol_list[sym]['240'] == False: # 240 하방이면 2배씩 매도
                                 sell *= 2
 
-                            message_list += f"  --- 트레이딩 매도 --- ({sell:,.0f}원) \n\n"
+                            message_list += f"  --- 트레이딩 매도({sell:,.0f}원) ---  \n\n"
 
                             sell_quantity = sell / current_price
                             coin = get_balance(symbol_list[sym]['매도티커'])
@@ -307,7 +315,7 @@ try:
                                 if sell_result is not None:
                                     message_list +="!!! 매도 성공 !!!\n\n"  
                                 else:
-                                    message_list += f"!!! 매도 실패 !!! ({sell_result})\n\n"
+                                    message_list += f"!!! 매도 실패({sell_result}) !!! \n\n"
 
                         #매수신호 (240아래 매수안함!!)
                         elif (symbol_list[sym]['240'] == True
@@ -316,18 +324,18 @@ try:
                               and (open_price < average_price_10)): 
                             
                             total_cash = float(get_balance("KRW"))
-                            buy = float(trading_buy) # 예산만큼 매수
+                            buy = trading_buy*trading_x_n # 예산만큼 매수
                             if buy > total_cash:
                                 message_list += f"[{symbol_list[sym]['종목명']}] 잔액 부족 매수 (잔액: {total_cash:,.0f})\n"
                                 buy = total_cash
                             
-                            message_list += f"  +++ 트레이딩 매수 +++ ({buy:,.0f}원) \n\n"
+                            message_list += f"  +++ 트레이딩 매수({buy:,.0f}원) +++  \n\n"
 
                             buy_result = upbit.buy_market_order(sym, buy)
                             if buy_result is not None:
                                 message_list +="+++ 매수 성공 +++\n\n"          
                             else:
-                                message_list += f"+++ 매수 실패 +++ ({buy_result})\n\n"
+                                message_list += f"+++ 매수 실패({buy_result}) +++ \n\n"
 
                         else: #나가리
                             message_list += f"+++ 거래량 만족 + (240아래 or 시가/음봉/양봉 실패) +++\n\n"
